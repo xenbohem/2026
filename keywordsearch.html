@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Spider Archive</title>
+
+<style>
+:root{
+ --pink:#ff008c;
+ --purple:#3d1b6a;
+ --black:#0d0d0d;
+ --charcoal:#161616;
+ --silver:#d4d4d4;
+}
+
+body{
+ margin:0;
+ background:var(--black);
+ font-family:"Courier New",monospace;
+ color:white;
+ overflow:hidden;
+}
+
+.wrapper{
+ display:grid;
+ grid-template-columns:420px 1fr;
+ height:100vh;
+}
+
+.sidebar{
+ background:var(--charcoal);
+ padding:20px;
+ overflow-y:auto;
+ border-right:2px solid var(--purple);
+}
+
+h1{
+ color:var(--pink);
+ font-size:16px;
+ letter-spacing:3px;
+}
+
+.controls{
+ margin-top:10px;
+ display:flex;
+ flex-wrap:wrap;
+ gap:8px;
+}
+
+input, select, button{
+ background:black;
+ border:1px solid var(--purple);
+ color:var(--pink);
+ padding:6px;
+ font-size:12px;
+}
+
+button:hover{
+ border-color:var(--pink);
+ cursor:pointer;
+}
+
+.tile{
+ position:relative;
+ border:2px solid var(--purple);
+ background:black;
+ overflow:hidden;
+ margin-bottom:10px;
+ transition:.3s ease;
+}
+
+.tile:hover{
+ border-color:var(--pink);
+ transform:scale(1.02);
+}
+
+.tile img{
+ width:100%;
+ height:150px;
+ object-fit:cover;
+ filter:grayscale(40%);
+}
+
+.title{
+ position:absolute;
+ bottom:0;
+ width:100%;
+ background:linear-gradient(to top,black,transparent);
+ color:var(--pink);
+ font-size:10px;
+ padding:5px;
+ text-align:center;
+}
+
+.viewer{
+ background:black;
+}
+
+iframe{
+ width:100%;
+ height:100%;
+ border:none;
+}
+
+#spider{
+ position:absolute;
+ width:30px;
+ height:30px;
+ font-size:24px;
+ animation:crawl 20s linear infinite;
+ z-index:9999;
+}
+
+@keyframes crawl{
+ 0%{top:0; left:0;}
+ 25%{top:0; left:90%;}
+ 50%{top:90%; left:90%;}
+ 75%{top:90%; left:0;}
+ 100%{top:0; left:0;}
+}
+
+canvas{
+ position:fixed;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+ pointer-events:none;
+ z-index:0;
+ opacity:0.2;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="sidebar">
+
+<h1>SPIDER ARCHIVE</h1>
+
+<div class="controls">
+<input type="text" id="search" placeholder="Search title, character...">
+<select id="tagFilter">
+<option value="all">All Tags</option>
+<option value="cafe">Cafe</option>
+<option value="adventure">Adventure</option>
+<option value="chat">Chat</option>
+<option value="guild">Guild</option>
+<option value="menu">Menu</option>
+<option value="membership">Membership</option>
+</select>
+<button onclick="toggleView()">Grid/List</button>
+<button onclick="scanAllPages(event)">🕷 Scan All</button>
+</div>
+
+<div id="grid"></div>
+
+</div>
+
+<div class="viewer">
+<iframe name="viewer"></iframe>
+</div>
+
+</div>
+
+<div id="spider">🕷</div>
+<canvas id="webLayer"></canvas>
+
+<script>
+
+/* =============================
+   🔗 ADD YOUR URLS HERE
+============================= */
+
+const urls = [
+"https://3society.neocities.org/GUILD.AUGUST/TRIO.CHATCAFE/triochat",
+"https://3society.neocities.org/GUILD.AUGUST/GUILD.REFRESHED/TEASHOP.game/cashier",
+"https://3society.neocities.org/00JAN31-2026/videogame",
+"https://3society.neocities.org/00January.forum/002"
+];
+
+/* =============================
+   🧠 CHARACTER + TAG SYSTEM
+============================= */
+
+const characterNames = [
+"Stellar","Star","Milo","Chimi","Hans"
+];
+
+const tagKeywords = {
+ cafe:["cafe","coffee","tea","shop"],
+ adventure:["adventure","quest","game"],
+ chat:["chat","realm","bot"],
+ guild:["guild","library","music"],
+ menu:["menu","navigation","gateway"],
+ membership:["join","signup","member"]
+};
+
+/* =============================
+   🕷 SCAN SYSTEM
+============================= */
+
+async function scanAllPages(e){
+
+ const button = e.target;
+ button.innerText = "Scanning...";
+ button.disabled = true;
+
+ const results = [];
+
+ for(const url of urls){
+
+  try{
+   const res = await fetch(url);
+   const html = await res.text();
+
+   const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+   const title = titleMatch ? titleMatch[1] : url.split("/").pop();
+
+   const lowerHTML = html.toLowerCase();
+
+   const foundCharacters = characterNames.filter(name =>
+     lowerHTML.includes(name.toLowerCase())
+   );
+
+   let detectedTag = "guild";
+
+   for(const tag in tagKeywords){
+    if(tagKeywords[tag].some(word => lowerHTML.includes(word))){
+     detectedTag = tag;
+     break;
+    }
+   }
+
+   const keywords = [...new Set([...foundCharacters, detectedTag])];
+
+   results.push({ url, title, tag:detectedTag, keywords });
+
+  }catch(err){
+   console.warn("Blocked or failed:", url);
+  }
+ }
+
+ buildArchive(results);
+
+ button.innerText = "🕷 Scan All";
+ button.disabled = false;
+}
+
+/* =============================
+   🧱 BUILD GRID
+============================= */
+
+function buildArchive(items){
+
+ const grid = document.getElementById("grid");
+ grid.innerHTML = "";
+
+ items.sort((a,b)=>a.title.localeCompare(b.title));
+
+ items.forEach(item=>{
+
+  const tile = document.createElement("div");
+  tile.className="tile";
+  tile.dataset.tag=item.tag;
+  tile.dataset.title=item.title.toLowerCase();
+  tile.dataset.keywords=item.keywords.join(",").toLowerCase();
+
+  tile.innerHTML = `
+   <a href="${item.url}" target="viewer">
+    <img src="https://image.thum.io/get/width/400/${item.url}">
+    <div class="title">${item.title} [${item.tag}]</div>
+   </a>
+  `;
+
+  grid.appendChild(tile);
+ });
+}
+
+/* =============================
+   🔍 SEARCH + FILTER
+============================= */
+
+document.getElementById("search").addEventListener("input",filterTiles);
+document.getElementById("tagFilter").addEventListener("change",filterTiles);
+
+function filterTiles(){
+
+ const term = document.getElementById("search").value.toLowerCase();
+ const tag = document.getElementById("tagFilter").value;
+
+ document.querySelectorAll(".tile").forEach(tile=>{
+
+  const titleMatch = tile.dataset.title.includes(term);
+  const keywordMatch = tile.dataset.keywords.includes(term);
+  const tagMatch = (tag==="all" || tile.dataset.tag===tag);
+
+  tile.style.display = (titleMatch || keywordMatch) && tagMatch ? "block" : "none";
+ });
+}
+
+/* =============================
+   🕷 SPIDER CONTROLS
+============================= */
+
+const spider=document.getElementById("spider");
+
+spider.addEventListener("mouseenter",()=>{
+ spider.style.animationPlayState="paused";
+});
+
+spider.addEventListener("mouseleave",()=>{
+ spider.style.animationPlayState="running";
+});
+
+spider.addEventListener("click",()=>{
+ spider.style.animationPlayState =
+ spider.style.animationPlayState==="paused"?"running":"paused";
+});
+
+/* =============================
+   🕸 CORNER WEBS
+============================= */
+
+const canvas=document.getElementById("webLayer");
+const ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
+ canvas.width=window.innerWidth;
+ canvas.height=window.innerHeight;
+ drawCornerWebs();
+}
+
+function drawCornerWebs(){
+
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.strokeStyle="#ff008c";
+ ctx.lineWidth=1;
+ ctx.setLineDash([4,3]);
+
+ const size=150;
+ const corners=[
+  {x:0,y:0},
+  {x:canvas.width,y:0},
+  {x:0,y:canvas.height},
+  {x:canvas.width,y:canvas.height}
+ ];
+
+ corners.forEach(c=>{
+  for(let r=20;r<size;r+=15){
+   ctx.beginPath();
+   ctx.arc(c.x,c.y,r,0,Math.PI/2);
+   ctx.stroke();
+  }
+ });
+}
+
+window.addEventListener("resize",resizeCanvas);
+resizeCanvas();
+
+</script>
+
+</body>
+</html>
