@@ -10,9 +10,7 @@
  --purple:#3d1b6a;
  --black:#0d0d0d;
  --charcoal:#161616;
- --silver:#d4d4d4;
 }
-
 body{
  margin:0;
  background:var(--black);
@@ -20,33 +18,28 @@ body{
  color:white;
  overflow:hidden;
 }
-
 .wrapper{
  display:grid;
  grid-template-columns:420px 1fr;
  height:100vh;
 }
-
 .sidebar{
  background:var(--charcoal);
  padding:20px;
  overflow-y:auto;
  border-right:2px solid var(--purple);
 }
-
 h1{
  color:var(--pink);
  font-size:16px;
  letter-spacing:3px;
 }
-
 .controls{
  margin-top:10px;
  display:flex;
  flex-wrap:wrap;
  gap:8px;
 }
-
 input, select, button{
  background:black;
  border:1px solid var(--purple);
@@ -54,33 +47,27 @@ input, select, button{
  padding:6px;
  font-size:12px;
 }
-
 button:hover{
  border-color:var(--pink);
  cursor:pointer;
 }
-
 .tile{
  position:relative;
  border:2px solid var(--purple);
  background:black;
- overflow:hidden;
  margin-bottom:10px;
  transition:.3s ease;
 }
-
 .tile:hover{
  border-color:var(--pink);
  transform:scale(1.02);
 }
-
 .tile img{
  width:100%;
  height:150px;
  object-fit:cover;
  filter:grayscale(40%);
 }
-
 .title{
  position:absolute;
  bottom:0;
@@ -91,17 +78,14 @@ button:hover{
  padding:5px;
  text-align:center;
 }
-
 .viewer{
  background:black;
 }
-
 iframe{
  width:100%;
  height:100%;
  border:none;
 }
-
 #spider{
  position:absolute;
  width:30px;
@@ -110,24 +94,12 @@ iframe{
  animation:crawl 20s linear infinite;
  z-index:9999;
 }
-
 @keyframes crawl{
  0%{top:0; left:0;}
  25%{top:0; left:90%;}
  50%{top:90%; left:90%;}
  75%{top:90%; left:0;}
  100%{top:0; left:0;}
-}
-
-canvas{
- position:fixed;
- top:0;
- left:0;
- width:100%;
- height:100%;
- pointer-events:none;
- z-index:0;
- opacity:0.2;
 }
 </style>
 </head>
@@ -151,8 +123,7 @@ canvas{
 <option value="menu">Menu</option>
 <option value="membership">Membership</option>
 </select>
-<button onclick="toggleView()">Grid/List</button>
-<button onclick="scanAllPages(event)">🕷 Scan All</button>
+<button onclick="scanAllPages()">🕷 Scan All</button>
 </div>
 
 <div id="grid"></div>
@@ -166,12 +137,11 @@ canvas{
 </div>
 
 <div id="spider">🕷</div>
-<canvas id="webLayer"></canvas>
 
 <script>
 
 /* =============================
-   🔗 ADD YOUR URLS HERE
+   🔗 YOUR URL LIST
 ============================= */
 
 const urls = [
@@ -182,71 +152,65 @@ const urls = [
 ];
 
 /* =============================
-   🧠 CHARACTER + TAG SYSTEM
+   🧠 KEYWORD SYSTEM
 ============================= */
 
 const characterNames = [
-"Stellar","Star","Milo","Chimi","Hans"
+"stellar","star","milo","chimi","hans"
 ];
 
 const tagKeywords = {
  cafe:["cafe","coffee","tea","shop"],
  adventure:["adventure","quest","game"],
- chat:["chat","realm","bot"],
+ chat:["chat","realm","bot","trio"],
  guild:["guild","library","music"],
  menu:["menu","navigation","gateway"],
  membership:["join","signup","member"]
 };
 
 /* =============================
-   🕷 SCAN SYSTEM
+   🕷 URL-BASED SCAN
 ============================= */
 
-async function scanAllPages(e){
-
- const button = e.target;
- button.innerText = "Scanning...";
- button.disabled = true;
+function scanAllPages(){
 
  const results = [];
 
- for(const url of urls){
+ urls.forEach(url => {
 
-  try{
-   const res = await fetch(url);
-   const html = await res.text();
+  const lowerURL = url.toLowerCase();
 
-   const titleMatch = html.match(/<title>(.*?)<\/title>/i);
-   const title = titleMatch ? titleMatch[1] : url.split("/").pop();
+  // Title from last part of URL
+  const rawTitle = url.split("/").filter(Boolean).pop();
+  const cleanTitle = rawTitle.replace(/[-._]/g," ");
 
-   const lowerHTML = html.toLowerCase();
+  // Detect characters from URL
+  const foundCharacters = characterNames.filter(name =>
+    lowerURL.includes(name)
+  );
 
-   const foundCharacters = characterNames.filter(name =>
-     lowerHTML.includes(name.toLowerCase())
-   );
+  // Detect tag from URL
+  let detectedTag = "guild";
 
-   let detectedTag = "guild";
-
-   for(const tag in tagKeywords){
-    if(tagKeywords[tag].some(word => lowerHTML.includes(word))){
-     detectedTag = tag;
-     break;
-    }
+  for(const tag in tagKeywords){
+   if(tagKeywords[tag].some(word => lowerURL.includes(word))){
+    detectedTag = tag;
+    break;
    }
-
-   const keywords = [...new Set([...foundCharacters, detectedTag])];
-
-   results.push({ url, title, tag:detectedTag, keywords });
-
-  }catch(err){
-   console.warn("Blocked or failed:", url);
   }
- }
+
+  const keywords = [...new Set([...foundCharacters, detectedTag])];
+
+  results.push({
+   url,
+   title: cleanTitle,
+   tag: detectedTag,
+   keywords
+  });
+
+ });
 
  buildArchive(results);
-
- button.innerText = "🕷 Scan All";
- button.disabled = false;
 }
 
 /* =============================
@@ -297,12 +261,15 @@ function filterTiles(){
   const keywordMatch = tile.dataset.keywords.includes(term);
   const tagMatch = (tag==="all" || tile.dataset.tag===tag);
 
-  tile.style.display = (titleMatch || keywordMatch) && tagMatch ? "block" : "none";
+  tile.style.display =
+   (titleMatch || keywordMatch) && tagMatch
+   ? "block"
+   : "none";
  });
 }
 
 /* =============================
-   🕷 SPIDER CONTROLS
+   🕷 SPIDER INTERACTION
 ============================= */
 
 const spider=document.getElementById("spider");
@@ -317,48 +284,10 @@ spider.addEventListener("mouseleave",()=>{
 
 spider.addEventListener("click",()=>{
  spider.style.animationPlayState =
- spider.style.animationPlayState==="paused"?"running":"paused";
+ spider.style.animationPlayState==="paused"
+ ? "running"
+ : "paused";
 });
-
-/* =============================
-   🕸 CORNER WEBS
-============================= */
-
-const canvas=document.getElementById("webLayer");
-const ctx=canvas.getContext("2d");
-
-function resizeCanvas(){
- canvas.width=window.innerWidth;
- canvas.height=window.innerHeight;
- drawCornerWebs();
-}
-
-function drawCornerWebs(){
-
- ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.strokeStyle="#ff008c";
- ctx.lineWidth=1;
- ctx.setLineDash([4,3]);
-
- const size=150;
- const corners=[
-  {x:0,y:0},
-  {x:canvas.width,y:0},
-  {x:0,y:canvas.height},
-  {x:canvas.width,y:canvas.height}
- ];
-
- corners.forEach(c=>{
-  for(let r=20;r<size;r+=15){
-   ctx.beginPath();
-   ctx.arc(c.x,c.y,r,0,Math.PI/2);
-   ctx.stroke();
-  }
- });
-}
-
-window.addEventListener("resize",resizeCanvas);
-resizeCanvas();
 
 </script>
 
