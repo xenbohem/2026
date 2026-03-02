@@ -1,1 +1,295 @@
-more 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sealed Celestial Scroll</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Uncial+Antiqua&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Cinzel', serif;
+}
+
+/* ===== STARS ===== */
+.stars {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(2px 2px at 20% 30%, white, transparent),
+        radial-gradient(2px 2px at 70% 80%, white, transparent),
+        radial-gradient(1.5px 1.5px at 50% 60%, #cfd8ff, transparent),
+        radial-gradient(2px 2px at 80% 20%, #ffffff, transparent),
+        radial-gradient(1px 1px at 30% 70%, #b0c4ff, transparent);
+    background-size: 400px 400px;
+    animation: twinkle 6s infinite alternate ease-in-out;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+/* ===== SCROLL ===== */
+.scroll-wrapper {
+    width: 750px;
+    height: 80px;
+    background: linear-gradient(#f6e6c8, #e8d3a3);
+    position: relative;
+    border-radius: 8px;
+    overflow: visible;
+    box-shadow: 0 0 60px rgba(0,0,0,0.9);
+    transition: height 2s ease;
+}
+
+.scroll-wrapper.open {
+    height: 600px;
+}
+
+/* RODS */
+.rod {
+    position: absolute;
+    left: -60px;
+    right: -60px;
+    height: 40px;
+    background: linear-gradient(90deg, #c6a25e, #a47b35);
+    border-radius: 50px;
+}
+
+.rod.top { top: -20px; }
+.rod.bottom { bottom: -20px; }
+
+/* ===== CRYSTALS ===== */
+.crystal {
+    position: absolute;
+    width: 55px;
+    height: 55px;
+    clip-path: polygon(
+        50% 0%, 85% 20%, 100% 50%, 85% 80%,
+        50% 100%, 15% 80%, 0% 50%, 15% 20%
+    );
+    background: linear-gradient(135deg,#7f5af0,#a855f7,#9b5de5,#5f9cff);
+    box-shadow: 0 0 20px #7f5af0;
+    transition: all 1.5s ease;
+}
+
+.scroll-wrapper.open .crystal {
+    box-shadow: 0 0 80px #a855f7, 0 0 120px #5f9cff;
+    transform: scale(1.2);
+}
+
+.crystal.top-left { top: -48px; left: -85px; }
+.crystal.top-right { top: -48px; right: -85px; }
+.crystal.bottom-left { bottom: -48px; left: -85px; }
+.crystal.bottom-right { bottom: -48px; right: -85px; }
+
+/* ===== SEAL ===== */
+/* Centered Seal with hidden Lamb inside the cross */
+.seal {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle at 30% 30%, #9b0000, #5a0000);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 25px crimson;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: gold;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.5s;
+    z-index: 5;
+    font-size: 50px;  /* for the cross */
+}
+
+/* Add tiny lamb inside cross as a pseudo-element */
+.seal::after {
+    content: "🐑";  /* subtle lamb */
+    font-size: 18px; /* small, just inside the cross */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.6;  /* faint, just a hint */
+}
+
+.seal:hover {
+    box-shadow: 0 0 50px gold;
+}
+
+/* Broken seal */
+.seal.broken {
+    animation: shatter 1s forwards;
+}
+
+@keyframes shatter {
+    0% { transform: translateX(-50%) scale(1); opacity: 1; }
+    100% { transform: translateX(-50%) scale(0.2) rotate(720deg); opacity: 0; }
+}
+
+/* ===== MODAL ===== */
+.modal {
+    position: fixed;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+}
+
+.modal input {
+    padding: 10px;
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+.modal button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.scroll-content {
+    opacity: 0;
+    padding: 80px 60px 60px;
+    transition: opacity 1.5s ease;
+}
+
+.scroll-wrapper.open .scroll-content {
+    opacity: 1;
+}
+/* ===== DIVINE LIGHT BEAM ===== */
+.light-beam {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 100%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255,255,255,0.25),
+        rgba(200,220,255,0.15),
+        transparent 70%
+    );
+    opacity: 0;
+    pointer-events: none;
+    filter: blur(30px);
+    z-index: 2;
+}
+
+.light-beam.active {
+    animation: divineFade 3s ease forwards;
+}
+
+@keyframes divineFade {
+    0% { opacity: 0; }
+    20% { opacity: 0.8; }
+    60% { opacity: 0.5; }
+    100% { opacity: 0; }
+}
+
+
+/* ===== SEAL EMBOSS EFFECT ===== */
+.seal::after {
+    content: "🐑";
+    font-size: 40px;
+    opacity: 0.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="stars"></div>
+<div class="light-beam" id="lightBeam"></div>
+<div class="scroll-wrapper" id="scroll">
+
+    <div class="rod top"></div>
+    <div class="rod bottom"></div>
+
+    <div class="crystal top-left"></div>
+    <div class="crystal top-right"></div>
+    <div class="crystal bottom-left"></div>
+    <div class="crystal bottom-right"></div>
+
+    <div class="seal" id="seal">✠</div>
+
+    <div class="scroll-content">
+        <h1>The Sealed Chronicle</h1>
+        <p>Only the worthy may open what was sealed.</p>
+    </div>
+
+</div>
+
+<div class="modal" id="modal">
+    <h2>Riddle</h2>
+    <p>Who alone is worthy to break the seals in Revelation?</p>
+    <input type="text" id="answer" placeholder="Your answer...">
+    <button onclick="checkAnswer()">Submit</button>
+</div>
+
+<script>
+const seal = document.getElementById('seal');
+const modal = document.getElementById('modal');
+const scroll = document.getElementById('scroll');
+const lightBeam = document.getElementById('lightBeam');
+
+seal.onclick = () => {
+    modal.style.display = "flex";
+};
+
+function checkAnswer() {
+    const value = document.getElementById('answer').value.toLowerCase().trim();
+
+    const accepted = [
+        "yeshua",
+        "jesus christ",
+        "the lamb of god",
+        "jesus",
+        "the lamb"
+    ];
+
+    if (accepted.includes(value)) {
+        modal.style.display = "none";
+
+        // Soft descending mist
+        lightBeam.classList.add("active");
+
+        // Sacred whisper echo
+        const whisper = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8b5e7f6f2.mp3");
+        whisper.volume = 0.25;
+
+        whisper.play();
+
+        seal.classList.add("broken");
+
+        setTimeout(() => {
+            scroll.classList.add("open");
+        }, 900);
+
+    } else {
+        alert("The seal remains unbroken.");
+    }
+}
+
+</script>
+
+</body>
+</html>
