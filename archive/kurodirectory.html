@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuromi Directory - CyberGoth Edition</title>
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, #ffb6c1, #6a4c7c, #1c1c1c);
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* Jester Collar (Kuromi Style) */
+    #jester-collar {
+      width: 100%;
+      height: 40px;
+      background: #ff66cc;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 0 0 50% 50%;
+      z-index: 100;
+    }
+
+    /* Skinny Video */
+    #skinny-video {
+      width: 100%;
+      height: 100px;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      background: #000;
+      z-index: 99;
+    }
+
+    /* Search Bar */
+    #search-bar {
+      width: 70%;
+      margin: 120px auto;
+      padding: 10px;
+      background: #2d2d2d;
+      color: #ff66cc;
+      border: 2px solid #ff66cc;
+      border-radius: 10px;
+      font-size: 1.2em;
+    }
+
+    #search-bar::placeholder {
+      color: #ffb6c1;
+    }
+
+    /* Switches (Filter Buttons) */
+    .switches {
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .switch {
+      padding: 12px;
+      background: #ff66cc;
+      color: #000;
+      text-transform: uppercase;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .switch:hover {
+      background: #1a1a1a;
+      color: #ff66cc;
+      transform: scale(1.1);
+    }
+
+    /* Directory Grid */
+    .directory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .directory-item {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 15px;
+      border: 2px solid #ff66cc;
+      text-align: center;
+      color: #ff66cc;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .directory-item:hover {
+      background: #ff66cc;
+      color: #000;
+      transform: scale(1.05);
+    }
+
+    .directory-item h3 {
+      margin: 10px 0;
+    }
+
+    .tag {
+      background: #8a00d4;
+      color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+      margin-top: 5px;
+      display: inline-block;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Jester Collar -->
+  <div id="jester-collar"></div>
+
+  <!-- Skinny Video -->
+  <div id="skinny-video">
+    <video width="100%" height="100" autoplay loop muted>
+      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <!-- Search Bar -->
+  <input id="search-bar" type="text" placeholder="Search for Websites...">
+
+  <!-- Filter Buttons -->
+  <div class="switches">
+    <div class="switch" data-tag="bio">Bio</div>
+    <div class="switch" data-tag="music">Music</div>
+    <div class="switch" data-tag="quiz">Quiz</div>
+    <div class="switch" data-tag="chat">Chat</div>
+    <div class="switch" data-tag="lore">Lore</div>
+  </div>
+
+  <!-- Directory Grid -->
+  <div class="directory-grid" id="directory"></div>
+
+  <script>
+    // ===== YOUR FULL URL LIST =====
+    const urls = [
+      "https://3society.neocities.org/01-08-2025-ValentinesLOGIN/PUNKPAPER/2",
+      "https://3society.neocities.org/00JAN31-2026/videogame",
+      "https://3society.neocities.org/ZINE-template-12-8/backend_builder_cosmic",
+      "https://3society.neocities.org/00Jan292026/last",
+      "https://3society.neocities.org/00Jan292026/Godhelpme",
+      "https://3society.neocities.org/00January.forum/005",
+      "https://3society.neocities.org/00JAN31-2026/HELPME/24HRS",
+      "https://3society.neocities.org/00JAN31-2026/NEWEST/scripturally",
+      "https://3society.neocities.org/00JAN31-2026/blockchaintea",
+      "https://3society.neocities.org/00JAN31-2026/SEARCH-HERBS/colorsearch",
+      "https://3society.neocities.org/00JANUARY2026/loginayeaye",
+      "https://3society.neocities.org/00JANUARY2026/JAN18455am/askewed",
+      "https://3society.neocities.org/00JANUARY19th2026/youresafehere",
+      "https://3society.neocities.org/01-04-2026/30-MIN-LOGIN/",
+      "https://3society.neocities.org/01-08-2025-ValentinesLOGIN/PUNKPAPER/Drawers/last",
+      "https://3society.neocities.org/01-08-2025-ValentinesLOGIN/riddlerotation",
+      "https://3society.neocities.org/01-08-2025-ValentinesLOGIN/punk",
+      "https://3society.neocities.org/01-08-2025-ValentinesLOGIN/PUNKPAPER/Valentineriddle",
+      "https://3society.neocities.org/01-09-26-catalog/admincatalog",
+      "https://3society.neocities.org/01-10-25-FORUM/newest/better-responses",
+      "https://3society.neocities.org/01-3-2026/forum/",
+      "https://3society.neocities.org/ANTHOLOGY/ANTHOLOGY2/17",
+      "https://3society.neocities.org/ANTHOLOGY/SONG.LYRICS.CAFE/originaltunes",
+      "https://3society.neocities.org/CANDYLAND/NEW/Complete",
+      "https://3society.neocities.org/CATALOG.GUILD/Tea.Searchengine",
+      "https://3society.neocities.org/CATALOG.GUILD/SUPABASE.SEARCH/GUIDE.SUPABASE/Clear.Instructions.CommunityLogin",
+      "https://3society.neocities.org/GUILD.AUGUST/ELEVATOR.REALM.CHAT/chat.cards.intro",
+      "https://3society.neocities.org/GUILD.AUGUST/ELEVATOR.REALM.CHAT/commorantfont.ticker",
+      "https://3society.neocities.org/GUILD.AUGUST/ELEVATOR.REALM.CHAT/dramatic.chatrealm",
+      "https://3society.neocities.org/GUILD.AUGUST/ELEVATOR.REALM.CHAT/musicalchatbots",
+      "https://3society.neocities.org/GUILD.AUGUST/GUILD.REFRESHED/Fashionadvisor",
+      "https://3society.neocities.org/GUILD.AUGUST/MENUS/VAMPYMENU",
+      "https://3society.neocities.org/GUILD.AUGUST/MUSIC.ROOM/musiclibrary",
+      "https://3society.neocities.org/GUILD.AUGUST/MEMBERS/members.anchored",
+      "https://3society.neocities.org/GUILD.AUGUST/TRIO.CHATCAFE/triochat",
+      "https://3society.neocities.org/ROOMS.INTERACTIVE/Getting%20there/ALMOSTTHERE/artRealm",
+      "https://3society.neocities.org/SPIDER.WEB/FloaterDeviceSpideyMan",
+      "https://3society.neocities.org/SPIDERSEARCH/bkbxSpiderGuideSearch",
+      "https://x3nb.github.io/shrinkingviolets/quests/mysterycafe/"
+    ];
+
+    // Define tags for each URL (Example: "bio", "chat", etc.)
+    const tags = [
+      ["punk", "chat", "game"],
+      ["videogame", "music"],
+      ["cosmic", "backends"],
+      ["forum", "last"],
+      ["help", "24HRS"]
+      // Add tags for all the URLs accordingly
+    ];
+
+    // Render the URLs in the grid
+    const directoryElement = document.getElementById('directory');
+    urls.forEach((url, index) => {
+      const item = document.createElement('div');
+      item.classList.add('directory-item');
+      item.dataset.tag = tags[index].join(' '); // Allow multiple tags
+      item.innerHTML = `
+        <h3>${url}</h3>
+        <a href="${url}" target="_blank">Visit</a>
+        <div class="tag">${tags[index].join(', ')}</div>
+      `;
+      directoryElement.appendChild(item);
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('search-bar');
+    searchInput.addEventListener('input', function () {
+      const searchTerm = searchInput.value.toLowerCase();
+      const items = document.querySelectorAll('.directory-item');
+      items.forEach(item => {
+        const tags = item.dataset.tag.toLowerCase();
+        const title = item.querySelector('h3').innerText.toLowerCase();
+        if (tags.includes(searchTerm) || title.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
