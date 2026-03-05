@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hans Library</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Georgia, serif;
+  background:linear-gradient(#1e1b2e,#2a2140);
+  color:white;
+  overflow:hidden;
+}
+
+/* SCROLLABLE LIBRARY */
+#libraryWrapper{
+  height:100vh;
+  overflow-y:auto;
+  padding-right:340px;
+}
+
+/* SHELVES */
+.shelf{
+  width:80%;
+  margin:60px auto;
+  padding:20px;
+  background:#3a2e4f;
+  border-radius:8px;
+  box-shadow:0 6px 20px rgba(0,0,0,.5);
+  min-height:120px;
+}
+
+.shelf h2{
+  margin-top:0;
+  font-size:20px;
+  color:#d8c9ff;
+}
+
+/* BOOKS */
+.book{
+  display:inline-block;
+  width:60px;
+  height:100px;
+  margin:8px;
+  background:linear-gradient(45deg,#5e3a87,#8a5fcf);
+  border-radius:4px;
+  writing-mode:vertical-rl;
+  text-align:center;
+  font-size:14px;
+  padding:6px 2px;
+  cursor:grab;
+  user-select:none;
+  transition:.3s;
+}
+
+.book:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 12px violet;
+}
+
+.book.done{
+  background:linear-gradient(45deg,#1a1424,#241833);
+  color:#aaa;
+  cursor:default;
+}
+
+.book.placed{
+  background:linear-gradient(45deg,#2b1d3a,#3a2e4f);
+  opacity:.9;
+}
+
+/* HANS PANEL */
+#hansPanel{
+  position:fixed;
+  right:-320px;
+  top:50%;
+  transform:translateY(-50%);
+  width:300px;
+  height:533px;
+  background:black;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 0 30px rgba(150,100,255,.6);
+  transition:1.5s ease;
+}
+
+#hansPanel.show{
+  right:20px;
+}
+
+#hansVideo{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* MUTE */
+#muteBtn{
+  position:absolute;
+  bottom:12px;
+  right:12px;
+  background:rgba(0,0,0,.6);
+  border:none;
+  color:white;
+  font-size:18px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  cursor:pointer;
+}
+
+/* MESSAGE */
+#message{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.7);
+  padding:12px 20px;
+  border-radius:20px;
+  font-size:18px;
+  opacity:0;
+  transition:.4s;
+}
+
+/* TEA BUTTON */
+#teaButton{
+  position:fixed;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:42px;
+  text-decoration:none;
+  opacity:0;
+  transition:1s ease;
+}
+
+#teaButton.show{
+  opacity:1;
+}
+
+/* ENTER OVERLAY */
+#enterOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.9);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+#enterButton{
+  padding:20px 40px;
+  font-size:22px;
+  background:linear-gradient(45deg,#5e3a87,#8a5fcf);
+  border-radius:30px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+#enterButton:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 20px violet;
+}
+</style>
+</head>
+
+<body>
+
+<div id="libraryWrapper">
+
+  <div class="shelf" data-section="Theology"><h2>Theology</h2></div>
+  <div class="shelf" data-section="History"><h2>History</h2></div>
+  <div class="shelf" data-section="Poetry"><h2>Poetry</h2></div>
+  <div class="shelf" data-section="Philosophy"><h2>Philosophy</h2></div>
+  <div class="shelf" data-section="Redemption"><h2>Redemption</h2></div>
+
+</div>
+
+<!-- BOOK SOURCE -->
+<div style="position:fixed;left:20px;bottom:20px;">
+  <div class="book" draggable="true" data-section="Theology">Covenant</div>
+  <div class="book" draggable="true" data-section="History">Empires</div>
+  <div class="book" draggable="true" data-section="Poetry">Lament</div>
+  <div class="book" draggable="true" data-section="Philosophy">Logos</div>
+  <div class="book" draggable="true" data-section="Redemption">Grace</div>
+</div>
+
+<!-- HANS -->
+<div id="hansPanel">
+  <video id="hansVideo" src="https://xenbohem.github.io/chimeraescape/Hans-Library-Apprentice/Hans2-Nean-Pippit.mp4" playsinline></video>
+  <button id="muteBtn">🔊</button>
+</div>
+
+<div id="message"></div>
+
+<a id="teaButton" href="https://your-tearoom-link.com" target="_blank">☕</a>
+
+<!-- ENTER OVERLAY -->
+<div id="enterOverlay">
+  <div id="enterButton">Enter the Library</div>
+</div>
+
+<script>
+const books = document.querySelectorAll('.book');
+const shelves = document.querySelectorAll('.shelf');
+const message = document.getElementById('message');
+const teaButton = document.getElementById('teaButton');
+const video = document.getElementById("hansVideo");
+const muteBtn = document.getElementById("muteBtn");
+const enterOverlay = document.getElementById("enterOverlay");
+const enterButton = document.getElementById("enterButton");
+
+let correctCount = 0;
+
+/* Slide Hans In */
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    document.getElementById("hansPanel").classList.add("show");
+  },800);
+});
+
+/* ENTER BUTTON STARTS VIDEO */
+enterButton.addEventListener("click",()=>{
+  video.currentTime = 0;
+  video.play();
+  enterOverlay.style.display="none";
+});
+
+/* AUDIO FILES */
+const voiceLines = {
+  Theology: new Audio("theology.mp3"),
+  History: new Audio("history.mp3"),
+  Poetry: new Audio("poetry.mp3"),
+  Philosophy: new Audio("philosophy.mp3"),
+  Redemption: new Audio("redemption.mp3"),
+  Wrong: new Audio("wrong.mp3"),
+  Applause: new Audio("applause.mp3")
+};
+
+books.forEach(book=>{
+  book.addEventListener('dragstart', e=>{
+    if(book.classList.contains("done")) return;
+    e.dataTransfer.setData("section", book.dataset.section);
+    e.dataTransfer.setData("title", book.textContent);
+  });
+});
+
+shelves.forEach(shelf=>{
+  shelf.addEventListener('dragover', e=> e.preventDefault());
+
+  shelf.addEventListener('drop', e=>{
+    e.preventDefault();
+
+    const section = e.dataTransfer.getData("section");
+    const title = e.dataTransfer.getData("title");
+
+    const originalBook = [...books].find(b => 
+      b.textContent === title && !b.classList.contains("done")
+    );
+
+    if(!originalBook) return;
+
+    if(shelf.dataset.section === section){
+
+      const newBook = document.createElement("div");
+      newBook.className="book placed";
+      newBook.textContent=title;
+      shelf.appendChild(newBook);
+
+      originalBook.classList.add("done");
+      originalBook.setAttribute("draggable","false");
+
+      showMessage("Hans nods approvingly.");
+      playVoice(section);
+
+      correctCount++;
+
+      if(correctCount === books.length){
+        showMessage("Hans applauds. You are invited to tea.");
+        playVoice("Applause");
+        teaButton.classList.add("show");
+      }
+
+    }else{
+      showMessage("Hans raises a brow.");
+      playVoice("Wrong");
+    }
+  });
+});
+
+function playVoice(type){
+  const clip = voiceLines[type];
+  if(!clip) return;
+  clip.currentTime = 0;
+  clip.play();
+}
+
+function showMessage(text){
+  message.textContent=text;
+  message.style.opacity="1";
+  setTimeout(()=> message.style.opacity="0",3000);
+}
+
+/* MUTE TOGGLE */
+muteBtn.addEventListener("click",()=>{
+  video.muted = !video.muted;
+  muteBtn.textContent = video.muted ? "🔇" : "🔊";
+});
+</script>
+
+</body>
+</html>
