@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Hans Library Quest</title>
+
+<style>
+
+body{
+margin:0;
+background:#1c1530;
+font-family:Georgia,serif;
+color:white;
+overflow:hidden;
+}
+
+/* Stage Curtains */
+
+#curtains{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:linear-gradient(90deg,#2b0040 0%, #2b0040 50%, #2b0040 100%);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:10;
+}
+
+#openCurtains{
+padding:15px 30px;
+font-size:20px;
+background:#7b3fff;
+border:none;
+color:white;
+cursor:pointer;
+}
+
+/* Main Layout */
+
+#stage{
+display:flex;
+height:100vh;
+}
+
+#libraryArea{
+flex:3;
+position:relative;
+background:url('library-bg.jpg') center/cover;
+padding-top:120px;
+}
+
+/* Hans Panel */
+
+#hansPanel{
+flex:1;
+background:#0e0e1f;
+display:flex;
+flex-direction:column;
+align-items:center;
+padding:15px;
+border-left:3px solid #6c42ff;
+}
+
+#hansVideo{
+width:90%;
+border-radius:10px;
+opacity:1;
+transition:opacity .6s;
+}
+
+#controls{
+margin-top:10px;
+}
+
+#chatBox{
+margin-top:15px;
+background:#181830;
+padding:12px;
+border-radius:8px;
+height:140px;
+overflow-y:auto;
+font-size:14px;
+}
+
+/* Carrier */
+
+#carrier{
+position:absolute;
+bottom:180px;
+left:40%;
+width:220px;
+height:90px;
+background:url('book-cart.png') center/contain no-repeat;
+transition:left 0.5s;
+z-index:5;
+}
+
+/* Move Buttons */
+
+#moveLeft,#moveRight{
+position:absolute;
+bottom:120px;
+padding:10px 20px;
+background:#7b3fff;
+border:none;
+color:white;
+cursor:pointer;
+}
+
+#moveLeft{ left:20px; }
+#moveRight{ right:20px; }
+
+/* Shelf Row */
+
+#shelfRow{
+position:absolute;
+bottom:0;
+width:100%;
+height:170px;
+display:flex;
+overflow-x:auto;
+background:#2c1f4f;
+border-top:4px solid #4c33a3;
+}
+
+/* Shelf */
+
+.shelf{
+flex:0 0 220px;
+border-right:2px solid #3d2a75;
+padding:10px;
+}
+
+.shelfTitle{
+font-size:14px;
+margin-bottom:5px;
+text-align:center;
+}
+
+/* Book Slot */
+
+.slot{
+height:30px;
+margin:3px;
+border:1px dashed #777;
+}
+
+/* Books */
+
+.book{
+width:70px;
+height:22px;
+background:#8c5cff;
+margin:4px;
+cursor:pointer;
+font-size:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:4px;
+transition:.2s;
+}
+
+.book:hover{
+transform:scale(1.1);
+box-shadow:0 0 8px #c6b2ff;
+}
+
+/* Tea Button */
+
+#teaButton{
+display:none;
+margin-top:15px;
+padding:10px 20px;
+background:#caa74b;
+border:none;
+cursor:pointer;
+}
+
+.show{
+display:block;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="curtains">
+<button id="openCurtains">Enter Hans Library</button>
+</div>
+
+<div id="stage">
+
+<div id="libraryArea">
+
+<div id="carrier"></div>
+
+<button id="moveLeft">◀</button>
+<button id="moveRight">▶</button>
+
+<div id="shelfRow">
+
+<div class="shelf" data-category="Tragedy">
+<div class="shelfTitle">Shakespeare Tragedy</div>
+<div class="slot"></div>
+<div class="slot"></div>
+</div>
+
+<div class="shelf" data-category="Comedy">
+<div class="shelfTitle">Shakespeare Comedy</div>
+<div class="slot"></div>
+<div class="slot"></div>
+</div>
+
+<div class="shelf" data-category="History">
+<div class="shelfTitle">Shakespeare History</div>
+<div class="slot"></div>
+<div class="slot"></div>
+</div>
+
+</div>
+
+</div>
+
+<div id="hansPanel">
+
+<video id="hansVideo" autoplay muted>
+<source src="hans-suspicious.mp4" type="video/mp4">
+</video>
+
+<div id="controls">
+<button onclick="playVideo()">Play</button>
+<button onclick="pauseVideo()">Pause</button>
+<input type="range" min="0" max="1" step="0.1" onchange="setVolume(this.value)">
+</div>
+
+<div id="chatBox"></div>
+
+<button id="teaButton">Accept Tea Invitation</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* Curtain */
+
+document.getElementById("openCurtains").onclick = function(){
+document.getElementById("curtains").style.display="none";
+hansSpeak("Hm. A visitor? Few arrive here prepared… redemption begins with discipline.");
+};
+
+/* Hans Dialogue */
+
+const chatBox = document.getElementById("chatBox");
+
+function hansSpeak(text){
+chatBox.innerHTML += "<p>Hans: "+text+"</p>";
+chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+/* Video Controls */
+
+const video = document.getElementById("hansVideo");
+
+function playVideo(){ video.play(); }
+function pauseVideo(){ video.pause(); }
+function setVolume(v){ video.volume=v; video.muted=false; }
+
+/* Carrier Movement */
+
+let carrier = document.getElementById("carrier");
+let pos = 40;
+
+document.getElementById("moveLeft").onclick=function(){
+pos-=10;
+carrier.style.left=pos+"%";
+};
+
+document.getElementById("moveRight").onclick=function(){
+pos+=10;
+carrier.style.left=pos+"%";
+};
+
+/* Books */
+
+const books = [
+
+{title:"Macbeth", category:"Tragedy"},
+{title:"Othello", category:"Tragedy"},
+{title:"Twelfth Night", category:"Comedy"},
+{title:"Much Ado", category:"Comedy"},
+{title:"Henry V", category:"History"}
+
+];
+
+const carrierDiv = document.getElementById("carrier");
+
+books.forEach(book=>{
+
+let b = document.createElement("div");
+b.className="book";
+b.innerText=book.title;
+b.title=book.title;
+b.dataset.category=book.category;
+
+b.onclick=function(){
+
+let shelf = document.querySelector(`[data-category='${book.category}'] .slot:not(.filled)`);
+
+if(shelf){
+
+shelf.innerHTML=book.title;
+shelf.classList.add("filled");
+
+b.remove();
+
+hansCorrect();
+
+checkVictory();
+
+}else{
+
+hansWrong();
+
+}
+
+};
+
+carrierDiv.appendChild(b);
+
+});
+
+/* Hans Reactions */
+
+function hansCorrect(){
+
+let lines=[
+"Acceptable.",
+"Good. Precision matters.",
+"Yes… that is correct."
+];
+
+hansSpeak(lines[Math.floor(Math.random()*lines.length)]);
+
+}
+
+function hansWrong(){
+
+let lines=[
+"No.",
+"That does not belong there.",
+"You rush without thinking."
+];
+
+hansSpeak(lines[Math.floor(Math.random()*lines.length)]);
+
+}
+
+/* Victory */
+
+function checkVictory(){
+
+let placed = document.querySelectorAll(".filled").length;
+
+if(placed === books.length){
+
+hansSpeak("Remarkable… the shelves rest in perfect order. You have earned tea.");
+
+playTeaVideo();
+
+document.getElementById("teaButton").classList.add("show");
+
+}
+
+}
+
+/* Video Swap */
+
+function playTeaVideo(){
+
+video.style.opacity=0;
+
+setTimeout(()=>{
+
+video.src="hans-tea-invitation.mp4";
+video.currentTime=0;
+video.muted=false;
+video.play();
+video.style.opacity=1;
+
+},600);
+
+}
+
+</script>
+
+</body>
+</html>
