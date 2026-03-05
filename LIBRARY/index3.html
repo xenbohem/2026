@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Royal Library</title>
+    <!-- Importing a Royal Gothic Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --royal-purple: #2E004F;
+            --deep-indigo: #1A0B2E;
+            --cornflower-blue: #6495ED;
+            --gold-accent: #D4AF37;
+            --text-light: #F0F0F0;
+        }
+
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, var(--deep-indigo), var(--royal-purple));
+            color: var(--text-light);
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- SCORE & RESTART SECTION --- */
+        #score-container {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: var(--gold-accent);
+            font-weight: bold;
+        }
+
+        #restart-container {
+            margin-top: 20px;
+            display: none; /* Hidden until game is won */
+        }
+
+        .btn {
+            background-color: var(--gold-accent);
+            color: var(--royal-purple);
+            border: 2px solid var(--gold-accent);
+            padding: 10px 20px;
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background-color: transparent;
+            color: var(--gold-accent);
+            transform: scale(1.05);
+        }
+
+        .btn-external {
+            background-color: var(--cornflower-blue);
+            color: white;
+            border: 2px solid var(--cornflower-blue);
+        }
+
+        .btn-external:hover {
+            background-color: transparent;
+            color: var(--cornflower-blue);
+        }
+
+        /* --- HOST SECTION --- */
+        #host-container {
+            margin-bottom: 30px;
+            border: 3px solid var(--gold-accent);
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            display: inline-block;
+            min-width: 300px;
+            box-shadow: 0 0 20px var(--gold-accent);
+            position: relative;
+            z-index: 100;
+            
+            /* Initial State for Animation */
+            transform: translateX(-150%);
+            opacity: 0;
+            transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.5s ease-in;
+        }
+
+        /* Class to trigger the slide-in */
+        #host-container.visible {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Pop effect when speaking */
+        .host-pop {
+            animation: pop 0.3s ease-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        #host-image {
+            width: 150px;
+            height: 150px;
+            background-color: #444;
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #fff;
+            border: 4px solid var(--gold-accent);
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        #host-image img, #host-image video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #host-message {
+            font-size: 1.3em;
+            color: var(--cornflower-blue);
+            min-height: 60px;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px black;
+            line-height: 1.4;
+        }
+
+        /* --- GAME AREA --- */
+        #game-area {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .shelf-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .shelf {
+            width: 110px;
+            height: 120px;
+            background-color: #3e2723; /* Dark wood */
+            border: 4px solid #5d4037;
+            border-bottom: 8px solid #3e2723;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-accent);
+            font-weight: bold;
+            font-size: 0.9em;
+            border-radius: 4px;
+            position: relative;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .shelf:active {
+            transform: scale(0.95);
+        }
+
+        /* The Pile of Books */
+        .book-pile {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            min-height: 120px;
+        }
+
+        .book {
+            width: 80px;
+            height: 100px;
+            background-color: var(--cornflower-blue);
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.75em;
+            padding: 5px;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            z-index: 10;
+        }
+
+        /* Mobile/Click State */
+        .book.selected {
+            transform: translateY(-20px);
+            box-shadow: 0 0 15px var(--gold-accent);
+            border-color: var(--gold-accent);
+            z-index: 20;
+        }
+
+        /* Animation Classes */
+        .slide-in {
+            animation: slideIn 0.4s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Instructions for Mobile */
+        .mobile-hint {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- SCORE SECTION -->
+    <div id="score-container">
+        Points: <span id="score">0</span>
+    </div>
+
+    <!-- HOST SECTION -->
+    <div id="host-container">
+        <div id="host-image">
+            <!-- 
+                TIP: Replace the src below with a video file for the "Mysterious" effect.
+                Example: <video src="sir-reginald.mp4" autoplay muted loop></video>
+            -->
+            <img src="https://via.placeholder.com/150/2E004F/D4AF37?text=Sir+Reginald" alt="Host">
+        </div>
+        <div id="host-message">Welcome, patron. Please sort the books correctly.</div>
+    </div>
+
+    <!-- GAME AREA -->
+    <div id="game-area">
+        <h2>The Royal Collection</h2>
+        
+        <!-- The Shelves -->
+        <div class="shelf-row" id="shelf-row">
+            <!-- Shelves generated by JS -->
+        </div>
+
+        <!-- The Books -->
+        <div class="book-pile" id="book-pile">
+            <!-- Books generated by JS -->
+        </div>
+        
+        <div class="mobile-hint">
+            <strong>Desktop:</strong> Drag & Drop &nbsp;|&nbsp; <strong>Mobile:</strong> Tap to Pick, Tap Shelf to Place
+        </div>
+    </div>
+
+    <!-- RESTART & EXTERNAL BUTTONS -->
+    <div id="restart-container">
+        <button class="btn" onclick="restartGame()">Another Cup of Tea?</button>
+        <a href="https://your-tea-etiquette-adventure.com" class="btn btn-external">Next Adventure: TEA ETIQUETTE</a>
+    </div>
+
+    <!-- AUDIO FILES -->
+    <audio id="sound-thud" src="https://assets.mixkit.co/sfx/preview/mixkit-wood-block-tap-2016.mp3"></audio>
+    <audio id="sound-ding" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+
+    <script>
+        // --- CONFIGURATION ---
+        const categories = [
+            { id: "history", label: "History" },
+            { id: "mythology", label: "Mythology" },
+            { id: "etiquette", label: "Etiquette" },
+            { id: "tea", label: "Tea" },
+            { id: "humor", label: "Humor" },
+            { id: "manners", label: "Manners" }
+        ];
+
+        const books = [
+            { title: "History of English Peoples", category: "history" },
+            { title: "Mythology: Gods & Heroes", category: "mythology" },
+            { title: "Etiquette of Modern Life", category: "etiquette" },
+            { title: "The Art of Tea", category: "tea" },
+            { title: "Hitchhiker's Guide", category: "humor" },
+            { title: "How to Be a Gentleman", category: "manners" }
+        ];
+
+        const hostMessages = {
+            correct: [
+                "Splendid. A most satisfactory placement.",
+                "One might almost call that... correct.",
+                "Adequate. You may proceed.",
+                "Very well. That book is in its proper home."
+            ],
+            wrong: [
+                "Oh, dear. I suppose that's a bit of a shelving error, isn't it?",
+                "My, my. That book belongs in the past, not the present.",
+                "I'm afraid that is a bit of a shambles.",
+                "Do try to keep your wits about you, old chap.",
+                "That is a rather dreadful mistake."
+            ],
+            win: "A perfect library! I shall have the kettle boiled. Do join me for tea."
+        };
+
+        // --- STATE ---
+        let selectedBook = null;
+        let booksPlaced = 0;
+        let score = 0;
+        const hostMessage = document.getElementById('host-message');
+        const hostContainer = document.getElementById('host-container');
+        const scoreDisplay = document.getElementById('score');
+        const restartContainer = document.getElementById('restart-container');
+
+        // --- INITIALIZATION ---
+        function initGame() {
+            // Reset State
+            booksPlaced = 0;
+            score = 0;
+            selectedBook = null;
+            scoreDisplay.innerText = score;
+            restartContainer.style.display = 'none';
+            hostMessage.innerText = "Welcome, patron. Please sort the books correctly.";
+            
+            // Clear existing shelves and books
+            document.getElementById('shelf-row').innerHTML = '';
+            document.getElementById('book-pile').innerHTML = '';
+
+            // Trigger Host Entrance
+            hostContainer.classList.remove('visible');
+            setTimeout(() => {
+                hostContainer.classList.add('visible');
+            }, 100);
+
+            // Create Shelves
+            const shelfRow = document.getElementById('shelf-row');
+            categories.forEach(cat => {
+                const shelf = document.createElement('div');
+                shelf.classList.add('shelf');
+                shelf.dataset.category = cat.id;
+                shelf.innerText = cat.label;
+                shelf.addEventListener('click', handleShelfClick); // Mobile click
+                shelfRow.appendChild(shelf);
+            });
+
+            // Create Books (Shuffled)
+            const bookPile = document.getElementById('book-pile');
+            const shuffled = [...books].sort(() => 0.5 - Math.random());
+            
+            shuffled.forEach((book, index) => {
+                const el = document.createElement('div');
+                el.classList.add('book');
+                el.innerText = book.title;
+                el.dataset.category = book.category;
+                el.id = `book-${index}`;
+                
+                // Desktop Drag Events
+                el.addEventListener('dragstart', dragStart);
+                
+                // Mobile Click Events
+                el.addEventListener('click', (e) => handleBookClick(e, el));
+                
+                bookPile.appendChild(el);
+            });
+        }
+
+        // --- AUDIO HANDLER ---
+        function playSound(type) {
+            const sound = document.getElementById(type === 'correct' ? 'sound-ding' : 'sound-thud');
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Audio play failed (user interaction needed first)"));
+            }
+        }
+
+        // --- DESKTOP DRAG & DROP ---
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.category);
+            e.dataTransfer.setData('id', e.target.id);
+        }
+
+        // Setup Shelves for Drag
+        const shelves = document.querySelectorAll('.shelf');
+        shelves.forEach(shelf => {
+            shelf.addEventListener('dragover', (e) => e.preventDefault());
+            shelf.addEventListener('drop', handleDrop);
+        });
+
+        // --- MOBILE CLICK LOGIC ---
+        function handleBookClick(e, bookEl) {
+            e.stopPropagation(); // Prevent triggering shelf click
+            
+            // If clicking the same book, deselect it
+            if (selectedBook === bookEl) {
+                deselectBook();
+                return;
+            }
+
+            // Deselect previous
+            if (selectedBook) deselectBook();
+
+            // Select new
+            selectedBook = bookEl;
+            bookEl.classList.add('selected');
+        }
+
+        function handleShelfClick(e) {
+            if (!selectedBook) return;
+
+            const shelfCategory = e.target.dataset.category;
+            const bookCategory = selectedBook.dataset.category;
+
+            if (shelfCategory === bookCategory) {
+                // Correct!
+                placeBook(selectedBook, e.target);
+                playSound('correct');
+                hostMessage.innerText = getRandomMessage(hostMessages.correct);
+                booksPlaced++;
+                score += 10; // 10 points for correct
+                scoreDisplay.innerText = score;
+                selectedBook = null;
+
+                // Check Win Condition
+                if (booksPlaced === books.length) {
+                    setTimeout(() => {
+                        hostMessage.innerText = hostMessages.win;
+                        hostContainer.classList.add('host-pop');
+                        restartContainer.style.display = 'block';
+                    }, 1000);  
+                }
+            } else {
+                // Wrong!
+                playSound('wrong');
+                hostMessage.innerText = getRandomMessage(hostMessages.wrong);
+                score -= 5; // Lose 5 points for mistakes
+                scoreDisplay.innerText = score;
+                selectedBook.classList.add('shake');
+                setTimeout(() => selectedBook.classList.remove('shake'), 500);
+            }
+        }
+
+        function deselectBook() {
+            if (selectedBook) {
+                selectedBook.classList.remove('selected');
+                selectedBook = null;
+            }
+        }
+
+        // --- PLACE BOOK LOGIC (Animation & DOM) ---
+        function placeBook(bookEl, shelfEl) {
+            // Add animation class
+            bookEl.classList.add('slide-in');
+            
+            // Move book to shelf
+            shelfEl.appendChild(bookEl);
+            
+            // Disable dragging/clicking after placement
+            bookEl.draggable = false;
+            bookEl.style.cursor = 'default';
+            bookEl.classList.remove('selected');
+        }
+
+        // --- RANDOM MESSAGE HELPER ---
+        function getRandomMessage(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // --- DESKTOP DROP HANDLER ---
+        function handleDrop(e) {
+            e.preventDefault();
+            const shelfCategory = e.target.dataset.category;
+            const bookCategory = e.dataTransfer.getData('text/plain');
+            const bookElement = document.querySelector(`.book[data-category="${bookCategory}"]`);
+
+            if (shelfCategory === bookCategory) {
+                // Correct
+                placeBook(bookElement, e.target);
+                playSound('correct');
+                hostMessage.innerText = getRandomMessage(hostMessages.correct);
+                booksPlaced++;
+                score += 10; // 10 points for correct
+                scoreDisplay.innerText = score;
+                
+                // Check Win Condition
+                if (booksPlaced === books.length) {
+                    setTimeout(() => {
+                        hostMessage.innerText = hostMessages.win;
+                        hostContainer.classList.add('host-pop');
+                        restartContainer.style.display = 'block';
+                    }, 1000);
+                }
+            } else {
+                // Wrong
+                playSound('wrong');
+                hostMessage.innerText = getRandomMessage(hostMessages.wrong);
+                score -= 5; // Lose 5 points for mistakes
+                scoreDisplay.innerText = score;
+                bookElement.classList.add('shake');
+                setTimeout(() => bookElement.classList.remove('shake'), 500);
+            }
+        }
+
+        // --- RESTART GAME FUNCTION ---
+        function restartGame() {
+            initGame();
+        }
+
+        // --- START GAME ---
+        initGame();
+
+    </script>
+</body>
+</html>
