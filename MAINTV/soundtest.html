@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Xen TV Catalog – CRT TV with Video & Sound</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Klee+One&display=swap" rel="stylesheet">
+
+<style>
+body{background:black; font-family:'Klee One', cursive; color:cornflowerblue; margin:0; overflow:hidden;}
+#stars{position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1;}
+h1{text-align:center; padding:20px;}
+.main{display:flex; justify-content:space-around; flex-wrap:wrap;}
+.links{width:35%; max-height:70vh; overflow-y:auto; padding:20px;}
+.topic{display:none;}
+.topic.active{display:block;}
+a{display:block; margin:8px 0; color:cornflowerblue;}
+a:hover{color:white;}
+.tv{position:relative; width:600px; height:380px; background:#111; border:10px solid #555; border-radius:14px; overflow:hidden; box-shadow:0 0 40px rgba(120,160,255,.4), inset 0 0 40px rgba(0,0,0,.8);}
+#screen{width:100%; height:100%; transition:opacity .4s; background:black;}
+#glitch{position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; opacity:0;}
+#crtWarp{position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; mix-blend-mode:screen;}
+.tv::after{content:""; position:absolute; width:100%; height:100%; background:repeating-linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.05) 2px, transparent 2px, transparent 4px); pointer-events:none;}
+#channelLabel{position:absolute; top:10px; left:12px; font-size:14px; background:rgba(0,0,0,.5); padding:3px 8px;}
+.remote{text-align:center; margin-top:20px;}
+button{background:black; border:2px solid cornflowerblue; color:cornflowerblue; padding:8px 14px; margin:4px; cursor:pointer; border-radius:6px;}
+button:hover{background:cornflowerblue; color:black;}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<h1>ウェブサイトカタログ</h1>
+
+<div class="main">
+<div class="links">
+
+<div id="CHAT" class="topic active">
+<h3>CHAT</h3>
+<a href="#" class="link" data-url="video.mp4">Sample Video</a>
+<a href="#" class="link" data-url="https://xenbohem.github.io/valentine/chatmosaic.html">Valentine Chat Mosaic</a>
+</div>
+
+<div id="LIBRARY" class="topic">
+<h3>LIBRARY</h3>
+<a href="#" class="link" data-url="video.mp4">Library Video</a>
+</div>
+
+<div id="MUSIC" class="topic">
+<h3>MUSIC</h3>
+<a href="#" class="link" data-url="video.mp4">Music Video</a>
+</div>
+
+</div>
+
+<div>
+<div class="tv">
+<div id="channelLabel">CH-01</div>
+<canvas id="glitch"></canvas>
+<canvas id="crtWarp"></canvas>
+<video id="screen" autoplay muted loop playsinline poster="fallback.jpg">
+  <source src="video.mp4" type="video/mp4">
+  Your browser does not support HTML5 video.
+</video>
+</div>
+
+<div class="remote">
+<button id="powerBtn">OFF</button>
+<button data-topic="CHAT">CH-01</button>
+<button data-topic="LIBRARY">CH-02</button>
+<button data-topic="MUSIC">CH-03</button>
+</div>
+</div>
+</div>
+
+<script>
+/* STARFIELD */
+const starCanvas=document.getElementById("stars");
+const sctx=starCanvas.getContext("2d");
+starCanvas.width=window.innerWidth; starCanvas.height=window.innerHeight;
+let stars=[];
+for(let i=0;i<200;i++){stars.push({x:Math.random()*starCanvas.width,y:Math.random()*starCanvas.height,r:Math.random()*2})}
+function drawStars(){sctx.clearRect(0,0,starCanvas.width,starCanvas.height);stars.forEach(s=>{sctx.fillStyle="white";sctx.fillRect(s.x,s.y,s.r,s.r)});requestAnimationFrame(drawStars)}
+drawStars();
+
+/* VHS GLITCH */
+const glitchCanvas=document.getElementById("glitch");
+const gctx=glitchCanvas.getContext("2d");
+const screen=document.getElementById("screen");
+glitchCanvas.width=600; glitchCanvas.height=380;
+let glitchAnim,line1=80,line2=240;
+let tvOn = true;
+function drawGlitch(){
+  if(!tvOn) return;
+  gctx.clearRect(0,0,glitchCanvas.width,glitchCanvas.height);
+  gctx.fillStyle="rgba(255,255,255,0.35)"; gctx.fillRect(0,line1,glitchCanvas.width,4);
+  gctx.fillStyle="rgba(0,0,0,0.5)"; gctx.fillRect(0,line1+4,glitchCanvas.width,3);
+  gctx.fillStyle="rgba(255,255,255,0.35)"; gctx.fillRect(0,line2,glitchCanvas.width,4);
+  gctx.fillStyle="rgba(0,0,0,0.5)"; gctx.fillRect(0,line2+4,glitchCanvas.width,3);
+  line1-=1.8; line2-=1.8;
+  if(line1<-10) line1=glitchCanvas.height; if(line2<-10) line2=glitchCanvas.height;
+  let offset=(Math.random()*6)-3;
+  screen.style.transform="translateX("+offset+"px)";
+  let r=(Math.random()*2)-1,g=(Math.random()*2)-1,b=(Math.random()*2)-1;
+  screen.style.filter="drop-shadow("+r+"px 0 red) drop-shadow("+g+"px 0 lime) drop-shadow("+b+"px 0 blue)";
+  glitchAnim=requestAnimationFrame(drawGlitch);
+}
+
+/* CRT WARP */
+const crtCanvas=document.getElementById("crtWarp");
+const cctx=crtCanvas.getContext("2d");
+crtCanvas.width=600; crtCanvas.height=380;
+function drawCRT(){
+  if(!tvOn) return;
+  cctx.clearRect(0,0,crtCanvas.width,crtCanvas.height);
+  for(let y=0;y<crtCanvas.height;y+=2){
+    let curve=Math.sin(y/20)*4;
+    cctx.fillStyle="rgba(255,255,255,0.03)";
+    cctx.fillRect(curve,y,crtCanvas.width-curve*2,1);
+  }
+  let grad=cctx.createRadialGradient(crtCanvas.width/2,crtCanvas.height/2,0,crtCanvas.width/2,crtCanvas.height/2,crtCanvas.height/2);
+  grad.addColorStop(0,"rgba(255,255,255,0)"); grad.addColorStop(1,"rgba(0,0,0,0.35)");
+  cctx.fillStyle=grad;
+  cctx.fillRect(0,0,crtCanvas.width,crtCanvas.height);
+  requestAnimationFrame(drawCRT);
+}
+drawCRT();
+
+/* AUTO PLAY FIRST VIDEO ON LOAD */
+window.addEventListener("load",()=>{
+  if(screen.tagName==="VIDEO"){
+    screen.play();
+  }
+  drawGlitch();
+});
+
+/* CHANNEL SWITCH */
+function switchChannel(url){
+  if(!tvOn) return;
+  glitchCanvas.style.opacity=1;
+  drawGlitch();
+  screen.style.opacity=0;
+  setTimeout(()=>{
+    if(screen.tagName==="VIDEO"){
+      screen.pause();
+      screen.querySelector("source").src=url;
+      screen.load();
+      screen.play();
+    } else {
+      screen.src=url;
+    }
+    screen.style.opacity=1;
+    glitchCanvas.style.opacity=0;
+    screen.style.transform="translateX(0px)";
+    screen.style.filter="none";
+    cancelAnimationFrame(glitchAnim);
+  },700);
+}
+
+/* LINK HOVER + CLICK */
+document.querySelectorAll(".link").forEach(link=>{
+  link.addEventListener("mouseenter",()=>{switchChannel(link.dataset.url)});
+  link.addEventListener("click",e=>{e.preventDefault(); switchChannel(link.dataset.url)});
+});
+
+/* CHANNEL BUTTONS + KEYBOARD */
+const label=document.getElementById("channelLabel");
+let topics=["CHAT","LIBRARY","MUSIC"];
+let current=0;
+function setChannel(index){
+  document.querySelectorAll(".topic").forEach(t=>t.classList.remove("active"));
+  const topicName = topics[index];
+  const topicDiv = document.getElementById(topicName);
+  topicDiv.classList.add("active");
+  label.textContent = "CH-0" + (index+1);
+  const firstLink = topicDiv.querySelector(".link");
+  if(firstLink){ switchChannel(firstLink.dataset.url); }
+  current = index;
+}
+document.querySelectorAll("button[data-topic]").forEach((btn,i)=>{btn.onclick=()=>{setChannel(i)}});
+window.addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){current=(current+1)%topics.length; setChannel(current);}
+  if(e.key==="ArrowUp"){current=(current-1+topics.length)%topics.length; setChannel(current);}
+});
+
+/* POWER BUTTON */
+const powerBtn = document.getElementById("powerBtn");
+powerBtn.addEventListener("click", () => {
+  tvOn = !tvOn;
+  if(tvOn){
+    screen.style.display = "block";
+    if(screen.tagName==="VIDEO"){
+      screen.muted = false; // UNMUTE on power-on
+      screen.play();
+    }
+    glitchCanvas.style.display = "block";
+    crtCanvas.style.display = "block";
+    powerBtn.textContent="OFF";
+    drawCRT();
+  } else {
+    screen.style.display = "none";
+    if(screen.tagName==="VIDEO") screen.pause();
+    glitchCanvas.style.display = "none";
+    crtCanvas.style.display = "none";
+    powerBtn.textContent="ON";
+  }
+});
+</script>
+
+</body>
+</html>
