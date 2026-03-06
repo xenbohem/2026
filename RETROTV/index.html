@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Retro TV Catalog</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="tv">
+
+    <div class="screen-wrap">
+        <video id="screen" autoplay muted loop playsinline></video>
+
+        <div class="scanline"></div>
+        <div class="scanline2"></div>
+        <div class="crt"></div>
+    </div>
+
+    <button id="powerBtn">POWER</button>
+
+</div>
+
+<div class="menu">
+
+<a href="#" class="channel" data-type="video" data-src="intro.mp4">Intro Channel</a>
+
+<a href="#" class="channel" data-type="video" data-src="video1.mp4">Music Channel</a>
+
+<a href="#" class="channel" data-type="video" data-src="video2.mp4">Nature Channel</a>
+
+<a href="#" class="channel" data-type="iframe" data-src="https://example.com">Website Channel</a>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
