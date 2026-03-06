@@ -173,22 +173,25 @@
 
   // Handle link clicks inside each topic
   const links = document.querySelectorAll('.link');
+  
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      // Show the selected topic's links
-      const topic = tab.getAttribute('data-topic');
-      topicDivs.forEach(div => {
-        if(div.id === topic) {
-          div.classList.add('active');
-        } else {
-          div.classList.remove('active');
-        }
-      });
-      // Clear the TV screen when changing topics
-      tvFrame.src = "";
+    const topic = tab.getAttribute('data-topic');
+    const tvImage = tab.getAttribute('data-tv');
+
+    topicDivs.forEach(div => {
+      if(div.id === topic) {
+        div.classList.add('active');
+      } else {
+        div.classList.remove('active');
+      }
     });
+
+    // Change TV screen
+    tvFrame.src = tvImage;
   });
+});
 
   // Add click event to each link
   document.querySelectorAll('.link').forEach(link => {
