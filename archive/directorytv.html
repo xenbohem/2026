@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>Website Catalog with TV Screen</title>
+<!-- Linking a cute Japanese handwriting font from Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Klee+One&display=swap" rel="stylesheet">
+<style>
+  body {
+    background-color: black;
+    font-family: 'Klee One', cursive;
+    color: cornflowerblue;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    text-align: center;
+    padding: 20px;
+  }
+  /* Container for links and TV side by side */
+  .main-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 10px;
+    flex-wrap: wrap;
+  }
+  /* Links section */
+  .links-section {
+    width: 40%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 10px;
+  }
+  /* Style for each topic's links */
+  .topic-links {
+    display: none;
+    margin-bottom: 20px;
+  }
+  .topic-links.active {
+    display: block;
+  }
+  /* Individual links inside topics */
+  a {
+    display: block;
+    margin: 8px 0;
+    color: cornflowerblue;
+    text-decoration: underline;
+  }
+  a:hover {
+    color: white;
+  }
+  /* Tabs styling */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .tab {
+    background-color: transparent;
+    border: 2px solid cornflowerblue;
+    border-radius: 8px;
+    padding: 8px 16px;
+    margin: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .tab:hover {
+    background-color: cornflowerblue;
+    color: black;
+  }
+  /* TV screen area */
+  .tv-area {
+    width: 55%;
+    min-width: 300px;
+    height: 500px;
+    background-color: #222;
+    border: 8px solid #555;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>ウェブサイトカタログ</h1>
+
+<!-- Tabs for selecting topics -->
+<div class="tabs">
+  <div class="tab" data-topic="CHAT">CHAT</div>
+  <div class="tab" data-topic="CAFE">CAFE</div>
+  <div class="tab" data-topic="LIBRARY">LIBRARY</div>
+  <div class="tab" data-topic="VIDEO">VIDEO</div>
+  <div class="tab" data-topic="STAR">STAR</div>
+  <div class="tab" data-topic="HANZ">HANZ</div>
+  <div class="tab" data-topic="CHARI">CHARI</div>
+  <div class="tab" data-topic="TRIO CHAT">TRIO CHAT</div>
+  <div class="tab" data-topic="HUB">HUB</div>
+  <div class="tab" data-topic="COMMUNITY">COMMUNITY</div>
+  <div class="tab" data-topic="JOIN">JOIN</div>
+  <div class="tab" data-topic="MEMBERS">MEMBERS</div>
+  <div class="tab" data-topic="QUESTS">QUESTS</div>
+  <div class="tab" data-topic="MUSIC">MUSIC</div>
+  <div class="tab" data-topic="PLAYLIST">PLAYLIST</div>
+  <div class="tab" data-topic="SHOP">SHOP</div>
+  <div class="tab" data-topic="AFFILIATES">AFFILIATES</div>
+</div>
+
+<!-- Main container holding links and TV -->
+<div class="main-container">
+
+  <!-- Left side: Links -->
+  <div class="links-section">
+    <!-- Links for each topic; hidden by default -->
+    <div id="CHAT" class="topic-links">
+      <h3>CHAT</h3>
+      <a href="#" class="link" data-url="https://xenbohem.github.io/chimeraescape/CAFE/starflynarrowchat.html">Star narrow Chat</a>
+       <a href="#" class="link" data-url="https://xenbohem.github.io/valentine/chatmosaic.html">Valentine Chat Mosaic</a>
+       <a href="#" class="link" data-url="https://xenbohem.github.io/chimeraescape/cafe-apprenticeship/index.html">Chimera Cafe Apprenticeship</a>
+      <a href="#" class="link" data-url="https://xenbohem.github.io/quest/teasnobinterview/usernamefx.html">Tea Snob Interview</a>
+    </div>
+    <div id="CAFE" class="topic-links">
+      <h3>CAFE</h3>
+      <a href="#" class="link" data-url="https://xenbohem.github.io/chimeraescape/cafe-apprenticeship/index.html">Chimera Cafe Apprenticeship</a>
+    
+    </div>
+     <div id="SHOP" class="topic-links">
+    	<h3>SHOP</h3>
+    	  <a href="#" class="link" data-url="https://xencafe.nekoweb.org/SHOP/favorites.html">favorites Shop</a>
+    </div>
+    <div id="MUSIC" class="topic-links">
+    	<h3>MUSIC</h3>
+    	 <a href="#" class="link" data-url="https://xenbohem.github.io/twasforetold/visualizer/visualizer-ripples-fin.html">Visualizer Ripples</a>
+    	 <a href="#" class="link" data-url="https://xenbohem.github.io/cerulean/Dream-Player/dream-portal-player.html">Dream Portal Player</a>
+    </div>
+    <!-- Continue adding other topics similarly -->
+    <div id="LIBRARY" class="topic-links">
+      <h3>LIBRARY</h3>
+     	 <a href="#" class="link" data-url="https://xencafe.nekoweb.org/2026/HANSLIBRARY/RESTARTLIBRARYGAME.html">LIBRARY</a>
+    </div>
+        <!-- Continue adding other topics similarly -->
+    <div id="VIDEO" class="topic-links">
+      <h3>VIDEO</h3>
+  
+      <a href="#" class="link" data-url="https://xenbohem.github.io/twasforetold/visualizer/visualizer-ripples-fin.html">Visualizer Ripples</a>
+      <a href="#" class="link" data-url="https://xenbohem.github.io/quest/teasnobinterview/usernamefx.html">Tea Snob Interview</a>
+    </div>
+    <!-- Add other topics as needed -->
+  </div>
+
+  <!-- Right side: TV Screen -->
+  <div class="tv-area">
+    <iframe id="tvFrame" src="https://xencafe.nekoweb.org/2026/DIRECTORY/MARCHWEBSITES/hansvideo000.jpeg"></iframe>
+  </div>
+</div>
+
+<script>
+  // Handle tab clicks
+  const tabs = document.querySelectorAll('.tab');
+  const topicDivs = document.querySelectorAll('.topic-links');
+  const tvFrame = document.getElementById('tvFrame');
+
+  // Handle link clicks inside each topic
+  const links = document.querySelectorAll('.link');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Show the selected topic's links
+      const topic = tab.getAttribute('data-topic');
+      topicDivs.forEach(div => {
+        if(div.id === topic) {
+          div.classList.add('active');
+        } else {
+          div.classList.remove('active');
+        }
+      });
+      // Clear the TV screen when changing topics
+      tvFrame.src = "";
+    });
+  });
+
+  // Add click event to each link
+  document.querySelectorAll('.link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const url = link.getAttribute('data-url');
+      tvFrame.src = url;
+    });
+  });
+
+  // Initialize: show the first topic by default
+  if (topicDivs.length > 0) {
+    topicDivs[0].classList.add('active');
+  }
+</script>
+
+</body>
+</html>
