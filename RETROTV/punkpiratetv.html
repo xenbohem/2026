@@ -1,1 +1,457 @@
+<!DOCTYPE html>
 
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Punk Pirate TV</title>
+
+<style>
+
+body{
+margin:0;
+font-family:monospace;
+color:#00ff66;
+background:
+radial-gradient(circle at 20% 30%, #222 0%, black 60%),
+repeating-linear-gradient(
+45deg,
+rgba(255,0,80,.08),
+rgba(255,0,80,.08) 4px,
+transparent 4px,
+transparent 8px
+);
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+}
+
+/* ------------------------- */
+/* COLLAGE BACKGROUND */
+/* ------------------------- */
+
+.collage{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
+z-index:0;
+}
+
+.note{
+
+position:absolute;
+width:220px;
+background:#eee;
+padding:8px;
+
+clip-path: polygon(
+3% 6%, 8% 1%, 95% 4%, 98% 8%,
+96% 92%, 90% 98%, 5% 96%, 2% 90%
+);
+
+box-shadow:0 10px 20px rgba(0,0,0,.6);
+animation:drift 6s infinite alternate ease-in-out;
+}
+
+.note img{
+width:100%;
+display:block;
+filter:contrast(1.2) saturate(1.2);
+}
+
+/* tape */
+
+.tape{
+
+position:absolute;
+width:70px;
+height:22px;
+
+background:
+linear-gradient(
+rgba(255,255,255,.8),
+rgba(255,255,255,.4)
+);
+
+top:-12px;
+left:70px;
+
+transform:rotate(-8deg);
+
+box-shadow:0 2px 6px rgba(0,0,0,.4);
+
+}
+
+/* floating animation */
+
+@keyframes drift{
+0%{transform:translateY(0px) rotate(-4deg)}
+100%{transform:translateY(-6px) rotate(-6deg)}
+}
+
+/* note positions */
+
+.n1{
+top:8%;
+left:5%;
+}
+
+.n2{
+bottom:10%;
+left:12%;
+}
+
+.n3{
+top:15%;
+right:10%;
+}
+
+/* ------------------------- */
+/* MAIN LAYOUT */
+/* ------------------------- */
+
+.wrapper{
+display:flex;
+gap:40px;
+position:relative;
+z-index:10;
+}
+
+/* CHANNEL LIST */
+
+.sidebar{
+width:220px;
+}
+
+.sidebar h2{
+font-size:18px;
+letter-spacing:3px;
+}
+
+.channel{
+
+display:block;
+padding:6px;
+margin:6px 0;
+
+background:#111;
+border-left:5px solid #ff0055;
+
+cursor:pointer;
+transform:rotate(-1deg);
+
+}
+
+.channel:hover{
+background:#003300;
+}
+
+/* ------------------------- */
+/* CRT TV */
+/* ------------------------- */
+
+.tv{
+
+width:620px;
+height:360px;
+
+background:black;
+border:8px solid #111;
+
+position:relative;
+overflow:hidden;
+
+transform:rotate(-2deg) skewX(-1deg);
+
+box-shadow:
+0 0 10px #ff0055,
+0 0 30px #00ff66;
+
+animation:tvWobble 4s infinite alternate ease-in-out;
+
+}
+
+@keyframes tvWobble{
+
+0%{transform:rotate(-2deg) skewX(-1deg)}
+50%{transform:rotate(-1deg) skewX(-.5deg)}
+100%{transform:rotate(-3deg) skewX(-1.5deg)}
+
+}
+
+video, iframe{
+width:100%;
+height:100%;
+border:none;
+}
+
+/* scanline */
+
+.scan{
+position:absolute;
+width:100%;
+height:4px;
+background:rgba(255,255,255,.1);
+animation:scan 8s linear infinite;
+}
+
+@keyframes scan{
+0%{top:-5%}
+100%{top:105%}
+}
+
+/* glitch overlay */
+
+.tv::after{
+content:"";
+position:absolute;
+width:100%;
+height:100%;
+
+background:
+repeating-linear-gradient(
+0deg,
+rgba(255,255,255,.05),
+rgba(255,255,255,.05) 2px,
+transparent 2px,
+transparent 4px
+);
+
+pointer-events:none;
+}
+
+/* static */
+
+.static{
+
+position:absolute;
+width:100%;
+height:100%;
+
+background:
+repeating-linear-gradient(
+0deg,
+rgba(255,255,255,.2),
+rgba(255,255,255,.2) 2px,
+transparent 2px,
+transparent 4px
+);
+
+display:none;
+}
+
+/* power */
+
+.power{
+
+margin-top:12px;
+padding:8px 18px;
+
+border:2px solid #00ff66;
+background:black;
+color:#00ff66;
+
+cursor:pointer;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- COLLAGE NOTES -->
+
+<div class="collage">
+
+<div class="note n1">
+<img src="image1.jpg">
+<div class="tape"></div>
+</div>
+
+<div class="note n2">
+<img src="image2.jpg">
+<div class="tape"></div>
+</div>
+
+<div class="note n3">
+<img src="image3.jpg">
+<div class="tape"></div>
+</div>
+
+</div>
+
+<!-- MAIN UI -->
+
+<div class="wrapper">
+
+<div class="sidebar">
+
+<h2>PIRATE TV</h2>
+
+<div class="channel"
+data-type="video"
+data-src="intro.mp4">
+01 INTRO
+</div>
+
+<div class="channel"
+data-type="iframe"
+data-src="https://xenbohem.github.io/2026/archive/movie/index.html">
+02 MOVIE ARCHIVE
+</div>
+
+<div class="channel"
+data-type="iframe"
+data-src="https://xenbohem.github.io/twasforetold/visualizer/dream_visualizer_playlist.html">
+03 DREAM FEED
+</div>
+
+<div class="channel"
+data-type="iframe"
+data-src="https://xencafe.nekoweb.org/2026/QUEST.MANIFEST/original#">
+04 QUEST MODE
+</div>
+
+</div>
+
+<div>
+
+<div class="tv">
+
+<video id="screen" autoplay loop muted playsinline></video>
+
+<div class="scan"></div>
+
+<div class="static" id="static"></div>
+
+</div>
+
+<button class="power" id="power">POWER</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* power */
+
+let tvOn=false
+const power=document.getElementById("power")
+
+power.onclick=()=>{
+
+tvOn=!tvOn
+
+const screen=document.getElementById("screen")
+
+if(tvOn){
+
+if(screen.tagName==="VIDEO"){
+screen.muted=false
+screen.play()
+}
+
+}else{
+
+if(screen.tagName==="VIDEO"){
+screen.pause()
+}
+
+}
+
+}
+
+/* channels */
+
+const channels=document.querySelectorAll(".channel")
+const staticEl=document.getElementById("static")
+
+function flashStatic(){
+
+staticEl.style.display="block"
+
+setTimeout(()=>{
+
+staticEl.style.display="none"
+
+},120)
+
+}
+
+let currentChannel=0
+
+channels.forEach((c,i)=>{
+
+c.onclick=()=>{
+
+if(!tvOn) return
+
+flashStatic()
+
+const src=c.dataset.src
+const type=c.dataset.type
+
+const old=document.getElementById("screen")
+
+let el
+
+if(type==="video"){
+
+el=document.createElement("video")
+
+el.src=src
+el.autoplay=true
+el.loop=true
+el.volume=1
+
+}else{
+
+el=document.createElement("iframe")
+
+el.src=src
+
+}
+
+el.id="screen"
+
+old.replaceWith(el)
+
+currentChannel=i
+
+}
+
+})
+
+/* keyboard surfing */
+
+document.addEventListener("keydown",e=>{
+
+if(!tvOn) return
+
+if(e.key==="ArrowDown"){
+
+currentChannel=(currentChannel+1)%channels.length
+channels[currentChannel].click()
+
+}
+
+if(e.key==="ArrowUp"){
+
+currentChannel=(currentChannel-1+channels.length)%channels.length
+channels[currentChannel].click()
+
+}
+
+})
+
+</script>
+
+</body>
+</html>
