@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Punk Pirate TV</title>
+
+<style>
+
+body{
+margin:0;
+font-family:monospace;
+color:#00ff66;
+
+background:
+radial-gradient(circle at 20% 30%, #222 0%, black 60%),
+repeating-linear-gradient(45deg,
+rgba(255,0,80,.08),
+rgba(255,0,80,.08) 4px,
+transparent 4px,
+transparent 8px);
+
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+}
+
+/* COLLAGE */
+
+.collage{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
+z-index:0;
+}
+
+.note{
+
+position:absolute;
+width:220px;
+background:#eee;
+padding:8px;
+
+clip-path:polygon(
+3% 6%, 8% 1%, 95% 4%, 98% 8%,
+96% 92%, 90% 98%, 5% 96%, 2% 90%
+);
+
+box-shadow:0 10px 20px rgba(0,0,0,.6);
+
+animation:drift 6s infinite alternate ease-in-out;
+
+pointer-events:auto;
+cursor:pointer;
+
+}
+
+.note img{
+width:100%;
+display:block;
+}
+
+.tape{
+
+position:absolute;
+width:70px;
+height:22px;
+
+background:linear-gradient(
+rgba(255,255,255,.8),
+rgba(255,255,255,.4)
+);
+
+top:-12px;
+left:70px;
+
+transform:rotate(-8deg);
+
+}
+
+@keyframes drift{
+0%{transform:translateY(0px) rotate(-4deg)}
+100%{transform:translateY(-6px) rotate(-6deg)}
+}
+
+/* MAIN UI */
+
+.wrapper{
+display:flex;
+gap:40px;
+position:relative;
+z-index:10;
+}
+
+/* CHANNELS */
+
+.sidebar{
+width:220px;
+}
+
+.channel{
+display:block;
+padding:6px;
+margin:6px 0;
+background:#111;
+border-left:5px solid #ff0055;
+cursor:pointer;
+transform:rotate(-1deg);
+}
+
+.channel:hover{
+background:#003300;
+}
+
+/* CRT */
+
+.tv{
+
+width:620px;
+height:360px;
+
+background:black;
+border:8px solid #111;
+
+position:relative;
+overflow:hidden;
+
+transform:rotate(-2deg) skewX(-1deg);
+
+box-shadow:
+0 0 10px #ff0055,
+0 0 30px #00ff66;
+
+animation:tvWobble 4s infinite alternate;
+
+}
+
+@keyframes tvWobble{
+
+0%{transform:rotate(-2deg)}
+50%{transform:rotate(-1deg)}
+100%{transform:rotate(-3deg)}
+
+}
+
+video,iframe{
+width:100%;
+height:100%;
+border:none;
+}
+
+/* SCANLINE */
+
+.scan{
+position:absolute;
+width:100%;
+height:4px;
+background:rgba(255,255,255,.1);
+animation:scan 8s linear infinite;
+}
+
+@keyframes scan{
+0%{top:-5%}
+100%{top:105%}
+}
+
+/* STATIC */
+
+.static{
+
+position:absolute;
+width:100%;
+height:100%;
+
+background:repeating-linear-gradient(
+0deg,
+rgba(255,255,255,.2),
+rgba(255,255,255,.2) 2px,
+transparent 2px,
+transparent 4px
+);
+
+display:none;
+}
+
+.power{
+margin-top:12px;
+padding:8px 18px;
+border:2px solid #00ff66;
+background:black;
+color:#00ff66;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- AUDIO -->
+
+<audio id="powerSound" src="power_on.mp3"></audio> <audio id="staticSound" src="static.mp3"></audio>
+
+<!-- COLLAGE -->
+
+<div class="collage" id="collage">
+
+<div class="note" data-secret="https://example.com">
+<img src="image1.jpg">
+<div class="tape"></div>
+</div>
+
+<div class="note" data-secret="https://example.com">
+<img src="image2.jpg">
+<div class="tape"></div>
+</div>
+
+<div class="note" data-secret="https://example.com">
+<img src="image3.jpg">
+<div class="tape"></div>
+</div>
+
+</div>
+
+<!-- UI -->
+
+<div class="wrapper">
+
+<div class="sidebar">
+
+<h2>PIRATE TV</h2>
+
+<div class="channel" data-type="video" data-src="intro.mp4">01 INTRO</div>
+<div class="channel" data-type="iframe" data-src="https://xenbohem.github.io/2026/archive/movie/index.html">02 MOVIES</div>
+<div class="channel" data-type="iframe" data-src="https://xenbohem.github.io/twasforetold/visualizer/dream_visualizer_playlist.html">03 DREAM</div>
+<div class="channel" data-type="iframe" data-src="https://xencafe.nekoweb.org/2026/QUEST.MANIFEST/original#">04 QUEST</div>
+
+</div>
+
+<div>
+
+<div class="tv">
+
+<video id="screen" autoplay loop muted playsinline></video>
+
+<div class="scan"></div>
+<div class="static" id="static"></div>
+
+</div>
+
+<button class="power" id="power">POWER</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* RANDOM COLLAGE POSITIONS */
+
+document.querySelectorAll(".note").forEach(note=>{
+
+note.style.top=Math.random()*80+"%"
+note.style.left=Math.random()*80+"%"
+
+})
+
+/* SECRET CHANNELS */
+
+document.querySelectorAll(".note").forEach(note=>{
+
+note.onclick=()=>{
+
+const url=note.dataset.secret
+if(!tvOn) return
+
+loadChannel("iframe",url)
+
+}
+
+})
+
+/* POWER */
+
+let tvOn=false
+
+const power=document.getElementById("power")
+const powerSound=document.getElementById("powerSound")
+
+power.onclick=()=>{
+
+tvOn=!tvOn
+powerSound.currentTime=0
+powerSound.play()
+
+const screen=document.getElementById("screen")
+
+if(tvOn){
+
+if(screen.tagName==="VIDEO"){
+screen.muted=false
+screen.play()
+}
+
+}else{
+
+if(screen.tagName==="VIDEO"){
+screen.pause()
+}
+
+}
+
+}
+
+/* CHANNEL SYSTEM */
+
+const channels=document.querySelectorAll(".channel")
+const staticEl=document.getElementById("static")
+const staticSound=document.getElementById("staticSound")
+
+function flashStatic(){
+
+staticEl.style.display="block"
+
+staticSound.currentTime=0
+staticSound.play()
+
+setTimeout(()=>{
+
+staticEl.style.display="none"
+
+},120)
+
+}
+
+let currentChannel=0
+
+function loadChannel(type,src){
+
+flashStatic()
+
+const old=document.getElementById("screen")
+
+let el
+
+if(type==="video"){
+
+el=document.createElement("video")
+
+el.src=src
+el.autoplay=true
+el.loop=true
+el.volume=1
+
+}else{
+
+el=document.createElement("iframe")
+
+el.src=src
+
+}
+
+el.id="screen"
+
+old.replaceWith(el)
+
+}
+
+channels.forEach((c,i)=>{
+
+c.onclick=()=>{
+
+if(!tvOn) return
+
+loadChannel(c.dataset.type,c.dataset.src)
+
+currentChannel=i
+
+}
+
+})
+
+/* KEYBOARD SURFING */
+
+document.addEventListener("keydown",e=>{
+
+if(!tvOn) return
+
+if(e.key==="ArrowDown"){
+
+currentChannel=(currentChannel+1)%channels.length
+channels[currentChannel].click()
+
+}
+
+if(e.key==="ArrowUp"){
+
+currentChannel=(currentChannel-1+channels.length)%channels.length
+channels[currentChannel].click()
+
+}
+
+})
+
+</script>
+
+</body>
+</html>
