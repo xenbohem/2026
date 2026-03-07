@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybergoth Ethereal Synth Instrument</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet"> <!-- Gothic font -->
+    <style>
+        body { font-family: 'Cinzel', serif; background: linear-gradient(135deg, #2d1b69, #1e3a8a, #7c3aed); color: #e0e7ff; text-align: center; padding: 20px; margin: 0; overflow-x: hidden; }
+        .instrument { max-width: 900px; margin: 0 auto; border: 3px solid #7c3aed; border-radius: 25px; padding: 25px; background: linear-gradient(145deg, #1e1b4b, #312e81); box-shadow: 0 0 30px rgba(124, 58, 237, 0.5), inset 0 0 20px rgba(59, 130, 246, 0.2); position: relative; }
+        .instrument::before { content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; background: linear-gradient(45deg, #7c3aed, #06b6d4, #8b5cf6); border-radius: 30px; z-index: -1; opacity: 0.3; }
+        h1 { font-size: 2.5em; text-shadow: 0 0 10px #7c3aed; margin-bottom: 10px; }
+        p { font-size: 1.1em; color: #c7d2fe; }
+        .piano-keys { display: flex; justify-content: center; margin: 20px 0; }
+        .key { width: 40px; height: 120px; background: linear-gradient(145deg, #06b6d4, #0891b2); border: 2px solid #0ea5e9; cursor: pointer; margin: 0 2px; border-radius: 0 0 8px 8px; transition: all 0.2s; box-shadow: 0 4px 8px rgba(6, 182, 212, 0.3); }
+        .key.black { width: 25px; height: 80px; background: linear-gradient(145deg, #1e1b4b, #312e81); position: relative; z-index: 1; margin-left: -12px; margin-right: -12px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .key:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(6, 182, 212, 0.5); }
+        .key.active { background: linear-gradient(145deg, #7c3aed, #5b21b6); box-shadow: 0 0 15px #7c3aed; }
+        .glock-keys { display: flex; justify-content: center; margin: 10px 0; }
+        .glock-key { width: 35px; height: 60px; background: linear-gradient(145deg, #e0e7ff, #c7d2fe); border: 2px solid #7c3aed; cursor: pointer; margin: 0 3px; border-radius: 5px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3); }
+        .glock-key:hover { transform: scale(1.05); box-shadow: 0 0 10px #7c3aed; }
+        .glock-key.active { background: linear-gradient(145deg, #7c3aed, #5b21b6); box-shadow: 0 0 15px #7c3aed; }
+        .accordion-pads { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+        .pad { width: 70px; height: 70px; background: radial-gradient(circle, #7c3aed, #5b21b6); border: 3px solid #c7d2fe; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s; box-shadow: 0 4px 8px rgba(124, 58, 237, 0.4); }
+        .pad:hover { transform: scale(1.1); box-shadow: 0 6px 12px rgba(124, 58, 237, 0.6); }
+        .pad.active { background: radial-gradient(circle, #06b6d4, #0891b2); box-shadow: 0 0 20px #06b6d4; }
+        .organ-bass { display: flex; justify-content: center; margin: 20px 0; }
+        .organ-pad { width: 60px; height: 60px; background: linear-gradient(145deg, #1e1b4b, #312e81); border: 2px solid #7c3aed; cursor: pointer; margin: 0 5px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; transition: all 0.2s; box-shadow: 0 4px 8px rgba(30, 27, 75, 0.5); }
+        .organ-pad:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(30, 27, 75, 0.7); }
+        .organ-pad.active { background: linear-gradient(145deg, #7c3aed, #5b21b6); box-shadow: 0 0 15px #7c3aed; }
+        .koto-strings { margin: 20px 0; }
+        .string { width: 100%; height: 25px; background: linear-gradient(to right, #7c3aed, #06b6d4, #8b5cf6); margin: 8px 0; cursor: pointer; border-radius: 12px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3); }
+        .string:hover { opacity: 0.8; box-shadow: 0 4px 8px rgba(124, 58, 237, 0.5); }
+        .string.active { opacity: 0.6; box-shadow: 0 0 15px #7c3aed; }
+        .controls { margin: 25px 0; }
+        button { padding: 12px 20px; margin: 5px; background: linear-gradient(145deg, #312e81, #1e1b4b); color: #e0e7ff; border: 2px solid #7c3aed; border-radius: 8px; cursor: pointer; font-family: 'Cinzel', serif; transition: all 0.2s; box-shadow: 0 4px 8px rgba(49, 46, 129, 0.5); }
+        button:hover { background: linear-gradient(145deg, #7c3aed, #5b21b6); box-shadow: 0 6px 12px rgba(124, 58, 237, 0.6); }
+        button.active { background: linear-gradient(145deg, #06b6d4, #0891b2); }
+        button:disabled { background: #666; cursor: not-allowed; opacity: 0.5; }
+        input { margin: 10px; accent-color: #7c3aed; }
+        #downloadLink { display: none; margin: 10px; color: #06b6d4; text-decoration: none; font-weight: bold; text-shadow: 0 0 5px #06b6d4; }
+        #downloadLink:hover { text-decoration: underline; text-shadow: 0 0 10px #06b6d4; }
+    </style>
+</head>
+<body>
+    <div class="instrument">
+        <h1>Cybergoth Synth Hybrid</h1>
+        <p>Ethereal, Primal, Delicate. Play keys (A-K), pads, strings, organ bass (Z/X/C/V), or glock chimes (Q/W/E/R). Record your cybergoth jams!</p>
+        
+        <!-- Start Audio Button -->
+        <button id="startAudio">Start Audio</button>
+        
+        <!-- Glockenspiel Chime Keys (High Notes) -->
+        <div class="glock-keys">
+            <div class="glock-key" data-note="C6">C6</div>
+            <div class="glock-key" data-note="D6">D6</div>
+            <div class="glock-key" data-note="E6">E6</div>
+            <div class="glock-key" data-note="F6">F6</div>
+        </div>
+        
+        <!-- Piano Keys -->
+        <div class="piano-keys">
+            <div class="key" data-note="C4">C</div>
+            <div class="key black" data-note="C#4">C#</div>
+            <div class="key" data-note="D4">D</div>
+            <div class="key black" data-note="D#4">D#</div>
+            <div class="key" data-note="E4">E</div>
+            <div class="key" data-note="F4">F</div>
+            <div class="key black" data-note="F#4">F#</div>
+            <div class="key" data-note="G4">G</div>
+            <div class="key black" data-note="G#4">G#</div>
+            <div class="key" data-note="A4">A</div>
+            <div class="key black" data-note="A#4">A#</div>
+            <div class="key" data-note="B4">B</div>
+            <div class="key" data-note="C5">C</div>
+        </div>
+        
+        <!-- Accordion Pads -->
+        <div class="accordion-pads">
+            <div class="pad" data-type="ethereal">Ethereal<br>Drone</div>
+            <div class="pad" data-type="primal">Primal<br>Bass</div>
+            <div class="pad" data-type="delicate">Delicate<br>Chime</div>
+            <div class="pad" data-type="hybrid">Hybrid<br>Layer</div>
+        </div>
+        
+        <!-- Organ Bass Pads (Low Notes) -->
+        <div class="organ-bass">
+            <div class="organ-pad" data-note="C2">C2</div>
+            <div class="organ-pad" data-note="D2">D2</div>
+            <div class="organ-pad" data-note="E2">E2</div>
+            <div class="organ-pad" data-note="F2">F2</div>
+        </div>
+        
+        <!-- Koto Strings -->
+        <div class="koto-strings">
+            <div class="string" data-string="1">String 1 (High Ethereal)</div>
+            <div class="string" data-string="2">String 2 (Mid Primal)</div>
+            <div class="string" data-string="3">String 3 (Low Delicate)</div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="controls">
+            <button id="primalMode">Primal Mode (Off)</button>
+            <label for="reverb">Ethereal Reverb:</label>
+            <input type="range" id="reverb" min="0" max="1" step="0.1" value="0.5">
+            <br>
+            <button id="startRecord">Start Recording</button>
+            <button id="stopRecord" disabled>Stop Recording</button>
+            <a id="downloadLink" href="#" download="cybergoth-synth-recording.wav">Download Recording</a>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Web Audio Context
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.3;
+        masterGain.connect(audioCtx.destination);
+
+        // Reverb (Convolution for Ethereal Space)
+        const reverb = audioCtx.createConvolver();
+        const reverbGain = audioCtx.createGain();
+        reverbGain.gain.value = 0.5;
+        reverbGain.connect(masterGain);
+        reverb.connect(reverbGain);
+        const reverbBuffer = audioCtx.createBuffer(2, audioCtx.sampleRate * 2, audioCtx.sampleRate);
+        for (let channel = 0; channel < 2; channel++) {
+            const channelData = reverbBuffer.getChannelData(channel);
+            for (let i = 0; i < channelData.length; i++) {
+                channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / channelData.length, 2);
+            }
+        }
+        reverb.buffer = reverbBuffer;
+
+        // Delay for Echoes
+        const delay = audioCtx.createDelay(1);
+        const delayGain = audioCtx.createGain();
+        delay.delayTime.value = 0.3;
+        delayGain.gain.value = 0.4;
+        delay.connect(delayGain);
+        delayGain.connect(reverb);
+        delayGain.connect(masterGain);
+
+        // Chorus for Shimmer
+        const chorus = audioCtx.createDelay(0.05);
+        const chorusGain = audioCtx.createGain();
+        chorusGain.gain.value = 0.3;
+        chorus.connect(chorusGain);
+        chorusGain.connect(reverb);
+
+        // LFO for Primal Modulation
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        lfo.frequency.value = 2;
+        lfoGain.gain.value = 0;
+        lfo.connect(lfoGain);
+        lfo.start();
+
+        let primalMode = false;
+        const reverbSlider = document.getElementById('reverb');
+        reverbSlider.addEventListener('input', () => {
+            reverbGain.gain.value = reverbSlider.value;
+        });
+
+        document.getElementById('primalMode').addEventListener('click', () => {
+            primalMode = !primalMode;
+            lfoGain.gain.value = primalMode ? 0.2 : 0;
+            document.getElementById('primalMode').textContent = `Primal Mode (${primalMode ? 'On' : 'Off'})`;
+            document.getElementById('primalMode').classList.toggle('active');
+        });
+
+        // Start Audio Button
+        document.getElementById('startAudio').addEventListener('click', async () => {
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+            document.getElementById('startAudio').style.display = 'none'; // Hide after starting
+        });
+
+        // Recording Setup
+        let mediaRecorder;
+        let recordedChunks = [];
+        const startRecordBtn = document.getElementById('startRecord');
+        const stopRecordBtn = document.getElementById('stopRecord');
+        const downloadLink = document.getElementById('downloadLink');
+
+        startRecordBtn.addEventListener('click', async () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Recording not supported in this browser.');
+                return;
+            }
+            try {
+                const stream = audioCtx.createMediaStreamDestination().stream;
+                mediaRecorder = new MediaRecorder(stream);
+                recordedChunks = [];
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) recordedChunks.push(event.data);
+                };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'audio/wav' });
+                    const url = URL.createObjectURL(blob);
+                    downloadLink.href = url;
+                    downloadLink.style.display = 'inline';
+                    downloadLink.textContent = 'Download Recording (WAV)';
+                };
+                mediaRecorder.start();
+                startRecordBtn.disabled = true;
+                stopRecordBtn.disabled = false;
+                downloadLink.style.display = 'none';
+            } catch (error) {
+                console.error('Recording error:', error);
+                alert('Failed to start recording. Check permissions.');
+            }
+        });
+
+        stopRecordBtn.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                startRecordBtn.disabled = false;
+                stopRecordBtn.disabled = true;
+            }
+        });
+
+        // Synth Voice Function (Advanced: ADSR, Filters, Oscillators)
+        function createSynthVoice(frequency, type = 'ethereal') {
+            const oscillator1 = audioCtx.createOscillator();
+            const oscillator2 = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            const envelope = { attack: 0.1, decay: 0.2, sustain: 0.5, release: 1 };
+
+            // Oscillator Setup
+            oscillator1.frequency.value = frequency;
+            oscillator2.frequency.value = frequency * 0.5; // Sub-octave for primal depth
+            if (type === 'ethereal') {
+                oscillator1.type = 'sine';
+                oscillator2.type = 'triangle';
+                filter.type = 'highpass';
+                filter.frequency.value = 1000; // Airy
+            } else if (type === 'primal') {
+                oscillator1.type = 'sawtooth';
+                oscillator2.type = 'sawtooth';
+                filter.type = 'lowpass';
+                filter.frequency.value = 300; // Warm bass
+            } else if (type === 'delicate') {
+                oscillator1.type = 'triangle';
+                oscillator2.type = 'sine';
+                filter.type = 'bandpass';
+                filter.frequency.value = frequency; // Nuanced
+            } else if (type === 'organ') {
+                oscillator1.type = 'sawtooth';
+                oscillator2.type = 'square';
+                filter.type = 'lowpass';
+                filter.frequency.value = 800; // Organ warmth
+            } else if (type === 'glock') {
+                oscillator1.type = 'sine';
+                oscillator2.type = 'sine';
+                filter.type = 'highpass';
+                filter.frequency.value = 2000; // Bright chime
+                envelope.attack = 0.01; // Quick attack for bell
+                envelope.release = 0.5; // Short decay
+            }
+
+            // Connect
+            oscillator1.connect(filter);
+            oscillator2.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(delay);
+            gainNode.connect(chorus);
+            lfoGain.connect(filter.frequency); // Primal modulation
+
+            // ADSR Envelope
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(1, audioCtx.currentTime + envelope.attack);
+            gainNode.gain.exponentialRampToValueAtTime(envelope.sustain, audioCtx.currentTime + envelope.attack + envelope.decay);
+
+            oscillator1.start();
+            oscillator2.start();
+
+            return {
+                gainNode,
+                oscillator1,
+                oscillator2,
+                release: () => {
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + envelope.release);
+                    setTimeout(() => {
+                        oscillator1.stop();
+                        oscillator2.stop();
+                    }, envelope.release * 1000);
+                }
+            };
+        }
+
+        // Note Frequencies (Including New Organ Bass and Glock Chimes)
+        const noteFreqs = {
+            'C2': 65.41, 'D2': 73.42, 'E2': 82.41, 'F2': 87.31, // Organ bass
+            'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'E4': 329.63,
+            'F4': 349.23, 'F#4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'A4': 440.00,
+            'A#4': 466.16, 'B4': 493.88, 'C5': 523.25,
+            'C6': 1046.50, 'D6': 1174.66, 'E6': 1318.51, 'F6': 1396.91 // Glock chimes
+        };
+
+        // Active Voices
+        const activeVoices = {};
+
+        // Piano Keys
+        document.querySelectorAll('.key').forEach(key => {
+            key.addEventListener('mousedown', () => {
+                const note = key.dataset.note;
+                if (!activeVoices[note]) {
+                    activeVoices[note] = createSynthVoice(noteFreqs[note], 'ethereal');
+                    key.classList.add('active');
+                }
+            });
+            key.addEventListener('mouseup', () => {
+                if (activeVoices[key.dataset.note]) {
+                    activeVoices[key.dataset.note].release();
+                    delete activeVoices[key.dataset.note];
+                    key.classList.remove('active');
+                }
+            });
+        });
+
+        // Glockenspiel Chime Keys
+        document.querySelectorAll('.glock-key').forEach(key => {
+            key.addEventListener('click', () => {
+                const note = key.dataset.note;
+                const voice = createSynthVoice(noteFreqs[note], 'glock');
+                key.classList.add('active');
+                setTimeout(() => {
+                    voice.release();
+                    key.classList.remove('active');
+                }, 1000); // Short chime
+            });
+        });
+
+        // Organ Bass Pads
+        document.querySelectorAll('.organ-pad').forEach(pad => {
+            pad.addEventListener('click', () => {
+                const note = pad.dataset.note;
+                const voice = createSynthVoice(noteFreqs[note], 'organ');
+                pad.classList.add('active');
+                setTimeout(() => {
+                    voice.release();
+                    pad.classList.remove('active');
+                }, 3000); // Sustained bass
+            });
+        });
+
+        // Keyboard Input (Updated for New Elements)
+        document.addEventListener('keydown', (e) => {
+            const keyMap = { 
+                'a': 'C4', 'w': 'C#4', 's': 'D4', 'e': 'D#4', 'd': 'E4', 'f': 'F4', 't': 'F#4', 'g': 'G4', 'y': 'G#4', 'h': 'A4', 'u': 'A#4', 'j': 'B4', 'k': 'C5',
+                'z': 'C2', 'x': 'D2', 'c': 'E2', 'v': 'F2', // Organ bass
+                'q': 'C6', 'w': 'D6', 'e': 'E6', 'r': 'F6' // Glock chimes (note: 'w' is shared, prioritize piano if needed)
+            };
+            const note = keyMap[e.key.toLowerCase()];
+            if (note && !activeVoices[note]) {
+                const type = note.includes('2') ? 'organ' : note.includes('6') ? 'glock' : 'ethereal';
+                activeVoices[note] = createSynthVoice(noteFreqs[note], type);
+                const element = document.querySelector(`[data-note="${note}"]`);
+                if (element) element.classList.add('active');
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            const keyMap = { 
+                'a': 'C4', 'w': 'C#4', 's': 'D4', 'e': 'D#4', 'd': 'E4', 'f': 'F4', 't': 'F#4', 'g': 'G4', 'y': 'G#4', 'h': 'A4', 'u': 'A#4', 'j': 'B4', 'k': 'C5',
+                'z': 'C2', 'x': 'D2', 'c': 'E2', 'v': 'F2',
+                'q': 'C6', 'w': 'D6', 'e': 'E6', 'r': 'F6'
+            };
+            const note = keyMap[e.key.toLowerCase()];
+            if (note && activeVoices[note]) {
+                activeVoices[note].release();
+                delete activeVoices[note];
+                const element = document.querySelector(`[data-note="${note}"]`);
+                if (element) element.classList.remove('active');
+            }
+        });
+
+        // Accordion Pads
+        document.querySelectorAll('.pad').forEach(pad => {
+            pad.addEventListener('click', () => {
+                const type = pad.dataset.type;
+                const freq = type === 'ethereal' ? 440 : type === 'primal' ? 110 : type === 'delicate' ? 660 : 330;
+                const voice = createSynthVoice(freq, type);
+                pad.classList.add('active');
+                setTimeout(() => {
+                    voice.release();
+                    pad.classList.remove('active');
+                }, 2000);
+            });
+        });
+
+        // Koto Strings
+        document.querySelectorAll('.string').forEach(string => {
+            string.addEventListener('click', () => {
+                const stringNum = string.dataset.string;
+                const freq = stringNum === '1' ? 880 : stringNum === '2' ? 220 : 110;
+                const type = stringNum === '1' ? 'ethereal' : stringNum === '2' ? 'primal' : 'delicate';
+                const voice = createSynthVoice(freq, type);
+                string.classList.add('active');
+                setTimeout(() => {
+                    voice.release();
+                    string.classList.remove('active');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
