@@ -249,20 +249,23 @@ value:"https://picsum.photos/800"
 ]
 
 /* CREATE NOTE */
-
 function createNote(){
+
+let data=notesData[Math.floor(Math.random()*notesData.length)]
 
 let note=document.createElement("div")
 note.className="note fadein"
 
 let img=document.createElement("img")
-img.src=images[Math.floor(Math.random()*images.length)]
+img.src=data.img
 
 let tape=document.createElement("div")
 tape.className="tape"
 
 note.appendChild(img)
 note.appendChild(tape)
+
+/* RANDOM POSITION */
 
 note.style.top=Math.random()*85+"%"
 note.style.left=Math.random()*85+"%"
@@ -275,7 +278,12 @@ note.style.transform="rotate("+rot+"deg) scale("+scale+")"
 let speed=5+Math.random()*10
 note.style.animationDuration=speed+"s"
 
+/* CLICK BEHAVIOR */
+
+note.onclick=()=>handlePortal(data)
+
 document.body.appendChild(note)
+
 
 }
 
