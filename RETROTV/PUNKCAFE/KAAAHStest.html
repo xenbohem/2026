@@ -1,429 +1,278 @@
-<!DOCTYPE html> 
-
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Punk Pirate TV</title>
+<title>Pirate TV</title>
 
 <style>
 
 body{
 margin:0;
+background:#0a0a0a;
 font-family:monospace;
-color:#00ff66;
-
-background:
-radial-gradient(circle at 20% 30%, #222 0%, black 60%),
-repeating-linear-gradient(45deg,
-rgba(255,0,80,.08),
-rgba(255,0,80,.08) 4px,
-transparent 4px,
-transparent 8px);
-
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
 overflow:hidden;
-}
-
-/* COLLAGE */
-
-.collage{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:0;
-}
-
-.note{
-
-position:absolute;
-width:220px;
-background:#eee;
-padding:8px;
-
-clip-path:polygon(
-2% 6%, 10% 0%, 92% 3%, 99% 9%,
-97% 93%, 88% 100%, 8% 96%, 1% 90%
-);
-
-box-shadow:0 10px 20px rgba(0,0,0,.6);
-
-animation:
-drift 6s infinite alternate ease-in-out,
-flicker 12s infinite;
-
-pointer-events:auto;
-cursor:pointer;
-
-}
-
-.note img{
-width:100%;
-display:block;
-}
-
-/* tape */
-
-.tape{
-position:absolute;
-width:70px;
-height:22px;
-background:linear-gradient(
-rgba(255,255,255,.8),
-rgba(255,255,255,.4)
-);
-box-shadow:0 2px 6px rgba(0,0,0,.4);
-}
-
-.t1{
-top:-12px;
-left:70px;
-transform:rotate(-8deg);
-}
-
-.t2{
-bottom:-10px;
-right:40px;
-transform:rotate(12deg);
-}
-
-/* floating */
-
-@keyframes drift{
-0%{transform:translateY(0px)}
-100%{transform:translateY(-8px)}
-}
-
-/* flicker */
-
-@keyframes flicker{
-
-0%{opacity:1}
-96%{opacity:1}
-97%{opacity:.5}
-98%{opacity:1}
-99%{opacity:.2}
-100%{opacity:1}
-
-}
-
-/* MAIN UI */
-
-.wrapper{
-display:flex;
-gap:40px;
-position:relative;
-z-index:10;
+color:#00ff99;
 }
 
 /* CHANNEL LIST */
 
-.sidebar{
-width:220px;
+#channels{
+position:fixed;
+left:20px;
+top:50%;
+transform:translateY(-50%);
+z-index:10;
 }
 
-.channel{
+#channels a{
 display:block;
-padding:6px;
+color:#00ff99;
+text-decoration:none;
 margin:6px 0;
+font-size:14px;
+}
+
+#channels a:hover{
+color:#fff;
+}
+
+/* TV */
+
+#tv{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) rotate(-3deg);
+width:720px;
+height:420px;
+background:#000;
+border:14px solid #111;
+box-shadow:0 0 80px #000;
+overflow:hidden;
+}
+
+#screen{
+width:100%;
+height:100%;
+}
+
+video{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+/* POWER BUTTON */
+
+#power{
+position:absolute;
+bottom:10px;
+right:10px;
 background:#111;
-border-left:5px solid #ff0055;
+color:#0f0;
+border:none;
+padding:6px 10px;
 cursor:pointer;
-transform:rotate(-1deg);
 }
 
-.channel:hover{
-background:#003300;
-}
+/* FLOATING NOTES */
 
-/* CRT */
+.note{
 
-.tv{
+position:absolute;
+width:180px;
+height:140px;
 
-width:620px;
-height:360px;
+background:#fff;
 
-background:black;
-border:8px solid #111;
-
-position:relative;
 overflow:hidden;
 
-transform:rotate(-2deg) skewX(-1deg);
-
-box-shadow:
-0 0 10px #ff0055,
-0 0 30px #00ff66;
-
-animation:tvWobble 4s infinite alternate;
-
-}
-
-@keyframes tvWobble{
-
-0%{transform:rotate(-2deg)}
-50%{transform:rotate(-1deg)}
-100%{transform:rotate(-3deg)}
-
-}
-
-video,iframe{
-width:100%;
-height:100%;
-border:none;
-}
-
-/* scanline */
-
-.scan{
-position:absolute;
-width:100%;
-height:4px;
-background:rgba(255,255,255,.1);
-animation:scan 8s linear infinite;
-}
-
-@keyframes scan{
-0%{top:-5%}
-100%{top:105%}
-}
-
-/* static */
-
-.static{
-position:absolute;
-width:100%;
-height:100%;
-background:repeating-linear-gradient(
-0deg,
-rgba(255,255,255,.2),
-rgba(255,255,255,.2) 2px,
-transparent 2px,
-transparent 4px
+clip-path: polygon(
+2% 6%, 10% 0%, 92% 3%, 99% 9%,
+97% 93%, 88% 100%, 8% 96%, 1% 90%
 );
-display:none;
+
+box-shadow:0 6px 18px rgba(0,0,0,.6);
+
+animation:drift 8s infinite alternate ease-in-out;
+
 }
 
-.power{
-margin-top:12px;
-padding:8px 18px;
-border:2px solid #00ff66;
-background:black;
-color:#00ff66;
-cursor:pointer;
+/* NOTE IMAGE */
+
+.note img{
+
+width:100%;
+height:100%;
+object-fit:cover;
+
+}
+
+/* TAPE */
+
+.tape{
+
+position:absolute;
+width:60px;
+height:16px;
+
+background:rgba(255,255,200,.7);
+
+top:-10px;
+left:60px;
+
+transform:rotate(-6deg);
+
+}
+
+/* FLOAT MOTION */
+
+@keyframes drift{
+
+0%{transform:translateY(-6px)}
+100%{transform:translateY(6px)}
+
+}
+
+/* FADE IN */
+
+.fadein{
+
+animation:fade .8s forwards;
+
+}
+
+@keyframes fade{
+
+from{opacity:0}
+to{opacity:1}
+
 }
 
 </style>
-
 </head>
 
 <body>
 
-<audio id="powerSound" src="power_on.mp3"></audio> <audio id="staticSound" src="static.mp3"></audio>
+<!-- CHANNEL LINKS -->
 
-<!-- COLLAGE -->
+<div id="channels">
 
-<div class="collage">
-
-<div class="note" data-secret="https://example.com">
-<img src="image1.jpg">
-<div class="tape t1"></div>
-<div class="tape t2"></div>
-</div>
-
-<div class="note" data-secret="https://example.com">
-<img src="image2.jpg">
-<div class="tape t1"></div>
-<div class="tape t2"></div>
-</div>
-
-<div class="note" data-secret="https://example.com">
-<img src="image3.jpg">
-<div class="tape t1"></div>
-<div class="tape t2"></div>
-</div>
+<a onclick="changeChannel('video1.mp4')">ART</a>
+<a onclick="changeChannel('video2.mp4')">CATS</a>
+<a onclick="changeChannel('video3.mp4')">DIY</a>
+<a onclick="changeChannel('video4.mp4')">MUSIC</a>
 
 </div>
 
-<!-- UI -->
+<!-- TV -->
 
-<div class="wrapper">
+<div id="tv">
 
-<div class="sidebar">
+<div id="screen">
+<video id="player" autoplay loop controls></video>
+</div>
 
-<h2>PIRATE TV</h2>
-
-<div class="channel" data-type="video" data-src="intro.mp4">01 INTRO</div>
-<div class="channel" data-type="iframe" data-src="https://xenbohem.github.io/2026/archive/movie/index.html">02 MOVIES</div>
-<div class="channel" data-type="iframe" data-src="https://xenbohem.github.io/twasforetold/visualizer/dream_visualizer_playlist.html">03 DREAM</div>
-<div class="channel" data-type="iframe" data-src="https://xencafe.nekoweb.org/2026/QUEST.MANIFEST/original#">04 QUEST</div>
+<button id="power">POWER</button>
 
 </div>
 
-<div>
+<!-- AUDIO -->
 
-<div class="tv">
-
-<video id="screen" autoplay loop muted playsinline></video>
-
-<div class="scan"></div>
-<div class="static" id="static"></div>
-
-</div>
-
-<button class="power" id="power">POWER</button>
-
-</div>
-
-</div>
+<audio id="powerSound"
+src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_6c3c0d7c62.mp3?filename=retro-click-23667.mp3"></audio>
 
 <script>
 
-/* RANDOM NOTE PLACEMENT */
+/* VIDEO */
 
-document.querySelectorAll(".note").forEach(note=>{
+function changeChannel(src){
 
-note.style.top=Math.random()*80+"%"
-note.style.left=Math.random()*80+"%"
+let v=document.getElementById("player")
+
+v.src=src
+v.play()
+
+}
+
+/* POWER BUTTON */
+
+let on=true
+
+document.getElementById("power").onclick=()=>{
+
+let tv=document.getElementById("tv")
+let sound=document.getElementById("powerSound")
+
+sound.currentTime=0
+sound.play()
+
+on=!on
+
+tv.style.opacity=on?1:0
+
+}
+
+/* NOTE IMAGES */
+
+let images=[
+
+"https://picsum.photos/300?1",
+"https://picsum.photos/300?2",
+"https://picsum.photos/300?3",
+"https://picsum.photos/300?4",
+"https://picsum.photos/300?5",
+"https://picsum.photos/300?6",
+"https://picsum.photos/300?7"
+
+]
+
+/* CREATE NOTE */
+
+function createNote(){
+
+let note=document.createElement("div")
+note.className="note fadein"
+
+let img=document.createElement("img")
+img.src=images[Math.floor(Math.random()*images.length)]
+
+let tape=document.createElement("div")
+tape.className="tape"
+
+note.appendChild(img)
+note.appendChild(tape)
+
+note.style.top=Math.random()*85+"%"
+note.style.left=Math.random()*85+"%"
 
 let rot=(Math.random()*20)-10
-let scale=.8+Math.random()*.4
+let scale=.8+Math.random()*.5
 
-note.style.transform=
-"rotate("+rot+"deg) scale("+scale+")"
+note.style.transform="rotate("+rot+"deg) scale("+scale+")"
 
-let duration=4+Math.random()*6
-note.style.animationDuration=duration+"s"
+let speed=5+Math.random()*10
+note.style.animationDuration=speed+"s"
 
-})
+document.body.appendChild(note)
 
-/* MOUSE PARALLAX */
+}
 
-document.addEventListener("mousemove",e=>{
+/* INITIAL NOTES */
 
-let x=(e.clientX/window.innerWidth-.5)*20
-let y=(e.clientY/window.innerHeight-.5)*20
+for(let i=0;i<6;i++){
 
-document.querySelectorAll(".note").forEach(n=>{
+createNote()
 
-n.style.transform+=" translate("+x+"px,"+y+"px)"
+}
 
-})
-
-})
-
-/* OCCASIONAL PAPER SHIFT */
+/* ADD NOTES OVER TIME */
 
 setInterval(()=>{
 
-let notes=document.querySelectorAll(".note")
-let n=notes[Math.floor(Math.random()*notes.length)]
+createNote()
 
-n.style.transform+=" rotate(20deg)"
-
-setTimeout(()=>{
-location.reload()
-},800)
-
-},9000)
-
-/* SECRET NOTE CHANNELS */
-
-document.querySelectorAll(".note").forEach(note=>{
-
-note.onclick=()=>{
-
-if(!tvOn) return
-
-loadChannel("iframe",note.dataset.secret)
-
-}
-
-})
-
-/* POWER */
-
-let tvOn=false
-
-const power=document.getElementById("power")
-const powerSound=document.getElementById("powerSound")
-
-power.onclick=()=>{
-
-tvOn=!tvOn
-
-powerSound.currentTime=0
-powerSound.play()
-
-}
-
-/* CHANNELS */
-
-const channels=document.querySelectorAll(".channel")
-const staticEl=document.getElementById("static")
-const staticSound=document.getElementById("staticSound")
-
-function flashStatic(){
-
-staticEl.style.display="block"
-
-staticSound.currentTime=0
-staticSound.play()
-
-setTimeout(()=>{
-
-staticEl.style.display="none"
-
-},120)
-
-}
-
-function loadChannel(type,src){
-
-flashStatic()
-
-const old=document.getElementById("screen")
-
-let el
-
-if(type==="video"){
-
-el=document.createElement("video")
-
-el.src=src
-el.autoplay=true
-el.loop=true
-el.volume=1
-
-}else{
-
-el=document.createElement("iframe")
-
-el.src=src
-
-}
-
-el.id="screen"
-
-old.replaceWith(el)
-
-}
-
-channels.forEach((c,i)=>{
-
-c.onclick=()=>{
-
-if(!tvOn) return
-
-loadChannel(c.dataset.type,c.dataset.src)
-
-}
-
-})
+},5000)
 
 </script>
 
