@@ -302,7 +302,41 @@ setInterval(()=>{
 createNote()
 
 },5000)
+function handlePortal(data){
 
+if(data.type==="link"){
+
+window.open(data.value,"_blank")
+
+}
+
+else if(data.type==="channel"){
+
+changeChannel(data.value)
+
+}
+
+else if(data.type==="text"){
+
+alert(data.value)
+
+}
+
+else if(data.type==="sound"){
+
+let s=new Audio(data.value)
+s.play()
+
+}
+
+else if(data.type==="image"){
+
+let w=window.open("")
+w.document.write("<img src='"+data.value+"' style='width:100%'>")
+
+}
+
+}
 </script>
 
 </body>
