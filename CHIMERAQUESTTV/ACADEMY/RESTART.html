@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Royal Tea & Manners Academy</title>
+<!-- Regal font -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet" />
+<style>
+  body {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    background-color: #4B0082;
+    color: #fff;
+    line-height: 1.6;
+  }
+
+  header {
+    padding: 20px;
+    font-size: 2.2em;
+    background-color: #4B0082;
+    color: #ffd700;
+    border-bottom: 4px solid #ffd700;
+    text-align: center;
+  }
+
+  #startAllBtn {
+    display: block;
+    margin: 20px auto;
+    padding: 15px 30px;
+    font-size: 1.4em;
+    background-color: #ffd700;
+    color: #4B0082;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  #startAllBtn:hover {
+    background-color: #e6c200;
+  }
+
+  #allLessonsContainer {
+    display: none;
+    max-width: 950px;
+    margin: auto;
+    padding: 20px;
+  }
+
+  .lesson {
+    display: none;
+    background: rgba(255,255,255,0.2);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #ffd700;
+    margin-top: 40px;
+  }
+  .lesson h2 {
+    text-align: center;
+    color: #4b2e83;
+    font-size: 2.2em;
+    margin-bottom: 10px;
+  }
+  .lesson p {
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+  }
+
+  .quiz {
+    text-align: center;
+  }
+  #question {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+  }
+  #options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .option {
+    width: 80%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 1.1em;
+  }
+  .option:hover {
+    background-color: #e6c200;
+  }
+  #feedback {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+  #nextBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #ffd700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #nextBtn:hover {
+    background-color: #e6c200;
+  }
+
+  .finalMsg {
+    margin-top: 30px;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #4b2e83;
+    display: none;
+    text-align: center;
+  }
+
+  #progressTracker {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff;
+    color: #4B0082;
+    border-radius: 8px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1em;
+  }
+  #progressTracker h3 {
+    margin-top: 0;
+    text-align: center;
+  }
+  #progressList {
+    list-style: none;
+    padding: 0;
+  }
+  #progressList li {
+    margin: 8px 0;
+  }
+
+  /* Certificate styles */
+  #certificateContainer {
+    display: none;
+    text-align: center;
+    margin-top: 30px;
+  }
+  #certificateCanvas {
+    border: 4px solid #ffd700;
+    border-radius: 10px;
+  }
+  #downloadCertBtn {
+    margin-top: 15px;
+    padding: 12px 24px;
+    font-size: 1.3em;
+    background-color: #ffd700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #downloadCertBtn:hover {
+    background-color: #e6c200;
+  }
+
+  /* Restart Button style */
+  #restartBtn {
+    margin-top: 15px;
+    padding: 12px 24px;
+    font-size: 1.3em;
+    background-color: #ffd700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #restartBtn:hover {
+    background-color: #e6c200;
+  }
+
+  footer {
+    margin-top: 50px;
+    padding: 20px;
+    background-color: #4B0082;
+    color: #ffd700;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  Welcome to the Royal Tea & Manners Academy
+</header>
+
+<button id="startAllBtn">Begin Royal Tea & Manners Journey</button>
+
+<!-- Progress tracker -->
+<div id="progressTracker" style="display:none;">
+  <h3>Your Progress</h3>
+  <ul id="progressList"></ul>
+</div>
+
+<!-- Lessons container -->
+<div id="allLessonsContainer">
+
+  <!-- Lesson 1 -->
+  <div class="lesson" id="lesson1">
+    <h2>The History of Royal Tea</h2>
+    <p>Test your knowledge about the origins and history of tea in royal courts.</p>
+    <div class="quiz" id="quiz1">
+      <h3 id="question"></h3>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <button id="nextBtn" style="display:none;">Next Question</button>
+      <div class="finalMsg" id="lesson1Complete">Congratulations! You completed Lesson 1.</div>
+    </div>
+  </div>
+
+  <!-- Lesson 2 -->
+  <div class="lesson" id="lesson2">
+    <h2>Proper Tea Service & Etiquette</h2>
+    <p>Learn the refined manners of tea service in royal customs.</p>
+    <div class="quiz" id="quiz2">
+      <h3 id="question"></h3>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <button id="nextBtn" style="display:none;">Next Question</button>
+      <div class="finalMsg" id="lesson2Complete">Congratulations! You completed Lesson 2.</div>
+    </div>
+  </div>
+
+  <!-- Lesson 3 -->
+  <div class="lesson" id="lesson3">
+    <h2>Table Manners & Silverware</h2>
+    <p>Master the art of handling fine dining ware with grace.</p>
+    <div class="quiz" id="quiz3">
+      <h3 id="question"></h3>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <button id="nextBtn" style="display:none;">Next Question</button>
+      <div class="finalMsg" id="lesson3Complete">Congratulations! You completed Lesson 3.</div>
+    </div>
+  </div>
+
+  <!-- Lesson 4 -->
+  <div class="lesson" id="lesson4">
+    <h2>Tea Time Conversation & Social Skills</h2>
+    <p>Refine your conversation skills during elegant tea gatherings.</p>
+    <div class="quiz" id="quiz4">
+      <h3 id="question"></h3>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <button id="nextBtn" style="display:none;">Next Question</button>
+      <div class="finalMsg" id="lesson4Complete">Congratulations! You completed Lesson 4.</div>
+    </div>
+  </div>
+
+  <!-- Lesson 5 -->
+  <div class="lesson" id="lesson5">
+    <h2>Decor & Ambiance</h2>
+    <p>Create a regal tea setting with style and grace.</p>
+    <div class="quiz" id="quiz5">
+      <h3 id="question"></h3>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <button id="nextBtn" style="display:none;">Next Question</button>
+      <div class="finalMsg" id="lesson5Complete">Congratulations! You completed Lesson 5.</div>
+    </div>
+  </div>
+
+  <!-- Lesson 6 -->
+  <div class="lesson" id="lesson6">
+    <h2>Dress & Appearance</h2>
+    <p>Learn noble attire and grooming standards for tea.</p>
+    <div class="quiz" id="quiz6">
+      <h3 id="question"></h3>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <button id="nextBtn" style="display:none;">Next Question</button>
+      <div class="finalMsg" id="lesson6Complete">Congratulations! You completed Lesson 6.</div>
+    </div>
+  </div>
+
+  <!-- Lesson 7 -->
+  <div class="lesson" id="lesson7">
+    <h2>The Grand Finale: Your Royal Tea Ceremony</h2>
+    <p>Show your mastery in a simulated royal tea ceremony.</p>
+    <div class="quiz" id="quiz7">
+      <h3 id="question"></h3>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <button id="nextBtn" style="display:none;">Finish</button>
+      <div class="finalMsg" id="lesson7Complete">Congratulations! You have completed all lessons!</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Certificate and Restart -->
+<div id="certificateContainer">
+  <canvas id="certificateCanvas" width="800" height="600"></canvas>
+  <br/>
+  <button id="downloadCertBtn">Download Your Royal Certificate</button>
+  <button id="restartBtn" style="margin-top:15px;">Restart All Lessons</button>
+</div>
+
+<!-- Footer -->
+<footer>
+  Long Live the Royal Tea & Manners Academy | Embrace Elegance & Grace
+</footer>
+
+<script>
+// List of lessons
+const lessons = ['lesson1','lesson2','lesson3','lesson4','lesson5','lesson6','lesson7'];
+
+// Questions data for each lesson
+const questionsData = {
+  'lesson1': [
+    {question: "Where did tea originally become popular among European royalty?", options: ["France", "England", "China", "India"], answer: 1},
+    {question: "Which British monarch is famously associated with popularizing afternoon tea?", options: ["Queen Victoria", "King George III", "Queen Elizabeth I", "Queen Anne"], answer: 0},
+    {question: "In which century did tea become a fashionable royal beverage in Europe?", options: ["15th", "16th", "17th", "18th"], answer: 3},
+    {question: "Which country introduced tea to Europe through trade?", options: ["Japan", "China", "India", "Korea"], answer: 1}
+  ],
+  'lesson2': [
+    {question: "What is the proper way to hold a teacup during a formal tea?", options: ["With fingers through the handle, pinky extended", "Hold with fingers around the handle, pinky down", "Hold with two hands", "Hold with the handle between thumb and index"], answer: 1},
+    {question: "When pouring tea for guests, the host should:", options: ["Fill the cup to the brim", "Pour from the right side, slowly and with grace", "Pour quickly", "Let guests pour their own tea"], answer: 1},
+    {question: "Which of these is an appropriate tea accompaniment?", options: ["Fried chicken", "Scones with clotted cream and jam", "Burgers", "Chips and dip"], answer: 1},
+    {question: "During tea, conversation should be:", options: ["Loud and boisterous", "Polite, calm, and refined", "Silent and awkward", "Talking loudly"], answer: 1}
+  ],
+  'lesson3': [
+    {question: "How should you position your napkin during a formal meal?", options: ["On the table", "Tucked into your collar", "Laid on your lap", "Rolled into a tube on your chair"], answer: 2},
+    {question: "When using a fork and knife, which hand should hold the fork?", options: ["Right hand", "Left hand", "Either hand", "Neither"], answer: 2},
+    {question: "In a formal setting, you should:", options: ["Use your fingers", "Use utensils properly", "Eat loudly", "Leave utensils on the plate"], answer: 1},
+    {question: "When finished eating, the utensils should be:", options: ["Crossed on the plate", "Resting on the table", "Placed parallel on the plate", "Stacked on the side"], answer: 2}
+  ],
+  'lesson4': [
+    {question: "During a royal tea, it's polite to:", options: ["Interrupt frequently", "Engage in polite, subdued conversation", "Whisper loudly", "Ignore your neighbors"], answer: 1},
+    {question: "What kind of topics are appropriate for tea conversations?", options: ["Gossip and scandals", "Politics and controversial issues", "Literature, art, and general pleasantries", "Personal disputes"], answer: 2},
+    {question: "If you accidentally spill tea, you should:", options: ["Ignore it and continue", "Apologize sincerely and assist in cleaning it up", "Blame someone else", "Leave the table immediately"], answer: 1},
+    {question: "A polite way to end a conversation is to:", options: ["Yawn loudly and stand up abruptly", "Thank the person and gently excuse yourself", "Ignore the other person and walk away", "Change the subject abruptly"], answer: 1}
+  ],
+  'lesson5': [
+    {question: "A proper tea setting includes:", options: ["Bright plastic tableware", "Fine china, floral arrangements, and soft lighting", "Paper napkins and disposable cups", "Minimal decorations"], answer: 1},
+    {question: "The color scheme for a regal tea setup typically involves:", options: ["Bright neon colors", "Pastels and floral patterns", "Deep jewel tones like purple, gold, and blue", "Black and white only"], answer: 2},
+    {question: "Floral arrangements during a royal tea are:", options: ["Loud and colorful", "Elegant, understated, and complementary to the setting", "Minimal or absent", "Made of plastic flowers"], answer: 1},
+    {question: "Lighting for a royal tea should be:", options: ["Harsh and bright", "Dim and romantic with candles or soft lamps", "Fluorescent and stark", "None, natural light only"], answer: 1}
+  ],
+  'lesson6': [
+    {question: "Royal attire for a tea involves:", options: ["Casual wear", "Elegant dresses or suits with accessories like gloves and hats", "T-shirts and jeans", "Sportswear"], answer: 1},
+    {question: "A gentleman attending tea should wear:", options: ["Casual T-shirt and shorts", "Formal waistcoat, coat, and polished shoes", "Athletic gear", "Pajamas"], answer: 1},
+    {question: "Grooming for a royal tea should include:", options: ["Well-kept hair, clean nails, and subtle makeup (for women)", "Messy hair and casual appearance", "Over-the-top makeup and jewelry", "No grooming needed"], answer: 0},
+    {question: "Accessories suitable for royal attire during tea include:", options: ["Sparkling jewelry and elegant gloves", "Baseball cap and sunglasses", "Casual watches and sneakers", "No accessories at all"], answer: 0}
+  ],
+  'lesson7': [
+    {question: "The final test involves:", options: ["A written exam about tea history", "Conducting a simulated royal tea ceremony demonstrating etiquette", "Reciting poetry", "Dancing the waltz"], answer: 1},
+    {question: "To impress the royal court, you should:", options: ["Show confidence, grace, and proper manners throughout", "Be loud and boastful", "Ignore etiquette and be casual", "Rush through the ceremony"], answer: 0},
+    {question: "Successful completion of the final lesson earns you:", options: ["A royal badge or certificate", "An invitation to the palace", "A set of fine china", "Nothing, just pride"], answer: 0},
+    {question: "The ultimate goal of the academy is:", options: ["To teach you how to host a royal tea with elegance and grace", "To become a chef", "To learn how to decorate a table", "To memorize historical facts only"], answer: 0}
+  ]
+};
+
+// Function to start a lesson
+function startLesson(lessonId) {
+  const questions = questionsData[lessonId];
+  let currentQ = 0;
+  const lessonDiv = document.getElementById(lessonId);
+  const questionEl = lessonDiv.querySelector('#question');
+  const optionsDiv = lessonDiv.querySelector('#options');
+  const feedbackDiv = lessonDiv.querySelector('#feedback');
+  const nextBtn = lessonDiv.querySelector('#nextBtn');
+  const completeMsg = lessonDiv.querySelector('#lesson' + lessonId.slice(-1) + 'Complete');
+
+  function loadQuestion() {
+    const q = questions[currentQ];
+    questionEl.textContent = q.question;
+    optionsDiv.innerHTML = '';
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className='option';
+      btn.textContent=opt;
+      btn.onclick=()=>checkAnswer(idx);
+      optionsDiv.appendChild(btn);
+    });
+    feedbackDiv.textContent='';
+    nextBtn.style.display='none';
+  }
+
+  function checkAnswer(selectedIdx) {
+    const correctIdx=questions[currentQ].answer;
+    if(selectedIdx===correctIdx){
+      feedbackDiv.textContent='Correct! Well done.';
+      nextBtn.style.display='inline-block';
+
+      // Save completion date/time if last question
+      if(currentQ===questions.length-1){
+        const now=new Date();
+        const timestamp=now.toLocaleString();
+        localStorage.setItem(lessonId+'_completed',timestamp);
+        updateProgress();
+        if(lessonId==='lesson7'){
+          // Show certificate after last lesson
+          showCertificate();
+        }
+      }
+    }else{
+      feedbackDiv.textContent='Gently remind to try again.';
+    }
+  }
+
+  nextBtn.onclick=()=>{
+    currentQ++;
+    if(currentQ<questions.length){
+      loadQuestion();
+    }else{
+      questionEl.style.display='none';
+      optionsDiv.style.display='none';
+      feedbackDiv.style.display='none';
+      nextBtn.style.display='none';
+      completeMsg.style.display='block';
+    }
+  }
+
+  loadQuestion();
+}
+
+// Update progress list
+function updateProgress() {
+  const listUL = document.getElementById('progressList');
+  listUL.innerHTML='';
+  for(let i=0;i<lessons.length;i++){
+    const lid=lessons[i];
+    const dateStr=localStorage.getItem(lid+'_completed');
+    if(dateStr){
+      const li=document.createElement('li');
+      li.textContent='Lesson '+(i+1)+' completed on '+dateStr;
+      listUL.appendChild(li);
+    }
+  }
+  document.getElementById('progressTracker').style.display='block';
+}
+
+// Initialize start button
+const startBtn=document.getElementById('startAllBtn');
+startBtn.onclick=()=>{
+  startBtn.style.display='none';
+  document.getElementById('allLessonsContainer').style.display='block';
+  document.getElementById('lesson1').style.display='block';
+  startLesson('lesson1');
+  updateProgress();
+};
+
+// Setup navigation buttons for lessons
+function setupNavigationButtons() {
+  lessons.forEach((lessonId, index) => {
+    const lessonDiv=document.getElementById(lessonId);
+    if(!lessonDiv.querySelector('.nextLessonBtn')){
+      const btn=document.createElement('button');
+      btn.textContent='Proceed to Next Lesson';
+      btn.className='option';
+      btn.style.marginTop='20px';
+      btn.onclick=()=>{
+        document.getElementById(lessonId).style.display='none';
+        if(index+1<lessons.length){
+          const nextId=lessons[index+1];
+          document.getElementById(nextId).style.display='block';
+          startLesson(nextId);
+        }else{
+          showCertificate();
+        }
+      };
+      lessonDiv.appendChild(btn);
+    }
+  });
+}
+
+// Show certificate after all lessons
+function showCertificate() {
+  document.getElementById('allLessonsContainer').style.display='none';
+  document.getElementById('certificateContainer').style.display='block';
+  generateCertificate();
+}
+
+// Generate the certificate
+function generateCertificate() {
+  const canvas = document.getElementById('certificateCanvas');
+  const ctx = canvas.getContext('2d');
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle='#fff8dc'; // Cornsilk background
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.strokeStyle='#b8860b';
+  ctx.lineWidth=10;
+  ctx.strokeRect(10,10,canvas.width-20,canvas.height-20);
+
+  ctx.fillStyle='#4b2e83';
+  ctx.font='bold 36px Georgia';
+  ctx.textAlign='center';
+  ctx.fillText('Royal Certificate of Achievement',canvas.width/2,80);
+
+  ctx.font='24px Georgia';
+  ctx.fillText('Presented to:',canvas.width/2,130);
+  ctx.font='bold 28px Georgia';
+  ctx.fillText('You, the Noble Student',canvas.width/2,170);
+
+  ctx.font='italic 20px Georgia';
+  ctx.fillText('For completing the Royal Tea & Manners Academy',canvas.width/2,220);
+
+  ctx.font='bold 22px Georgia';
+  ctx.fillText('Date: ' + new Date().toLocaleDateString(),canvas.width/2,260);
+
+  // Draw a seal (simple circle)
+  ctx.beginPath();
+  ctx.arc(canvas.width/2,340,50,0,Math.PI*2);
+  ctx.stroke();
+
+  // Add a decorative message
+  ctx.font='italic 20px Georgia';
+  ctx.fillText('You are now a Certified Royal Tea Host!',canvas.width/2,410);
+}
+
+// Download the certificate as PNG
+document.getElementById('downloadCertBtn').onclick=()=>{
+  const canvas=document.getElementById('certificateCanvas');
+  const link=document.createElement('a');
+  link.download='Royal_Certificate.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+};
+
+// Restart all lessons
+document.getElementById('restartBtn').onclick=()=>{
+  // Clear progress
+  lessons.forEach(lessonId => {
+    localStorage.removeItem(lessonId + '_completed');
+  });
+  // Reset UI
+  document.getElementById('certificateContainer').style.display='none';
+  document.getElementById('startAllBtn').style.display='block';
+  document.getElementById('progressList').innerHTML='';
+  document.getElementById('progressTracker').style.display='none';
+  // Show start button
+  document.getElementById('startAllBtn').style.display='block';
+};
+
+// Setup navigation buttons after lessons
+function setupNavigationButtons() {
+  lessons.forEach((lessonId, index) => {
+    const lessonDiv=document.getElementById(lessonId);
+    if(!lessonDiv.querySelector('.nextLessonBtn')){
+      const btn=document.createElement('button');
+      btn.textContent='Proceed to Next Lesson';
+      btn.className='option';
+      btn.style.marginTop='20px';
+      btn.onclick=()=>{
+        document.getElementById(lessonId).style.display='none';
+        if(index+1<lessons.length){
+          const nextId=lessons[index+1];
+          document.getElementById(nextId).style.display='block';
+          startLesson(nextId);
+        }else{
+          showCertificate();
+        }
+      };
+      lessonDiv.appendChild(btn);
+    }
+  });
+}
+
+// Initialize everything
+window.onload=()=>{
+  setupLessonNavigation();
+  setupNavigationButtons();
+  updateProgress();
+};
+</script>
+
+</body>
+</html>
