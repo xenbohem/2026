@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Royal Tea & Manners Academy</title>
+<!-- Regal font -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet" />
+<style>
+  body {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    background-color: #4B0082; /* Deep purple royal color */
+    color: #fff;
+    text-align: center;
+  }
+
+  header {
+    padding: 30px 20px;
+    font-size: 2.5em;
+    font-weight: normal;
+    background-color: #4B0082;
+    color: #ffd700;
+    border-bottom: 4px solid #ffd700;
+  }
+
+  /* Button to start the lesson */
+#startLessonBtn {
+  margin: 40px auto;
+  padding: 15px 30px;
+  font-size: 1.4em;
+  background-color: #ffd700;
+  color: #4B0082;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#startLessonBtn:hover {
+  background-color: #e6c200;
+}
+
+/* Container for the lesson (hidden initially) */
+#lesson1 {
+  display: none;
+  max-width: 900px;
+  margin: auto;
+  background: rgba(255,255,255,0.2);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #ffd700;
+  margin-top: 40px;
+}
+
+/* Lesson header */
+#lesson1 h2 {
+  text-align: center;
+  color: #4b2e83;
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+#lesson1 p {
+  text-align: center;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+/* Quiz styling inside lesson */
+#quiz1 {
+  text-align: center;
+}
+#question1 {
+  font-size: 1.3em;
+  margin-bottom: 15px;
+}
+#options1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+#options1 button {
+  width: 80%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: background-color 0.2s;
+}
+#options1 button:hover {
+  background-color: #e6c200;
+}
+#feedback1 {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+#nextBtn1 {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1.2em;
+  background-color: #ffd700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#nextBtn1:hover {
+  background-color: #e6c200;
+}
+
+/* Final message after quiz completion */
+#lesson1 .completion {
+  font-size: 1.4em;
+  color: #4b2e83;
+  margin-top: 30px;
+  font-weight: bold;
+}
+
+/* Button to return or continue */
+#continueBtn {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 15px 30px;
+  background-color: #ffd700;
+  color: #4B0082;
+  border-radius: 10px;
+  font-size: 1.3em;
+  text-decoration: none;
+  cursor: pointer;
+}
+#continueBtn:hover {
+  background-color: #e6c200;
+}
+
+/* Footer styling */
+footer {
+  margin-top: 50px;
+  padding: 20px;
+  background-color: #4B0082;
+  color: #ffd700;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2em;
+}
+</style>
+</head>
+<body>
+
+<header>
+  Welcome to the Royal Tea & Manners Academy
+</header>
+
+<!-- Button to start the lesson -->
+<button id="startLessonBtn">Begin the Royal Tea Lesson</button>
+
+<!-- Lesson container with embedded quiz -->
+<div id="lesson1">
+  <h2>The History of Royal Tea</h2>
+  <p>Test your knowledge about the origins and history of tea in royal courts.</p>
+  
+  <!-- Quiz Content -->
+  <div id="quiz1">
+    <div id="question1"></div>
+    <div id="options1"></div>
+    <div id="feedback1"></div>
+    <button id="nextBtn1" style="display:none;">Next Question</button>
+    <div class="completion" id="completionMsg" style="display:none;">Congratulations! You have completed this lesson.</div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  Long Live the Royal Tea & Manners Academy | Embrace Elegance & Grace
+</footer>
+
+<!-- JavaScript for controlling the flow -->
+<script>
+// Questions array for Lesson 1
+const questions1 = [
+  {
+    question: "Where did tea originally become popular among European royalty?",
+    options: ["France", "England", "China", "India"],
+    answer: 1
+  },
+  {
+    question: "Which British monarch is famously associated with popularizing afternoon tea?",
+    options: ["Queen Victoria", "King George III", "Queen Elizabeth I", "Queen Anne"],
+    answer: 0
+  },
+  {
+    question: "In which century did tea become a fashionable royal beverage in Europe?",
+    options: ["15th", "16th", "17th", "18th"],
+    answer: 3
+  },
+  {
+    question: "Which country introduced tea to Europe through trade?",
+    options: ["Japan", "China", "India", "Korea"],
+    answer: 1
+  }
+];
+
+let currentQ = 0;
+
+// Elements
+const startBtn = document.getElementById('startLessonBtn');
+const lessonDiv = document.getElementById('lesson1');
+const questionDiv = document.getElementById('question1');
+const optionsDiv = document.getElementById('options1');
+const feedbackDiv = document.getElementById('feedback1');
+const nextBtn = document.getElementById('nextBtn1');
+const completionMsg = document.getElementById('completionMsg');
+
+// Show lesson on button click
+startBtn.onclick = () => {
+  startBtn.style.display = 'none';
+  lessonDiv.style.display = 'block';
+  loadQuestion();
+};
+
+function loadQuestion() {
+  const q = questions1[currentQ];
+  questionDiv.textContent = q.question;
+  optionsDiv.innerHTML = '';
+
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(idx);
+    optionsDiv.appendChild(btn);
+  });
+
+  feedbackDiv.textContent = '';
+  nextBtn.style.display = 'none';
+  completionMsg.style.display = 'none';
+}
+
+function checkAnswer(selectedIdx) {
+  const correctIdx = questions1[currentQ].answer;
+  if (selectedIdx === correctIdx) {
+    feedbackDiv.textContent = "Correct! Well done.";
+    nextBtn.style.display = 'inline-block';
+  } else {
+    feedbackDiv.textContent = "Gently remind to try again.";
+  }
+}
+
+// Next question handler
+nextBtn.onclick = () => {
+  currentQ++;
+  if (currentQ < questions1.length) {
+    loadQuestion();
+  } else {
+    // Completed all questions
+    document.getElementById('question1').style.display = 'none';
+    document.getElementById('options1').style.display = 'none';
+    feedbackDiv.style.display = 'none';
+    nextBtn.style.display = 'none';
+    document.getElementById('completionMsg').style.display = 'block';
+  }
+};
+</script>
+
+</body>
+</html>
