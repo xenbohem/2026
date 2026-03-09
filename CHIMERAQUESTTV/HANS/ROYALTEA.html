@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head><script src="/.nekoweb-api/static/site.js" type="text/javascript" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Royal Tea & Manners Academy</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:'Playfair Display',serif;
+background:#4B0082;
+color:white;
+text-align:center;
+}
+
+/* PALACE LOADING SCREEN */
+
+#loading{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#4B0082;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+color:#ffd700;
+z-index:9999;
+}
+
+.palace{
+font-size:80px;
+animation:float 2s infinite ease-in-out;
+}
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-10px)}
+100%{transform:translateY(0)}
+}
+
+header{
+padding:20px;
+font-size:2.2em;
+color:#ffd700;
+border-bottom:4px solid #ffd700;
+}
+
+button{
+padding:12px 24px;
+font-size:1.2em;
+background:#ffd700;
+color:#4B0082;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#e6c200;
+}
+
+/* LESSON BOX */
+
+.lesson{
+display:none;
+max-width:900px;
+margin:auto;
+margin-top:40px;
+padding:20px;
+background:rgba(255,255,255,0.2);
+border-radius:15px;
+border:2px solid #ffd700;
+}
+
+.option{
+display:block;
+margin:10px auto;
+padding:10px;
+width:70%;
+border-radius:8px;
+border:none;
+cursor:pointer;
+}
+
+.option:hover{
+background:#ddd;
+}
+
+/* PROGRESS */
+
+#progress{
+background:white;
+color:#4B0082;
+width:350px;
+margin:auto;
+margin-top:20px;
+border-radius:10px;
+padding:10px;
+}
+
+/* BADGE CABINET */
+
+#badgeCabinet{
+margin-top:25px;
+padding:15px;
+background:rgba(255,255,255,0.2);
+border:2px solid #ffd700;
+border-radius:12px;
+width:400px;
+margin-left:auto;
+margin-right:auto;
+}
+
+#badges{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:12px;
+margin-top:10px;
+}
+
+.badgeIcon{
+font-size:32px;
+opacity:0.3;
+}
+
+.badgeEarned{
+opacity:1;
+filter:drop-shadow(0 0 5px gold);
+}
+
+/* GRADUATION */
+
+#graduation{
+display:none;
+margin-top:40px;
+}
+
+/* CERTIFICATE */
+
+#certificate{
+display:none;
+margin-top:40px;
+}
+
+canvas{
+border:4px solid #ffd700;
+animation:sealGlow 3s infinite alternate;
+}
+
+@keyframes sealGlow{
+from{box-shadow:0 0 10px gold;}
+to{box-shadow:0 0 25px gold;}
+}
+
+footer{
+margin-top:50px;
+padding:20px;
+color:#ffd700;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- LOADING -->
+
+<div id="loading">
+<div class="palace">🏰</div>
+<h1>Royal Tea & Manners Academy</h1>
+<p>Opening the Palace Gates...</p>
+</div>
+
+<header>Royal Tea & Manners Academy</header>
+
+<!-- WELCOME -->
+
+<div id="welcome">
+
+<h2>Welcome Noble Student</h2>
+
+<p>Enter your name to begin your royal training.</p>
+
+<input id="studentName" placeholder="Your Name"
+style="padding:10px;font-size:1.1em;border-radius:6px;border:none">
+
+<br><br>
+
+<button id="startBtn">Begin Royal Journey</button>
+
+</div>
+
+<!-- ACADEMY -->
+
+<div id="academy" style="display:none">
+
+<div id="progress">
+<h3>Your Royal Progress</h3>
+<ul id="progressList"></ul>
+</div>
+
+<div id="badgeCabinet">
+<h3>Royal Badge Cabinet</h3>
+<div id="badges"></div>
+</div>
+
+<div id="lessonBox" class="lesson">
+
+<h2 id="lessonTitle"></h2>
+
+<p id="question"></p>
+
+<div id="options"></div>
+
+<button id="nextBtn">Next Question</button>
+
+</div>
+
+</div>
+
+<!-- GRADUATION -->
+
+<div id="graduation">
+
+<h1>🎺 Royal Graduation Ceremony 🎺</h1>
+
+<p>The Royal Court recognizes your mastery of Tea & Manners.</p>
+
+<div style="font-size:80px;">👑</div>
+
+<p>Prepare to receive your Royal Certificate</p>
+
+<button id="receiveCert">Receive Certificate</button>
+
+</div>
+
+<!-- CERTIFICATE -->
+
+<div id="certificate">
+
+<h2>Royal Certificate</h2>
+
+<canvas id="certCanvas" width="800" height="500"></canvas>
+
+<br>
+
+<button id="downloadCert">Download Certificate</button>
+
+<br>
+
+<button id="restart">Restart Academy</button>
+
+</div>
+
+<footer>
+Long Live the Royal Tea & Manners Academy
+</footer>
+
+<script>
+
+/* LOADING */
+
+setTimeout(()=>{
+document.getElementById("loading").style.display="none";
+},2000);
+
+/* LESSON DATA */
+
+const lessons=[
+
+{title:"History of Royal Tea",badge:"☕",
+questions:[
+{q:"Tea originated in which country?",o:["China","France","England","India"],a:0},
+{q:"Which monarch popularized afternoon tea?",o:["Queen Victoria","Henry VIII","Elizabeth I","George III"],a:0}
+]},
+
+{title:"Tea Etiquette",badge:"🍵",
+questions:[
+{q:"How should a teacup be held?",o:["Pinky raised","Pinky down grip","Two hands","From rim"],a:1},
+{q:"Tea is served with?",o:["Scones","Burgers","Pizza","Soup"],a:0}
+]},
+
+{title:"Table Manners",badge:"🍽️",
+questions:[
+{q:"Napkin placement?",o:["Lap","Table","Chair","Collar"],a:0},
+{q:"Utensils after finishing?",o:["Parallel","Crossed","Table","Hidden"],a:0}
+]},
+
+{title:"Conversation Etiquette",badge:"💬",
+questions:[
+{q:"Tea conversation should be?",o:["Polite","Loud","Argumentative","Silent"],a:0},
+{q:"Appropriate topic?",o:["Art & culture","Arguments","Politics","Gossip"],a:0}
+]},
+
+{title:"Tea Decor",badge:"🌸",
+questions:[
+{q:"Royal tea decor includes?",o:["Fine china","Plastic cups","Paper plates","None"],a:0},
+{q:"Common color palette?",o:["Jewel tones","Neon","Grey","Black"],a:0}
+]},
+
+{title:"Dress Code",badge:"👑",
+questions:[
+{q:"Proper tea attire?",o:["Formal wear","Sportswear","Pajamas","Beachwear"],a:0},
+{q:"Accessories include?",o:["Gloves","Sneakers","Hats backward","None"],a:0}
+]},
+
+{title:"Royal Ceremony",badge:"🏆",
+questions:[
+{q:"Final ceremony demonstrates?",o:["Etiquette mastery","Cooking","Dance","History only"],a:0},
+{q:"Completion earns?",o:["Certificate","Nothing","Food","Money"],a:0}
+]}
+
+];
+
+let lessonIndex=0;
+let questionIndex=0;
+let student="";
+
+/* START */
+
+document.getElementById("startBtn").onclick=()=>{
+
+student=document.getElementById("studentName").value;
+
+if(!student){
+alert("Please enter your name.");
+return;
+}
+
+document.getElementById("welcome").style.display="none";
+document.getElementById("academy").style.display="block";
+
+document.getElementById("lessonBox").style.display="block";
+
+loadQuestion();
+
+};
+
+/* LOAD QUESTION */
+
+function loadQuestion(){
+
+const lesson=lessons[lessonIndex];
+const q=lesson.questions[questionIndex];
+
+document.getElementById("lessonTitle").textContent=lesson.title;
+document.getElementById("question").textContent=q.q;
+
+const options=document.getElementById("options");
+options.innerHTML="";
+
+q.o.forEach((opt,i)=>{
+
+const btn=document.createElement("button");
+btn.className="option";
+btn.textContent=opt;
+
+btn.onclick=()=>{
+
+if(i===q.a){
+
+btn.style.background="#E6D690";
+btn.style.color="#4B0082";
+
+document.getElementById("nextBtn").disabled=false;
+
+}else{
+
+btn.style.background="#c9b6ff";
+btn.style.color="#4B0082";
+
+alert("Not quite, noble student. Please try again.");
+
+return;
+
+}
+
+Array.from(options.children).forEach(b=>{
+if(b!==btn){b.disabled=true;}
+});
+
+};
+
+options.appendChild(btn);
+
+});
+
+document.getElementById("nextBtn").disabled=true;
+
+}
+
+/* NEXT */
+
+document.getElementById("nextBtn").onclick=()=>{
+
+questionIndex++;
+
+if(questionIndex<lessons[lessonIndex].questions.length){
+
+loadQuestion();
+
+}else{
+
+localStorage.setItem("lesson"+lessonIndex,"done");
+
+updateProgress();
+
+lessonIndex++;
+questionIndex=0;
+
+if(lessonIndex<lessons.length){
+
+loadQuestion();
+
+}else{
+
+finishAcademy();
+
+}
+
+}
+
+};
+
+/* PROGRESS */
+
+function updateProgress(){
+
+const list=document.getElementById("progressList");
+const badges=document.getElementById("badges");
+
+list.innerHTML="";
+badges.innerHTML="";
+
+for(let i=0;i<lessons.length;i++){
+
+const badge=document.createElement("div");
+badge.className="badgeIcon";
+badge.innerHTML=lessons[i].badge;
+
+if(localStorage.getItem("lesson"+i)){
+
+const li=document.createElement("li");
+li.innerHTML=lessons[i].badge+" Lesson "+(i+1)+" Completed";
+
+list.appendChild(li);
+
+badge.classList.add("badgeEarned");
+
+}
+
+badges.appendChild(badge);
+
+}
+
+}
+
+/* FINISH */
+
+function finishAcademy(){
+
+document.getElementById("academy").style.display="none";
+
+document.getElementById("graduation").style.display="block";
+
+}
+
+/* CERTIFICATE */
+
+document.getElementById("receiveCert").onclick=()=>{
+
+document.getElementById("graduation").style.display="none";
+
+document.getElementById("certificate").style.display="block";
+
+generateCert();
+
+};
+
+function generateCert(){
+
+const canvas=document.getElementById("certCanvas");
+const ctx=canvas.getContext("2d");
+
+ctx.fillStyle="#fff8dc";
+ctx.fillRect(0,0,800,500);
+
+ctx.strokeStyle="#b8860b";
+ctx.lineWidth=8;
+ctx.strokeRect(10,10,780,480);
+
+ctx.fillStyle="#4B0082";
+ctx.font="bold 36px serif";
+ctx.textAlign="center";
+
+ctx.fillText("Royal Certificate of Achievement",400,120);
+
+ctx.font="26px serif";
+ctx.fillText(student,400,220);
+
+ctx.font="20px serif";
+ctx.fillText("Has Mastered the Royal Tea & Manners Academy",400,280);
+
+ctx.fillText(new Date().toLocaleDateString(),400,340);
+
+/* WAX SEAL */
+
+ctx.beginPath();
+ctx.fillStyle="#8B0000";
+ctx.arc(650,350,40,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="#ffd700";
+ctx.font="28px serif";
+ctx.fillText("R",650,360);
+
+}
+
+/* DOWNLOAD */
+
+document.getElementById("downloadCert").onclick=()=>{
+
+const link=document.createElement("a");
+link.download="RoyalCertificate.png";
+link.href=document.getElementById("certCanvas").toDataURL();
+link.click();
+
+};
+
+/* RESTART */
+
+document.getElementById("restart").onclick=()=>{
+
+localStorage.clear();
+location.reload();
+
+};
+
+updateProgress();
+
+</script>
+
+</body>
+</html>
