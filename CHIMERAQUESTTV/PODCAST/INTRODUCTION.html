@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chimera Café</title>
+<style>
+body{
+  margin:0;
+  font-family:Courier New, monospace;
+  background:#0a0a2a;
+  color:#e0e0ff;
+  overflow:hidden;
+}
+body::after{
+  content:"";
+  position:fixed;
+  top:0;left:0;width:100%;height:100%;
+  background:linear-gradient(rgba(0,0,0,0)50%,rgba(0,0,0,.25)50%);
+  background-size:100% 4px;
+  pointer-events:none;
+}
+
+/* BOOT SCREEN */
+#bootScreen{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:black;color:#00ff9f;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  font-size:22px;z-index:1000;
+}
+#bootMessage{
+  margin-top:20px;font-size:18px;
+}
+
+/* CRT VIDEO */
+#crtStage{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:black;display:none;align-items:center;justify-content:center;z-index:900;
+}
+.crt{transform:rotate(-4deg);background:#111;padding:25px;border-radius:20px;
+  box-shadow:0 0 40px purple,0 0 80px violet;}
+.crt-screen{background:black;padding:10px;border-radius:10px;overflow:hidden;}
+.crt video{width:720px;max-width:90vw;filter:contrast(1.2) brightness(1.1) saturate(1.2);}
+
+/* MAIN SITE */
+#site{display:none;max-width:900px;margin:auto;margin-top:60px;background:rgba(40,40,80,.9);
+border:4px solid #8a2be2;padding:30px;}
+h1{text-align:center;margin-bottom:20px;}
+h2{text-align:center;margin-bottom:12px;}
+
+/* SYNOPSIS / COMIC STYLE */
+.synopsis, .character{
+  background:rgba(60,60,100,.7);
+  border:2px solid #4a00e0;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:8px;
+}
+.character b{color:#ff6b6b;}
+
+/* NEXT BUTTON */
+#nextBtn{
+  display:block;
+  margin:20px auto;
+  padding:12px 25px;
+  font-size:16px;
+  background:#ff6b6b;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+/* PODCAST / AUDIO */
+#audioSection{margin-top:30px;border:2px solid #8a2be2;padding:20px;}
+button{padding:10px 18px;background:#ff6b6b;border:none;cursor:pointer;}
+.progress{height:10px;background:#333;margin-top:10px;}
+.fill{height:100%;background:#00ff88;width:0%;}
+
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="bootScreen">
+  <div>Café Loading In Progress...</div>
+  <div id="bootMessage">Initializing Systems...</div>
+</div>
+
+<!-- CRT VIDEO -->
+<div id="crtStage">
+  <div class="crt">
+    <div class="crt-screen">
+      <video id="introVideo" muted playsinline>
+        <source src="https://xenbohem.github.io/2026/CHIMERAQUESTTV/PODCAST/Chimeracyberpunkwelcome.mp4">
+      </video>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN SITE -->
+<div id="site">
+<h1>Welcome to Chimera Café</h1>
+
+<!-- SYNOPSIS -->
+<div class="synopsis">
+<b>Chimera Café</b> is not just a café—it's a sanctuary. Rescued from sinister labs by Yeshua, the chimera inhabitants live in a parallel paradise, enjoying tea, herbal wisdom, and cozy adventures. The café is a place to chill, talk, and experience extraordinary stories.
+</div>
+
+<!-- CHARACTERS -->
+<div class="character">
+<b>Hans:</b> A redeemed hybrid vampire-fox. Captured in Paris, born in England, ultimate TeaSnob. Keeper of the Library, master of etiquette, teacher at the Tea Academy.
+</div>
+
+<div class="character">
+<b>Star:</b> Eldest, Goth chic but kindhearted. Runs the café, interviews apprentices, serves lavender lattes, Earl Grey, and herbal teas from Milo's garden.
+</div>
+
+<div class="character">
+<b>Milo:</b> Zen master of the herbal garden and guardian of Yeshua’s sanctuary. Master of herbal brews and café wisdom.
+</div>
+
+<div class="character">
+<b>Chari:</b> Youngest, shy apprentice, sister of Star. Learns the ways of the café and tea etiquette.
+</div>
+
+<div class="character">
+<b>Miki:</b> Half-cat, half-human musician. Loves punk rock, activism for human and animal rights, brings music and energy to the café.
+</div>
+
+<button id="nextBtn">NEXT → Podcast</button>
+
+<!-- PODCAST / AUDIO -->
+<div id="audioSection">
+<h2>Podcast</h2>
+<button id="play">Play</button>
+<div class="progress"><div class="fill" id="audioFill"></div></div>
+<audio id="audio"><source src="audio/ch1_intro.mp3"></audio>
+</div>
+</div>
+
+<script>
+/* ---------- BOOT SEQUENCE ---------- */
+const bootMessages=["Preparing Hans Library...","Brewing Tea Archives..."];
+let i=0
+const bootText=document.getElementById("bootMessage")
+function nextBoot(){
+  if(i<bootMessages.length){
+    bootText.innerText=bootMessages[i]; i++
+    setTimeout(nextBoot,1000)
+  }
+}
+nextBoot()
+
+/* BOOT → VIDEO */
+setTimeout(()=>{
+  document.getElementById("bootScreen").style.display="none";
+  const crt=document.getElementById("crtStage"); crt.style.display="flex";
+  const vid=document.getElementById("introVideo"); vid.play();
+  
+  // SITE REVEAL WHEN VIDEO ENDS
+  vid.onended=()=>{
+    crt.style.display="none";
+    document.getElementById("site").style.display="block";
+    document.body.style.overflow="auto";
+  }
+},4000) // boot screen ~4 sec
+
+/* NEXT BUTTON */
+document.getElementById("nextBtn").onclick=()=>{
+  document.getElementById("audioSection").scrollIntoView({behavior:"smooth"});
+}
+
+/* ---------- AUDIO ---------- */
+const audio=document.getElementById("audio")
+const play=document.getElementById("play")
+const fill=document.getElementById("audioFill")
+play.onclick=()=>audio.play()
+audio.addEventListener("timeupdate",()=>{
+  if(audio.duration) fill.style.width=(audio.currentTime/audio.duration*100)+"%"
+})
+</script>
+</body>
+</html>
