@@ -1114,41 +1114,40 @@ Booting Chimera Café System...
     </div>
 
     <script>
-        // Loading Screen Logic
-        const loadingScreen = document.getElementById('loading-screen');
-        const loadingText = document.getElementById('loading-text');
-        const loadingFill = document.getElementById('loading-fill');
-        const mainContainer = document.getElementById('main-container');
 
-        // Simulate loading progress (fake steps for demo)
-        const loadingSteps = [
-            'Loading game engine...',
-            'Initializing audio system...',
-            'Loading story levels...',
-            'Preparing narrator...',
-            'Adventure ready!'
-        ];
-        let stepIndex = 0;
-        let progress = 0;
+const video = document.getElementById("intro-video")
+const fill = document.getElementById("loading-fill")
+const screen = document.getElementById("loading-screen")
+const main = document.getElementById("main")
 
-        function updateLoading() {
-            if (stepIndex < loadingSteps.length) {
-                loadingText.textContent = loadingSteps[stepIndex];
-                progress += (100 / loadingSteps.length);
-                loadingFill.style.width = Math.min(progress, 100) + '%';
-                
-                stepIndex++;
-                setTimeout(updateLoading, 600); // Next step after 600ms
-            } else {
-                // Loading complete - fade out screen and show main content
-                setTimeout(() => {
-                    loadingScreen.classList.add('hidden');
-                    mainContainer.classList.add('visible');
-                    // Re-enable scrolling
-                    document.body.style.overflow = 'auto';
-                }, 800); // Brief pause before fade
-            }
-        }
+function showSite(){
+
+screen.style.display="none"
+main.style.display="block"
+document.body.style.overflow="auto"
+
+}
+
+/* progress bar */
+
+video.addEventListener("timeupdate",()=>{
+
+if(video.duration){
+
+fill.style.width=(video.currentTime/video.duration*100)+"%"
+
+}
+
+})
+
+/* when video finishes */
+
+video.addEventListener("ended",showSite)
+
+/* BACKUP in case ended doesn't fire */
+
+setTimeout(showSite,12000)
+
 
         // Start loading simulation
         updateLoading();
