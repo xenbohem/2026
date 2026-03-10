@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Spider Archive</title>
+
+<style>
+ :root{
+ --pink:#6495ED;      /* cornflower blue */
+ --purple:#2f3f8f;    /* deeper blue-purple accent */
+ --black:#0e0e0e;
+ --charcoal:#181818;
+ --soft:#b8c6ff;      /* softened blue-gray for badges */
+
+}
+body{
+ margin:0;
+ background:var(--black);
+ font-family:"Courier New",monospace;
+ color:white;
+ overflow:hidden;
+}
+.wrapper{
+ display:grid;
+ grid-template-columns:420px 1fr;
+ height:100vh;
+}
+.sidebar{
+ background:var(--charcoal);
+ padding:20px;
+ overflow-y:auto;
+ border-right:1px solid var(--purple);
+ position:relative;
+}
+h1{
+ font-size:14px;
+ letter-spacing:3px;
+ color:var(--pink);
+}
+.controls{
+ margin:10px 0;
+ display:flex;
+ flex-wrap:wrap;
+ gap:6px;
+}
+input, select, button{
+ background:black;
+ border:1px solid var(--purple);
+ color:var(--pink);
+ padding:6px;
+ font-size:11px;
+}
+button:hover{
+ border-color:var(--pink);
+ cursor:pointer;
+}
+.az-nav{
+ display:flex;
+ flex-wrap:wrap;
+ gap:4px;
+ margin-bottom:10px;
+}
+.az-nav span{
+ font-size:10px;
+ color:var(--soft);
+ cursor:pointer;
+}
+.az-nav span:hover{
+ color:var(--pink);
+}
+.tile{
+ border:1px solid var(--purple);
+ margin-bottom:12px;
+ background:black;
+ transition:.25s ease;
+}
+.tile:hover{
+ border-color:var(--pink);
+}
+.tile img{
+ width:100%;
+ height:140px;
+ object-fit:cover;
+ filter:grayscale(30%);
+}
+.title{
+ font-size:11px;
+ padding:6px;
+ color:var(--pink);
+}
+.badges{
+ padding:0 6px 6px 6px;
+ display:flex;
+ flex-wrap:wrap;
+ gap:4px;
+}
+.badge{
+ font-size:9px;
+ border:1px solid var(--purple);
+ padding:2px 4px;
+ color:var(--soft);
+}
+.commentary{
+ font-size:9px;
+ padding:6px;
+ color:var(--soft);
+ border-top:1px solid #222;
+ display:none;
+}
+.viewer{
+ background:black;
+}
+iframe{
+ width:100%;
+ height:100%;
+ border:none;
+}
+#spider{
+ position:absolute;
+ width:28px;
+ font-size:22px;
+ animation:crawl 25s linear infinite;
+ z-index:9999;
+}
+@keyframes crawl{
+ 0%{top:0; left:0;}
+ 25%{top:0; left:92%;}
+ 50%{top:92%; left:92%;}
+ 75%{top:92%; left:0;}
+ 100%{top:0; left:0;}
+}
+
+/* subtle corner webs */
+.web{
+ position:absolute;
+ width:120px;
+ opacity:.07;
+ pointer-events:none;
+}
+.web.top-left{top:0;left:0;}
+.web.bottom-right{bottom:0;right:0;transform:rotate(180deg);}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="sidebar">
+
+<h1>SPIDER ARCHIVE</h1>
+
+<div class="controls">
+<input type="text" id="search" placeholder="Search...">
+<select id="tagFilter">
+<option value="all">All</option>
+<option value="cafe">Cafe</option>
+<option value="adventure">Adventure</option>
+<option value="chat">Chat</option>
+<option value="guild">Guild</option>
+<option value="menu">Menu</option>
+<option value="membership">Membership</option>
+</select>
+<button onclick="scanAllPages()">Scan</button>
+<button onclick="toggleCommentary()">Commentary</button>
+</div>
+
+<div class="az-nav" id="azNav"></div>
+<div id="grid"></div>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Spider_web_icon.svg" class="web top-left">
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Spider_web_icon.svg" class="web bottom-right">
+
+</div>
+
+<div class="viewer">
+<iframe name="viewer"></iframe>
+</div>
+
+</div>
+
+<div id="spider">🕷</div>
+
+<script>
+/* ===== YOUR FULL URL LIST ===== */
+const urls=[
+"https://xencafe.nekoweb.org/AFFILIATES-HOWTO/INSTRUCTIONS/VISUAL-MOOD-BOARD/visual-mood.html",
+ "https://x3nb.github.io/Soundcafe/audiobook/index.html",
+ "https://3society.neocities.org/36Squarefx/perfect",
+ "https://xenbohem.github.io/2026/CHIMERAQUESTTV/ACADEMY/index.html",
+ "https://xencafe.nekoweb.org/2026/PODCAST-HANS/podcastsite1.html",
+ "https://xenbohem.github.io/2026/CHIMERAQUESTTV/HANS/ROYALTEA.html",
+ "https://xencafe.nekoweb.org/2026/MARCH/62026/Japanesetopics.html#movies",
+ "https://xenbohem.github.io/2026/TVCATALOG/TVGLITCHED3CHANNELS.html",
+ "https://xencafe.nekoweb.org/2026/PODCAST-HANS/test5.html#academy",
+ "https://xencafe.nekoweb.org/2026/HANSLIBRARY/hansinvitesyoutotea.html",
+ "https://xencafe.nekoweb.org/2026/DIRECTORY/MARCHWEBSITES/test7.html",
+ "https://x3nb.github.io/shrinkingviolets/kaleidoscope-Hans-intro.html",
+ "https://xencafe.nekoweb.org/2026/LIBRARY/library5.html",
+ "https://3society.neocities.org/7PASSWORD.LOGIN/COMMUNITYVAULT/loginpassword",
+"https://xencafe.nekoweb.org/FASHIONASSOC/STAR/star-cafe-stylist-budget/STAR-INTERACTIVE-NPC/starscabinetupgrade5.html",
+"https://xencafe.nekoweb.org/CRYSTALDEN/LAST.html",
+"https://xenbohem.github.io/twasforetold/visualizer/dream_visualizer_playlist.html",
+"https://valxentine.art/VALXENTINE/",
+ "https://xencafe.nekoweb.org/2026/HANSLIBRARY/hansinvitesyoutotea.html",
+ "https://x3nb.github.io/chezxen/uniqueuser.html",
+ "https://xenbohem.github.io/LoreQuest/Realms/Chimera-Cat-Cafe/Star-Apprentice/index.html",
+ "https://xenbohem.github.io/chimerastarcafe/cafegame/satisfiedcustomer/",
+ "https://x3nb.github.io/perplexed/marionette/index.html",
+"https://x3nb.github.io/cafecup/spider-landing.html",
+"https://3society.neocities.org/AUGUST2025/10th/STELL.CHAT/1",
+"https://xencafe.nekoweb.org/SHOPBITCHEZ/productflipwall.html",
+ "https://xenbohem.github.io/2026/THESCROLL/SIGNET.html#",
+"https://xencafe.nekoweb.org/2026/OFFICIAL-SCROLL-TEMPLATE#",
+"https://xencafe.nekoweb.org/2026/EPICSCROLL/index.html",
+"https://xencafe.nekoweb.org/2026/EPICSCROLL/divinehaloloading.html",
+"https://xencafe.nekoweb.org/2026/EPICSCROLL/divineloadingpage.html",
+"https://xencafe.nekoweb.org/2026/ROYALS/one.html",
+"https://xencafe.nekoweb.org/CALM/calm.html",
+ "https://3society.neocities.org/HANS-LIBRARY/SKIP-BUTTON",
+"https://x3nb.github.io/chezxen/uniqueuser.html",
+ "https://xenbohem.github.io/chimeraescape/cafe-apprenticeship/index.html",
+"https://xenbohem.github.io/valentine/chatmosaic.html",
+"https://3society.neocities.org/2026/2026-DESKTOP/FILE-EDITOR/HTMLFile-Editor/codeeditor",
+"https://3society.neocities.org/2026/ELEVATOR/",
+"https://3society.neocities.org/2026/2026-DESKTOP/NAVIGATION",
+"https://3society.neocities.org/2026/EPIC.NAVIGATION/INDUSTRIAL.MENU/Bassline.menu",
+"https://xencafe.nekoweb.org/2026/KUROSEARCH/cafe-chimera-charintro.mp4",
+"https://xencafe.nekoweb.org/2026/KUROSEARCH/searchwebsites.html",
+"https://xenbohem.github.io/2026/archive/kurowidgetsearch.html",
+"https://xencafe.nekoweb.org/2026/ARCHIVES/KEYWORDS-SEARCH.html",
+"https://3society.neocities.org/2026/TRON-DESKTOP/12-21-2025-155am-Cerulean/cerulean-revised",
+"https://3society.neocities.org/CALENDAERS/NewSoundCalendar",
+"https://3society.neocities.org/2026/SIS2.GIFT/revised1gift",
+"https://3society.neocities.org/2026/Christmas-gifts/blkbox-revised-Iam",
+"https://3society.neocities.org/2026/blackboxfix",
+"https://x3nb.github.io/cafecup/spider-landing.html",
+ https://xenbohem.github.io/2026/CHIMERAQUESTTV/",
+"https://3society.neocities.org/2026/CHIMERAESCAPE-STAR/stars-cafe",
+"https://3society.neocities.org/2026/tea",
+"https://3society.neocities.org/2026/CHIMERAESCAPE-STAR/milos-garden",
+"https://3society.neocities.org/11-15-2026-TeaAcademy/epic",
+"https://xenbohem.github.io/2026/archive/movie/index.html",
+"https://3society.neocities.org/12-7-25-menu/off_on_toggle",
+"https://3society.neocities.org/11-21-codex/codex-full",
+"https://3society.neocities.org/11-21-codex/fixed1",
+"https://3society.neocities.org/12-5-25/movie",
+"https://x3nb.github.io/starcup/guidesing.html",
+ "https://xenbohem.github.io/LoreQuest/Realms/Chimera-Cat-Cafe/Star-Apprentice/index.html",
+"https://3society.neocities.org/12-8-24-join/future",
+"https://3society.neocities.org/12-8-25.amz/chimera-menu",
+"https://3society.neocities.org/12-7-25-menu/miraculous",
+"https://3society.neocities.org/11-13-CHAT/chatroom",
+"https://3society.neocities.org/000THEVIBEZ_CAFE/DISCORD.CARD/FIZZCHAOS",
+"https://xencafe.nekoweb.org/AETHUR_NX/pilotcockpit.html",
+"https://3society.neocities.org/12-23-25-MysteryBlog/blog#",
+"https://3society.neocities.org/11-19-26-cool-aether/hansshort-mosaic-full",
+"https://3society.neocities.org/11-19-26-cool-aether/full-hans-mosaic2",
+ "https://xenbohem.github.io/chimeraescape/Hans-Library-Apprentice/Hans-dialogue-1.html",
+ "https://3society.neocities.org/2026/Valentine/footnote",
+"https://3society.neocities.org/01-08-2025-ValentinesLOGIN/PUNKPAPER/Drawers/last",
+"https://3society.neocities.org/01-08-2025-ValentinesLOGIN/riddlerotation",
+"https://3society.neocities.org/01-08-2025-ValentinesLOGIN/punk",
+"https://3society.neocities.org/01-08-2025-ValentinesLOGIN/PUNKPAPER/Valentineriddle",
+ "https://3society.neocities.org/12-8-25.amz/vaxentines-quest",
+ "https://3society.neocities.org/2026/Valentine/unlockheartbest",
+"https://3society.neocities.org/2026/Valentine/blog",
+"https://3society.neocities.org/2026/Valentine/quiz",
+"https://3society.neocities.org/2026/Valentine/Personalitytest/mapped",
+"https://3society.neocities.org/01-08-2025-ValentinesLOGIN/PUNKPAPER/2",
+"https://3society.neocities.org/00JAN31-2026/videogame",
+"https://xenbohem.github.io/twasforetold/visualizer/visualizer-ripples-fin.html",
+"https://3society.neocities.org/COMFYCAFE.IMAGES/movement.trio",
+"https://3society.neocities.org/ZINE-template-12-8/backend_builder_cosmic",
+"https://3society.neocities.org/00Jan292026/last",
+"https://3society.neocities.org/2026/SIS2.GIFT/FORM-DESKTOP/sis2",
+"https://3society.neocities.org/00Jan292026/Godhelpme",
+"https://3society.neocities.org/00January.forum/005",
+"https://3society.neocities.org/00JAN31-2026/HELPME/24HRS",
+"https://3society.neocities.org/00JAN31-2026/NEWEST/scripturally",
+"https://3society.neocities.org/12-8-25.amz/chamomile",
+"https://3society.neocities.org/12-8-25.amz/earl-grey",
+"https://3society.neocities.org/12-8-25.amz/lavender",
+"https://3society.neocities.org/00JAN31-2026/blockchaintea",
+"https://3society.neocities.org/00JAN31-2026/SEARCH-HERBS/colorsearch",
+"https://3society.neocities.org/00JANUARY2026/loginayeaye",
+"https://3society.neocities.org/00JANUARY2026/JAN18455am/askewed",
+"https://3society.neocities.org/00JANUARY19th2026/youresafehere",
+"https://3society.neocities.org/01-04-2026/30-MIN-LOGIN/",
+"https://x3nb.github.io/glasshub/newsletter.html",
+"https://3society.neocities.org/01-09-26-catalog/admincatalog",
+"https://3society.neocities.org/01-10-25-FORUM/newest/better-responses",
+"https://3society.neocities.org/01-3-2026/forum/",
+"https://xenbohem.github.io/cerulean/Dream-Player/dream-portal-player.html",
+"https://3society.neocities.org/PARIS.OCT25/video.pollembed",
+"https://3society.neocities.org/ANTHOLOGY/ANTHOLOGY2/17",
+"https://3society.neocities.org/ANTHOLOGY/SONG.LYRICS.CAFE/originaltunes",
+"https://3society.neocities.org/CANDYLAND/NEW/Complete",
+"https://3society.neocities.org/CATALOG.GUILD/Tea.Searchengine",
+"https://3society.neocities.org/CATALOG.GUILD/SUPABASE.SEARCH/GUIDE.SUPABASE/Clear.Instructions.CommunityLogin",
+"https://3society.neocities.org/CATALOG.GUILD/SUPABASE.SEARCH/GUIDE.SUPABASE/DATA.Rows.Columns.html/DATABASE.GUIDE",
+"https://3society.neocities.org/CATALOG.GUILD/SUPABASE.SEARCH/GUIDE.SUPABASE/Guide.Membership",
+"https://3society.neocities.org/CATALOG.GUILD/SUPABASE.SEARCH/developersearch",
+"https://3society.neocities.org/CATALOG.GUILD/Searchcatalog",
+"https://3society.neocities.org/2026/LORE.WEBSITE/",
+ "https://xencafe.nekoweb.org/2026/HANSLIBRARY/hansinvitesyoutotea.html",
+"https://3society.neocities.org/FOURTHWALL.QUEST/MEMBERSHIP.TIERS.GLITZ/one",
+"https://3society.neocities.org/COMFORTCAFE/MEMBERS.NEW/",
+"https://3society.neocities.org/COMFORTCAFE_LORE/BOOKSHELF/Classy%20vertical%20bookshelf.html/COMPLETEBOOKSHELF",
+"https://3society.neocities.org/GUILD.AUGUST/ELEVATOR.REALM.CHAT/chat.cards.intro",
+"https://3society.neocities.org/GUILD.AUGUST/ELEVATOR.REALM.CHAT/commorantfont.ticker",
+"https://3society.neocities.org/GUILD.AUGUST/ELEVATOR.REALM.CHAT/dramatic.chatrealm",
+"https://3society.neocities.org/GUILD.AUGUST/ELEVATOR.REALM.CHAT/musicalchatbots",
+"https://3society.neocities.org/GUILD.AUGUST/ELEVATOR.REALM.CHAT/MUSICAL.REALMS/Ethereal.RealmSounds",
+"https://3society.neocities.org/GUILD.AUGUST/GUILD.REFRESHED/EJFGATEWAY/gateway",
+"https://3society.neocities.org/GUILD.AUGUST/GUILD.REFRESHED/Fashionadvisor",
+"https://3society.neocities.org/GUILD.AUGUST/GUILD.REFRESHED/Loretwilightstyle",
+"https://3society.neocities.org/GUILD.AUGUST/GUILD.REFRESHED/TEASHOP.game/",
+"https://3society.neocities.org/GUILD.AUGUST/GUILD.REFRESHED/TEASHOP.game/cashier",
+"https://3society.neocities.org/GUILD.AUGUST/GUILD.REFRESHED/NAVIGATION/InterviewMenu/starintromenu",
+ "https://xenbohem.github.io/chimerastarcafe/cafegame/TRANSITION-MILOS/index.html",
+"https://3society.neocities.org/GUILD.AUGUST/MENUS/VAMPYMENU",
+"https://xenbohem.github.io/quest/teasnobinterview/usernamefx.html",
+"https://3society.neocities.org/2026/QUEST.MANIFEST/original#",
+"https://3society.neocities.org/GUILD.AUGUST/MUSIC.ROOM/musiclibrary",
+"https://3society.neocities.org/GUILD.AUGUST/MEMBERS/members.anchored",
+ "https://xencafe.nekoweb.org/2026/HANSLIBRARY/RESTARTLIBRARYGAME.html",
+"https://3society.neocities.org/GUILD.AUGUST/INTERVIEW/Shakespeareaninterview",
+"https://3society.neocities.org/GUILD.AUGUST/TRIO.CHATCAFE/triochat",
+"https://3society.neocities.org/GUILD.THERIAN/Adoption%20center.html/CafeKittenSupport/glasscats",
+"https://3society.neocities.org/GUILD.THERIAN/PersonalizedQuestCert/purplethemepersonal",
+"https://3society.neocities.org/GUILD.AUGUST/GUILD.REFRESHED/TeaSnobChat/",
+"https://3society.neocities.org/GUILD.AUGUST/VENDI.GLASS/vendimach",
+"https://3society.neocities.org/INTERACTIVE1.0/CSSSTYLE.CYBER/cybergothtemplate",
+"https://3society.neocities.org/MANIFESTACADEMY/orhere",
+"https://xencafe.nekoweb.org/2026/HANSLIBRARY/index.html",
+"https://xencafe.nekoweb.org/2026/HANSLIBRARY/RESTARTLIBRARYGAME.html",
+"https://3society.neocities.org/ROOMS.INTERACTIVE/Getting%20there/ALMOSTTHERE/artRealm",
+"https://3society.neocities.org/ROOMS.INTERACTIVE/Getting%20there/ALMOSTTHERE/cafeRealm",
+"https://3society.neocities.org/ROOMS.INTERACTIVE/Getting%20there/ALMOSTTHERE/XEN.BLUEPRINT/Roomsfixed",
+"https://3society.neocities.org/ROOMS.INTERACTIVE/Getting%20there/ALMOSTTHERE/XEN.BLUEPRINT/YES.SPIDEY",
+"https://3society.neocities.org/7ROOMS/harprooms",
+"https://3society.neocities.org/7ROOMS/ULTIMATE.TEAROOM/teagirlieschat",
+"https://3society.neocities.org/7ROOMS/USETHISSWIPE",
+"https://3society.neocities.org/7ROOMS/ECHO/cheekynarrativeaudio",
+"https://3society.neocities.org/7ROOMS/LAST%20ONE/experimentprototype",
+"https://xencafe.nekoweb.org/AFFILIATES-HOWTO/INSTRUCTIONS/UPGRADE-MOOD-BOARD/upgrade-formbold.html#",
+"https://3society.neocities.org/2026/QUEST.MANIFEST/TwilightAcademyQuest/dpaiQuestAcademy/regaljeopardy",
+"https://3society.neocities.org/12-8-25.amz/chimera-menu",
+ "https://3society.neocities.org/BOHEME/TRON-DESKTOP-CALENDAR/epictest1#",
+"https://3society.neocities.org/SPIDER.WEB/FloaterDeviceSpideyMan",
+"https://3society.neocities.org/SPIDERSEARCH/bkbxSpiderGuideSearch",
+"https://3society.neocities.org/PARIS.OCT25/LOADING",
+"https://3society.neocities.org/STARRYCAFE/VideosBioCats",
+"https://3society.neocities.org/SOUNDS/SoundsImageMenu/completemenu",
+"https://3society.neocities.org/SOUNDMENU/home#top",
+"https://3society.neocities.org/SUNO.MUSIC/PLAYLIST.HOME/ghostplaylist",
+"https://x3nb.github.io/shrinkingviolets/quests/mysterycafe/",
+"https://xenbohem.github.io/chimeraescape/CAFE/starflynarrowchat.html",
+"https://xencafe.nekoweb.org/GONE2THE1980s/AFFILIATEWEB/affiliateswebsitesECT.html",
+"https://xencafe.nekoweb.org/SHOP/ripples.html",
+"https://xencafe.nekoweb.org/2026/DIRECTORY/MARCHWEBSITES/catalogleftright.html",
+"https://3society.neocities.org/7-16_FLIPGLITCH/testflip",
+"https://3society.neocities.org/2026/REALMS/majesticrealms",
+"https://3society.neocities.org/PORTFOLIO-code/PORTFOLIO-X3N/12-11-2025#contact",
+"https://3society.neocities.org/2026/EPIC.NAVIGATION/INDUSTRIAL.MENU/DRUMMACHINE/",
+"https://3society.neocities.org/11-18-25-Paper-White-Portfolio/chi-forum"
+];
+
+const characters = ["stellar","star","milo","chimi","hans"];
+
+const keywordMap = {
+ cafe:["cafe","coffee","tea","shop"],
+ adventure:["quest","adventure","game"],
+ chat:["chat","realm","bot","trio"],
+ guild:["guild","library","music"],
+ menu:["menu","navigation","gateway"],
+ membership:["join","signup","member"]
+};
+
+let commentaryMode=false;
+
+function scanAllPages(){
+
+ const results=[];
+
+ urls.forEach(url=>{
+
+  const lower=url.toLowerCase();
+  const rawTitle=url.split("/").filter(Boolean).pop();
+  const cleanTitle=rawTitle.replace(/[-._]/g," ");
+
+  let tags=[];
+  for(const tag in keywordMap){
+   if(keywordMap[tag].some(word=>lower.includes(word))){
+    tags.push(tag);
+   }
+  }
+
+  const charHits=characters.filter(c=>lower.includes(c));
+
+  const keywords=[...new Set([...tags,...charHits])];
+
+  results.push({
+   url,
+   title:cleanTitle,
+   tags,
+   charHits,
+   keywords
+  });
+ });
+
+ localStorage.setItem("archiveData",JSON.stringify(results));
+ buildArchive(results);
+ buildAZ(results);
+}
+
+function buildArchive(items){
+
+ const grid=document.getElementById("grid");
+ grid.innerHTML="";
+
+ items.sort((a,b)=>a.title.localeCompare(b.title));
+
+ items.forEach(item=>{
+
+  const tile=document.createElement("div");
+  tile.className="tile";
+  tile.dataset.tags=item.tags.join(",");
+  tile.dataset.title=item.title.toLowerCase();
+  tile.dataset.keywords=item.keywords.join(",");
+
+  tile.innerHTML=`
+  <a href="${item.url}" target="viewer">
+   <img src="https://image.thum.io/get/width/400/${item.url}">
+  </a>
+  <div class="title">${item.title}</div>
+  <div class="badges">
+   ${item.keywords.map(k=>`<div class="badge">${k}</div>`).join("")}
+  </div>
+  <div class="commentary">
+   URL: ${item.url}<br>
+   Tags: ${item.tags.join(", ")}<br>
+   Characters: ${item.charHits.join(", ") || "None"}
+  </div>
+  `;
+
+  grid.appendChild(tile);
+ });
+
+}
+
+function buildAZ(items){
+ const nav=document.getElementById("azNav");
+ nav.innerHTML="";
+ const letters=[...new Set(items.map(i=>i.title[0].toUpperCase()))].sort();
+ letters.forEach(l=>{
+  const span=document.createElement("span");
+  span.textContent=l;
+  span.onclick=()=>scrollToLetter(l);
+  nav.appendChild(span);
+ });
+}
+
+function scrollToLetter(letter){
+ const tiles=[...document.querySelectorAll(".tile")];
+ const match=tiles.find(t=>t.dataset.title.startsWith(letter.toLowerCase()));
+ if(match) match.scrollIntoView({behavior:"smooth"});
+}
+
+document.getElementById("search").addEventListener("input",filterTiles);
+document.getElementById("tagFilter").addEventListener("change",filterTiles);
+
+function filterTiles(){
+ const term=document.getElementById("search").value.toLowerCase();
+ const tag=document.getElementById("tagFilter").value;
+
+ const tiles=[...document.querySelectorAll(".tile")];
+
+ tiles.sort((a,b)=>{
+  const aBoost=a.dataset.keywords.includes(term)?-1:0;
+  const bBoost=b.dataset.keywords.includes(term)?-1:0;
+  return aBoost-bBoost;
+ }).forEach(t=>document.getElementById("grid").appendChild(t));
+
+ tiles.forEach(tile=>{
+  const matchTitle=tile.dataset.title.includes(term);
+  const matchKey=tile.dataset.keywords.includes(term);
+  const matchTag=(tag==="all"||tile.dataset.tags.includes(tag));
+  tile.style.display=(matchTitle||matchKey)&&matchTag?"block":"none";
+ });
+}
+
+function toggleCommentary(){
+ commentaryMode=!commentaryMode;
+ document.querySelectorAll(".commentary").forEach(c=>{
+  c.style.display=commentaryMode?"block":"none";
+ });
+}
+
+const spider=document.getElementById("spider");
+spider.addEventListener("mouseenter",()=>spider.style.animationPlayState="paused");
+spider.addEventListener("mouseleave",()=>spider.style.animationPlayState="running");
+spider.addEventListener("click",()=>{
+ spider.style.animationDuration=
+ spider.style.animationDuration==="10s"?"25s":"10s";
+});
+
+window.onload=()=>{
+ const saved=localStorage.getItem("archiveData");
+ if(saved){
+  const parsed=JSON.parse(saved);
+  buildArchive(parsed);
+  buildAZ(parsed);
+ }
+};
+
+</script>
+
+</body>
+</html>
