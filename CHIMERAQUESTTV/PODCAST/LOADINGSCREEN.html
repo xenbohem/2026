@@ -591,13 +591,35 @@
 <body>
         <!-- Loading Screen -->
     <div class="loading-screen" id="loading-screen">
-        <div class="loading-spinner"></div>
-        <div class="loading-title">CHIMERA-CAFEQUEST-LORE</div>
-        <div class="loading-text" id="loading-text">Initializing Adventure...</div>
-        <div class="loading-progress">
-            <div class="loading-fill" id="loading-fill"></div>
-        </div>
-    </div>
+
+<video id="intro-video"
+autoplay
+muted
+playsinline
+class="intro-video">
+
+<source src="Chimeracyberpunkwelcome.mp4" type="video/mp4">
+
+</video>
+
+<div class="loading-overlay">
+
+<div class="loading-spinner"></div>
+
+<div class="loading-title">CHIMERA-CAFEQUEST-LORE</div>
+
+<div class="loading-text" id="loading-text">
+Booting Chimera Café System...
+</div>
+
+<div class="loading-progress">
+<div class="loading-fill" id="loading-fill"></div>
+</div>
+
+</div>
+
+</div>
+  
 
     <!-- Main Container (hidden until loading completes) -->
     <div class="container" id="main-container">
