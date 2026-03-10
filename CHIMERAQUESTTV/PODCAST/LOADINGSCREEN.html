@@ -1,204 +1,286 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chimera Cafe Base</title>
+
+<title>Chimera Café</title>
 
 <style>
 
-/* ===== GLOBAL STYLE ===== */
+/* -------------------- GLOBAL -------------------- */
 
 body{
-font-family:'Courier New',monospace;
+margin:0;
+font-family:Courier New, monospace;
 background:#0a0a2a;
 color:#e0e0ff;
-margin:0;
-padding:0;
 overflow:hidden;
 }
 
-/* CRT scanlines */
+/* scanlines */
 
-body::before{
-content:'';
+body::after{
+content:"";
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
-background:linear-gradient(rgba(0,0,0,0)50%,rgba(0,0,0,0.25)50%);
+background:linear-gradient(rgba(0,0,0,0)50%,rgba(0,0,0,.25)50%);
 background-size:100% 4px;
 pointer-events:none;
 }
 
-/* ===== LOADING VIDEO ===== */
+/* -------------------- STAGE 1 LOADING -------------------- */
 
-.loading-screen{
+#bootScreen{
+
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
 background:black;
-z-index:9999;
+color:#00ff9f;
+
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+
+font-size:22px;
+
+z-index:1000;
+
 }
 
-.intro-video{
-position:absolute;
+#bootMessage{
+
+margin-top:20px;
+font-size:18px;
+
+}
+
+/* -------------------- STAGE 2 CRT VIDEO -------------------- */
+
+#crtStage{
+
+position:fixed;
+top:0;
+left:0;
 width:100%;
 height:100%;
-object-fit:cover;
-opacity:.6;
+
+background:black;
+
+display:none;
+align-items:center;
+justify-content:center;
+
+z-index:900;
+
 }
 
-.loading-overlay{
-z-index:2;
-text-align:center;
+/* crooked CRT */
+
+.crt{
+
+transform:rotate(-4deg);
+
+background:#111;
+
+padding:25px;
+
+border-radius:20px;
+
+box-shadow:
+0 0 40px purple,
+0 0 80px violet;
+
 }
 
-.loading-title{
-font-size:2.5rem;
-text-shadow:0 0 10px violet;
+/* CRT screen */
+
+.crt-screen{
+
+background:black;
+
+padding:10px;
+
+border-radius:10px;
+
+overflow:hidden;
+
 }
 
-.loading-progress{
-width:300px;
-height:15px;
-border:2px solid violet;
-margin-top:15px;
+/* video */
+
+.crt video{
+
+width:720px;
+max-width:90vw;
+
+filter:
+contrast(1.2)
+brightness(1.1)
+saturate(1.2);
+
 }
 
-.loading-fill{
-height:100%;
-background:#ff6b6b;
-width:0%;
-}
+/* -------------------- MAIN WEBSITE -------------------- */
 
-/* ===== MAIN CONTAINER ===== */
+#site{
 
-.container{
+display:none;
+
 max-width:900px;
 margin:auto;
-margin-top:40px;
-background:rgba(30,30,60,.9);
+
+margin-top:60px;
+
+background:rgba(40,40,80,.9);
+
 border:4px solid #8a2be2;
-padding:20px;
-display:none;
+
+padding:30px;
+
 }
 
-/* ===== HEADER ===== */
+h1{
 
-.header{
 text-align:center;
 margin-bottom:20px;
+
 }
 
-.header h1{
-font-size:2.5rem;
-color:white;
-text-shadow:2px 2px black;
-}
-
-/* ===== ROLODEX TABS ===== */
+/* tabs */
 
 .tabs{
+
 display:flex;
 justify-content:center;
 gap:10px;
 margin-bottom:20px;
+
 }
 
 .tab{
+
 padding:8px 16px;
+
 background:#4a00e0;
-border-radius:6px 6px 0 0;
+
 cursor:pointer;
+
+border-radius:6px;
+
 }
 
 .tab.active{
+
 background:#ff6b6b;
+
 }
 
-/* ===== SEARCH ===== */
+/* search */
 
-.search-box{
+#search{
+
 width:100%;
 padding:10px;
-background:#1a1a2a;
-border:2px solid #4a00e0;
-color:#00ff88;
 margin-bottom:20px;
+
+background:#1a1a2a;
+
+border:2px solid #4a00e0;
+
+color:#00ff88;
+
 }
 
-/* ===== LORE CARDS ===== */
+/* lore cards */
 
-.lore-card{
+.card{
+
 background:rgba(60,60,100,.7);
-padding:10px;
+padding:12px;
 margin-bottom:10px;
 border:2px solid #4a00e0;
+
 }
 
-/* ===== LIBRARY ===== */
-
-.library{
-margin-top:30px;
-}
+/* library */
 
 .shelf{
+
 display:flex;
-gap:10px;
+gap:12px;
 background:#1a1a2a;
-padding:15px;
+padding:14px;
+margin-top:20px;
+
 border:3px solid #4a00e0;
+
 }
 
 .book{
+
 background:#8a2be2;
 padding:10px;
 cursor:pointer;
+
 transition:.3s;
+
 }
 
 .book:hover{
+
 transform:translateY(-5px);
+
 }
 
 .book.open{
+
 background:#ff6b6b;
 transform:translateX(40px);
+
 }
 
-/* ===== AUDIO PLAYER ===== */
+/* audio */
 
-.audio-section{
+#audioSection{
+
 margin-top:30px;
-padding:20px;
 border:2px solid #8a2be2;
+padding:20px;
+
 }
 
-.play-button{
-padding:10px 20px;
+button{
+
+padding:10px 18px;
 background:#ff6b6b;
 border:none;
 cursor:pointer;
+
 }
 
 .progress{
+
 height:10px;
 background:#333;
 margin-top:10px;
+
 }
 
-.progress-fill{
+.fill{
+
 height:100%;
 background:#00ff88;
 width:0%;
+
 }
 
 </style>
@@ -206,35 +288,41 @@ width:0%;
 
 <body>
 
-<!-- ===== LOADING SCREEN ===== -->
+<!-- LOADING SCREEN -->
 
-<div class="loading-screen" id="loading-screen">
+<div id="bootScreen">
 
-<video id="intro-video" autoplay muted playsinline class="intro-video">
-<source src="https://xenbohem.github.io/2026/CHIMERAQUESTTV/PODCAST/Chimeracyberpunkwelcome.mp4" type="video/mp4">
+<div>Café Loading In Progress...</div>
+
+<div id="bootMessage">Preparing Systems...</div>
+
+</div>
+
+<!-- CRT VIDEO -->
+
+<div id="crtStage">
+
+<div class="crt">
+
+<div class="crt-screen">
+
+<video id="introVideo" muted playsinline>
+
+<source src="https://xenbohem.github.io/2026/CHIMERAQUESTTV/PODCAST/Chimeracyberpunkwelcome.mp4">
+
 </video>
 
-<div class="loading-overlay">
-
-<div class="loading-title">CHIMERA CAFE BOOT</div>
-
-<div class="loading-progress">
-<div class="loading-fill" id="loading-fill"></div>
 </div>
 
 </div>
 
 </div>
 
-<!-- ===== MAIN SITE ===== -->
+<!-- MAIN WEBSITE -->
 
-<div class="container" id="main">
+<div id="site">
 
-<div class="header">
-<h1>CHIMERA CAFE BASE</h1>
-</div>
-
-<!-- TABS -->
+<h1>Chimera Café</h1>
 
 <div class="tabs">
 
@@ -242,47 +330,37 @@ width:0%;
 <div class="tab" data-char="hans">Hans</div>
 <div class="tab" data-char="milo">Milo</div>
 <div class="tab" data-char="star">Star</div>
-<div class="tab" data-char="chari">Chari</div>
 
 </div>
 
-<input class="search-box" id="search" placeholder="Search Chimera Lore...">
+<input id="search" placeholder="Search the lore...">
 
-<div id="lore-results"></div>
-
-<!-- ===== LIBRARY ===== -->
-
-<div class="library">
+<div id="results"></div>
 
 <h2>Hans Library</h2>
 
 <div class="shelf">
 
-<div class="book" data-lore="tea">Tea Etiquette</div>
-<div class="book" data-lore="history">Chimera History</div>
-<div class="book" data-lore="archives">Secret Archives</div>
-<div class="book" data-lore="potions">Potion Notes</div>
+<div class="book">Tea Etiquette</div>
+<div class="book">Cafe History</div>
+<div class="book">Potion Recipes</div>
+<div class="book">Secret Archives</div>
 
 </div>
 
-<div id="book-lore"></div>
+<div id="bookText"></div>
 
-</div>
+<div id="audioSection">
 
-<!-- ===== AUDIO PLAYER ===== -->
+<h2>Podcast</h2>
 
-<div class="audio-section">
-
-<h2>Chimera Podcast</h2>
-
-<button class="play-button" id="play">Play</button>
+<button id="play">Play</button>
 
 <div class="progress">
-<div class="progress-fill" id="progress"></div>
+<div class="fill" id="audioFill"></div>
 </div>
 
 <audio id="audio">
-
 <source src="audio/ch1_intro.mp3">
 </audio>
 
@@ -292,138 +370,139 @@ width:0%;
 
 <script>
 
-/* ===== VIDEO LOADING ===== */
+/* ---------- BOOT SEQUENCE ---------- */
 
-const video=document.getElementById("intro-video")
-const fill=document.getElementById("loading-fill")
-const screen=document.getElementById("loading-screen")
-const main=document.getElementById("main")
+const bootMessages=[
 
-video.addEventListener("timeupdate",()=>{
-
-if(video.duration){
-
-fill.style.width=(video.currentTime/video.duration*100)+"%"
-
-}
-
-})
-
-video.addEventListener("ended",()=>{
-
-screen.style.display="none"
-
-main.style.display="block"
-
-document.body.style.overflow="auto"
-
-})
-
-/* ===== LORE DATABASE ===== */
-
-const lore=[
-
-{title:"Tea Etiquette",character:"hans",text:"Hans teaches proper tea ceremony."},
-
-{title:"Potion Mixing",character:"milo",text:"Milo experiments with magical potions."},
-
-{title:"Star Navigation",character:"star",text:"Star reads cosmic patterns."},
-
-{title:"Garden Keeper",character:"chari",text:"Chari tends enchanted plants."},
-
-{title:"Cafe Origins",character:"all",text:"The Chimera Cafe was founded as a sanctuary."}
+"Preparing Hans Library...",
+"Brewing Tea Archives...",
+"Connecting Chimera Network...",
+"Initializing Café Interface..."
 
 ]
 
-const results=document.getElementById("lore-results")
+let i=0
+
+const bootText=document.getElementById("bootMessage")
+
+function nextBoot(){
+
+if(i<bootMessages.length){
+
+bootText.innerText=bootMessages[i]
+
+i++
+
+setTimeout(nextBoot,1500)
+
+}
+
+}
+
+nextBoot()
+
+/* move to video */
+
+setTimeout(()=>{
+
+document.getElementById("bootScreen").style.display="none"
+
+const crt=document.getElementById("crtStage")
+
+crt.style.display="flex"
+
+const vid=document.getElementById("introVideo")
+
+vid.play()
+
+},7000)
+
+/* reveal site */
+
+setTimeout(()=>{
+
+document.getElementById("crtStage").style.display="none"
+
+document.getElementById("site").style.display="block"
+
+document.body.style.overflow="auto"
+
+},17000)
+
+/* ---------- LORE SYSTEM ---------- */
+
+const lore=[
+
+{title:"Tea Etiquette",char:"hans",text:"Hans teaches the proper ceremony of tea."},
+
+{title:"Potion Experiments",char:"milo",text:"Milo explores strange alchemical brews."},
+
+{title:"Star Navigation",char:"star",text:"Star studies cosmic patterns above the café."},
+
+{title:"Café Origins",char:"all",text:"The Chimera Café was founded as a sanctuary."}
+
+]
+
+const results=document.getElementById("results")
 const search=document.getElementById("search")
-const tabs=document.querySelectorAll(".tab")
 
-let currentChar="all"
-
-function renderLore(){
-
-const key=search.value.toLowerCase()
+function render(){
 
 results.innerHTML=""
 
-lore.forEach(entry=>{
+const key=search.value.toLowerCase()
 
-if((currentChar==="all"||entry.character===currentChar||entry.character==="all") &&
+lore.forEach(l=>{
 
-(entry.title.toLowerCase().includes(key)||entry.text.toLowerCase().includes(key)))
+if(l.title.toLowerCase().includes(key)||l.text.toLowerCase().includes(key)){
 
-{
+let d=document.createElement("div")
 
-let card=document.createElement("div")
-card.className="lore-card"
+d.className="card"
 
-card.innerHTML=`<b>${entry.title}</b><br>${entry.text}`
+d.innerHTML="<b>"+l.title+"</b><br>"+l.text
 
-results.appendChild(card)
-
-}
-
-})
-
-}
-
-search.addEventListener("input",renderLore)
-
-tabs.forEach(tab=>{
-
-tab.onclick=()=>{
-
-tabs.forEach(t=>t.classList.remove("active"))
-
-tab.classList.add("active")
-
-currentChar=tab.dataset.char
-
-renderLore()
+results.appendChild(d)
 
 }
 
 })
 
-renderLore()
+}
 
-/* ===== LIBRARY ===== */
+search.addEventListener("input",render)
 
-const books=document.querySelectorAll(".book")
-const lorePanel=document.getElementById("book-lore")
+render()
 
-books.forEach(book=>{
+/* ---------- LIBRARY ---------- */
 
-book.onclick=()=>{
+document.querySelectorAll(".book").forEach(b=>{
 
-books.forEach(b=>b.classList.remove("open"))
+b.onclick=()=>{
 
-book.classList.add("open")
+document.querySelectorAll(".book").forEach(x=>x.classList.remove("open"))
 
-lorePanel.innerHTML="<p>Opening archive: "+book.dataset.lore+"</p>"
+b.classList.add("open")
+
+document.getElementById("bookText").innerHTML="Opening "+b.innerText+"..."
 
 }
 
 })
 
-/* ===== AUDIO PLAYER ===== */
+/* ---------- AUDIO ---------- */
 
 const audio=document.getElementById("audio")
 const play=document.getElementById("play")
-const progress=document.getElementById("progress")
+const fill=document.getElementById("audioFill")
 
-play.onclick=()=>{
-
-audio.play()
-
-}
+play.onclick=()=>audio.play()
 
 audio.addEventListener("timeupdate",()=>{
 
 if(audio.duration){
 
-progress.style.width=(audio.currentTime/audio.duration*100)+"%"
+fill.style.width=(audio.currentTime/audio.duration*100)+"%"
 
 }
 
@@ -434,1003 +513,3 @@ progress.style.width=(audio.currentTime/audio.duration*100)+"%"
 </body>
 </html>
 ```
-            background-size: 100% 4px;
-            z-index: 1000;
-            pointer-events: none;
-            opacity: 0.3;
-        }
-        
-        /* Scan lines for retro effect */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, 
-                rgba(255,255,255,0.03) 0%,
-                rgba(255,255,255,0.06) 50%,
-                rgba(255,255,255,0.03) 100%);
-            background-size: 100% 3px;
-            z-index: 1001;
-            pointer-events: none;
-        }
-
-        /* Loading Screen - Full screen overlay */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #0a0a2a, #1a1a3a);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            opacity: 1;
-            transform: scale(1);
-        }
-        .loading-screen.hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-        }
-        
-        /* Loading logo/title */
-        .loading-title {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 
-                3px 3px 0 #4a00e0,
-                6px 6px 0 #000;
-            letter-spacing: 3px;
-            margin-bottom: 1rem;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        @keyframes glow {
-            from { text-shadow: 3px 3px 0 #4a00e0, 6px 6px 0 #000, 0 0 10px #8a2be2; }
-            to { text-shadow: 3px 3px 0 #8a2be2, 6px 6px 0 #000, 0 0 20px #ff6b6b; }
-        }
-        
-        /* Loading status text */
-        .loading-text {
-            color: #e0e0ff;
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            text-shadow: 1px 1px 0 #000;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        
-        /* Loading progress bar */
-        .loading-progress {
-            width: 300px;
-            height: 20px;
-            background: #333;
-            border: 3px solid #4a00e0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 1rem;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-        .loading-fill {
-            height: 100%;
-            background: linear-gradient(to right, #ff6b6b, #00ff88);
-            width: 0%;
-            transition: width 0.1s linear;
-            position: relative;
-        }
-        .loading-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255,255,255,0.4) 50%, 
-                transparent 100%);
-            animation: shine 1.5s infinite;
-        }
-        @keyframes shine {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
-        /* Spinner for extra flair */
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #4a00e0;
-            border-top: 4px solid #ff6b6b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            background-color: rgba(30, 30, 60, 0.9);
-            border-radius: 8px;
-            border: 4px solid #8a2be2;
-            box-shadow: 
-                0 0 20px rgba(138, 43, 226, 0.6),
-                inset 0 0 20px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            position: relative;
-            padding: 0;
-            opacity: 0; /* Hidden initially */
-            transform: translateY(20px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-        .container.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Pixel art decorations */
-        .pixel-corner {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            background: linear-gradient(45deg, #8a2be2, #4a00e0);
-            image-rendering: pixelated;
-        }
-        .corner-tl { top: -4px; left: -4px; }
-        .corner-tr { top: -4px; right: -4px; }
-        .corner-bl { bottom: -4px; left: -4px; }
-        .corner-br { bottom: -4px; right: -4px; }
-
-        /* Header - Game Title Screen Style */
-        .header {
-            background: linear-gradient(to bottom, #4a00e0, #8a2be2);
-            padding: 2rem 1.5rem;
-            text-align: center;
-            border-bottom: 4px solid #ff6b6b;
-            position: relative;
-        }
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 
-                2px 2px 0 #4a00e0,
-                4px 4px 0 #000;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-        }
-        .header p {
-            font-size: 1rem;
-            color: #e0e0ff;
-            text-shadow: 1px 1px 0 #4a00e0;
-            opacity: 0.9;
-        }
-        
-        /* Health bar style progress indicator */
-        .health-bar {
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 8px;
-            background: #333;
-            border: 2px solid #000;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .health-fill {
-            height: 100%;
-            background: linear-gradient(to right, #ff6b6b, #ff9999);
-            width: 100%;
-            transition: width 0.3s;
-        }
-
-        /* Main content area */
-        .main {
-            padding: 2rem;
-            background: rgba(20, 20, 40, 0.8);
-        }
-
-        /* Game UI Terminal */
-        .terminal {
-            background: #1a1a2a;
-            color: #00ff88; /* Retro green */
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 2rem;
-            border: 2px solid #4a00e0;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-            font-family: 'Courier New', monospace;
-        }
-        .terminal-content {
-            display: flex;
-            align-items: center;
-            font-size: 1.1rem;
-        }
-        .prompt {
-            color: #ff6b6b; /* Red prompt */
-            margin-right: 0.5rem;
-            font-weight: bold;
-        }
-        .cursor {
-            animation: blink 1s step-start infinite;
-            color: #00ff88;
-        }
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-        .command {
-            margin-left: 0.5rem;
-            color: #e0e0ff;
-        }
-/* Rolodex Character Tabs */
-
-.character-tabs{
-    display:flex;
-    gap:8px;
-    justify-content:center;
-    margin-bottom:20px;
-}
-
-.char-tab{
-    padding:8px 16px;
-    background:#4a00e0;
-    border:2px solid #8a2be2;
-    border-bottom:none;
-    color:white;
-    cursor:pointer;
-    border-radius:6px 6px 0 0;
-    font-weight:bold;
-    transition:0.2s;
-}
-
-.char-tab:hover{
-    background:#6a20ff;
-}
-
-.char-tab.active{
-    background:#ff6b6b;
-    border-color:#ff9999;
-}
-
-/* Search bar */
-
-.search-box{
-    width:100%;
-    padding:10px;
-    background:#1a1a2a;
-    border:2px solid #4a00e0;
-    color:#00ff88;
-    font-family:'Courier New', monospace;
-    margin-bottom:20px;
-}
-
-/* Lore Results */
-
-.lore-results{
-    display:grid;
-    gap:10px;
-}
-
-.lore-card{
-    background:rgba(50,50,80,0.7);
-    border:2px solid #4a00e0;
-    padding:12px;
-    border-radius:6px;
-}
-
-.lore-title{
-    color:#ff6b6b;
-    font-weight:bold;
-}
-
-.lore-character{
-    font-size:0.8rem;
-    color:#00ff88;
-}
-
-
-        /* Level Select (Table of Contents) */
-        .level-select {
-            margin-bottom: 2rem;
-        }
-        .level-select h2 {
-            font-size: 1.5rem;
-            color: #ff6b6b;
-            text-shadow: 1px 1px 0 #000;
-            margin-bottom: 1rem;
-            text-align: center;
-            border-bottom: 2px solid #4a00e0;
-            padding-bottom: 0.5rem;
-        }
-        .level-list {
-            display: grid;
-            gap: 0.8rem;
-        }
-        .level-item {
-            padding: 1rem;
-            background: rgba(50, 50, 80, 0.6);
-            border: 2px solid #4a00e0;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .level-item:hover {
-            background: rgba(70, 70, 120, 0.8);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4);
-        }
-        .level-item.active {
-            background: rgba(100, 149, 237, 0.3);
-            border-color: #ff6b6b;
-            box-shadow: 0 0 15px rgba(255, 107, 107, 0.6);
-        }
-        .level-item.completed::before {
-            content: '✓';
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            color: #00ff88;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        .level-row {
-            display: flex;
-            align-items: center;
-        }
-        .level-number {
-            width: 2rem;
-            height: 2rem;
-            background: #4a00e0;
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-weight: bold;
-            font-size: 1rem;
-            border: 2px solid #8a2be2;
-        }
-        .level-item.active .level-number {
-            background: #ff6b6b;
-            border-color: #ff9999;
-        }
-        .level-title {
-            color: #e0e0ff;
-            flex: 1;
-            font-weight: 500;
-        }
-        .level-item.active .level-title {
-            color: #fff;
-            font-weight: bold;
-        }
-        .playing-status {
-            margin-left: auto;
-            color: #00ff88;
-            font-weight: bold;
-            animation: pulse 1s infinite;
-        }
-
-        /* Game Controls */
-        .game-controls {
-            background: rgba(40, 40, 70, 0.8);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 2px solid #8a2be2;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.4);
-        }
-        .controls-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid #4a00e0;
-            padding-bottom: 0.5rem;
-        }
-        .controls-header h3 {
-            font-size: 1.2rem;
-            color: #ff6b6b;
-            text-shadow: 1px 1px 0 #000;
-        }
-        .chapter-info {
-            font-size: 0.9rem;
-            color: #e0e0ff;
-            background: #4a00e0;
-            padding: 0.3rem 0.8rem;
-            border-radius: 12px;
-            font-weight: bold;
-        }
-        .controls-content {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        .play-button {
-            width: 4rem;
-            height: 4rem;
-            background: linear-gradient(45deg, #ff6b6b, #ff9999);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 2rem;
-            box-shadow: 
-                0 4px 8px rgba(0, 0, 0, 0.3),
-                inset 0 2px 4px rgba(255, 255, 255, 0.3);
-            border: 2px solid #fff;
-        }
-        .play-button:hover {
-            transform: scale(1.05);
-            box-shadow: 
-                0 6px 12px rgba(0, 0, 0, 0.4),
-                inset 0 2px 4px rgba(255, 255, 255, 0.4);
-        }
-        .play-button:active {
-            transform: scale(0.95);
-        }
-        .audio-info {
-            flex: 1;
-        }
-        .current-title {
-            font-size: 1rem;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 0.8rem;
-            text-shadow: 1px 1px 0 #000;
-        }
-        .xp-bar {
-            width: 100%;
-            height: 0.8rem;
-            background: #333;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 2px solid #000;
-            position: relative;
-        }
-        .xp-fill {
-            height: 100%;
-            background: linear-gradient(to right, #00ff88, #88ffaa);
-            width: 0%;
-            transition: width 0.3s;
-            position: relative;
-        }
-        .xp-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255,255,255,0.2) 50%, 
-                transparent 100%);
-            animation: shine 2s infinite;
-        }
-
-        /* Footer - Status Bar */
-        .footer {
-            background: linear-gradient(to top, #4a00e0, #8a2be2);
-            color: #fff;
-            padding: 1rem;
-            text-align: center;
-            font-size: 0.9rem;
-            border-top: 2px solid #ff6b6b;
-        }
-        .status-indicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        .status-dot {
-            width: 0.8rem;
-            height: 0.8rem;
-            background: #00ff88;
-            border-radius: 50%;
-            animation: pulse 1s infinite;
-            box-shadow: 0 0 8px #00ff88;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .loading-title {
-                font-size: 2.5rem;
-            }
-            .loading-progress {
-                width: 250px;
-            }
-            .header h1 {
-                font-size: 2rem;
-            }
-            .main {
-                padding: 1rem;
-            }
-            .controls-content {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            .play-button {
-                width: 3.5rem;
-                height: 3.5rem;
-            }
-        }
-
-        /* Hide audio element */
-        audio {
-            display: none;
-        }
-
-        /* Pulse animation for loading text */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-    </style>
-</head>
-<body>
-        <!-- Loading Screen -->
-    <div class="loading-screen" id="loading-screen">
-
-<video id="intro-video"
-autoplay
-muted
-playsinline
-class="intro-video">
-
-<source src="Chimeracyberpunkwelcome.mp4" type="video/mp4">
-
-</video>
-
-<div class="loading-overlay">
-
-<div class="loading-spinner"></div>
-
-<div class="loading-title">CHIMERA-CAFEQUEST-LORE</div>
-
-<div class="loading-text" id="loading-text">
-Booting Chimera Café System...
-</div>
-
-<div class="loading-progress">
-<div class="loading-fill" id="loading-fill"></div>
-</div>
-
-</div>
-
-</div>
-  
-
-    <!-- Main Container (hidden until loading completes) -->
-    <div class="container" id="main-container">
-        <!-- Pixel corners for game aesthetic -->
-        <div class="pixel-corner corner-tl"></div>
-        <div class="pixel-corner corner-tr"></div>
-        <div class="pixel-corner corner-bl"></div>
-        <div class="pixel-corner corner-br"></div>
-
-        <!-- Header -->
-        <div class="header">
-            <h1>CHIMERA-CAFEQUEST</h1>
-            <p>Interactive Adventure</p>
-            <div class="health-bar">
-                <div class="health-fill" id="health-bar"></div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main">
-        	<!-- Chimera Character Tabs -->
-
-<h2 style="text-align:center;color:#ff6b6b;">CHIMERA CAFE BASE</h2>
-
-<div class="character-tabs">
-
-<div class="char-tab active" data-char="all">All</div>
-<div class="char-tab" data-char="hans">Hans</div>
-<div class="char-tab" data-char="milo">Milo</div>
-<div class="char-tab" data-char="star">Star</div>
-<div class="char-tab" data-char="chari">Chari</div>
-
-</div>
-
-<input class="search-box" id="searchBox" placeholder="Search Chimera Lore...">
-
-<div class="lore-results" id="loreResults"></div>
-            <!-- Game Terminal -->
-            <div class="terminal">
-                <div class="terminal-content">
-                    <span class="prompt">></span>
-                    <span class="cursor">_</span>
-                    <span class="command" id="current-command">select_level(1)</span>
-                </div>
-            </div>
-
-            <!-- Level Select (Table of Contents) -->
-            <div class="level-select">
-                <h2>LEVEL SELECT</h2>
-                <div class="level-list" id="level-list">
-                    <!-- Levels will be populated by JS -->
-                </div>
-            </div>
-
-            <!-- Game Controls -->
-            <div class="game-controls">
-                <div class="controls-header">
-                    <h3>CURRENT MISSION</h3>
-                    <span class="chapter-info" id="chapter-counter">LEVEL 1/4</span>
-                </div>
-                <div class="controls-content">
-                    <button class="play-button" id="play-button">
-                        <!-- Play icon -->
-                        <svg class="play-icon" fill="currentColor" viewBox="0 0 20 20" style="display: block;">
-                            <path d="M8 5v10l7-5z"/>
-                        </svg>
-                        <!-- Pause icon (hidden initially) -->
-                        <svg class="pause-icon" fill="currentColor" viewBox="0 0 20 20" style="display: none;">
-                            <path d="M6 5h2v10H6V5zm6 0h2v10h-2V5z"/>
-                        </svg>
-                    </button>
-                    <div class="audio-info">
-                        <div class="current-title" id="current-title">Chapter 1: Introduction</div>
-                        <div class="xp-bar">
-                            <div class="xp-fill" id="progress-fill"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Hidden audio element -->
-            <audio id="audio-player" preload="metadata"></audio>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span>AUDIO SYSTEM: READY</span>
-            </div>
-        </div>
-    </div>
-
-    <script>
-
-const video = document.getElementById("intro-video")
-const fill = document.getElementById("loading-fill")
-const screen = document.getElementById("loading-screen")
-const main = document.getElementById("main")
-
-function showSite(){
-
-screen.style.display="none"
-main.style.display="block"
-document.body.style.overflow="auto"
-
-}
-
-/* progress bar */
-
-video.addEventListener("timeupdate",()=>{
-
-if(video.duration){
-
-fill.style.width=(video.currentTime/video.duration*100)+"%"
-
-}
-
-})
-
-/* when video finishes */
-
-video.addEventListener("ended",showSite)
-
-/* BACKUP in case ended doesn't fire */
-
-setTimeout(showSite,12000)
-
-
-        // Start loading simulation
-        updateLoading();
-
-        // Game Logic (rest of the script)
-        const songs = [
-            "audio/ch1_intro.mp3",
-            "audio/ch2_thejourney.mp3",
-            "audio/ch3_secrets.mp3",
-            "audio/ch4_cliffhanger.mp3"
-        ];
-
-        const titles = [
-            "Chapter 1: Introduction",
-            "Chapter 2: The Journey",
-            "Chapter 3: Secrets",
-            "Chapter 4: Cliffhanger"
-        ];
-
-        let currentChapter = 0;
-        let isPlaying = false;
-        let completedChapters = new Set();
-        const audio = document.getElementById('audio-player');
-        const playButton = document.getElementById('play-button');
-        const playIcon = playButton.querySelector('.play-icon');
-        const pauseIcon = playButton.querySelector('.pause-icon');
-        const levelList = document.getElementById('level-list');
-        const currentCommand = document.getElementById('current-command');
-        const chapterCounter = document.getElementById('chapter-counter');
-        const currentTitle = document.getElementById('current-title');
-        const progressFill = document.getElementById('progress-fill');
-        const healthBar = document.getElementById('health-bar');
-
-        // Wait for main content to be visible before initializing game
-        mainContainer.addEventListener('transitionend', () => {
-            initializeGame();
-        });
-
-        function initializeGame() {
-            // Populate level select
-            populateLevels();
-            updateUI();
-
-            // Optional: Preload audio metadata for smoother playback
-            songs.forEach((song, index) => {
-                const tempAudio = new Audio(song);
-                tempAudio.preload = 'metadata';
-            });
-        }
-
-        // Populate level select
-        function populateLevels() {
-            levelList.innerHTML = '';
-            titles.forEach((title, index) => {
-                const levelItem = document.createElement('div');
-                levelItem.className = `level-item ${completedChapters.has(index) ? 'completed' : ''}`;
-                levelItem.innerHTML = `
-                    <div class="level-row">
-                        <span class="level-number">${index + 1}</span>
-                        <span class="level-title">${title}</span>
-                        <span class="playing-status" style="display: none;">▶ PLAYING</span>
-                    </div>
-                `;
-                levelItem.addEventListener('click', () => selectLevel(index));
-                levelList.appendChild(levelItem);
-            });
-            updateLevels();
-        }
-
-        // Select level
-        function selectLevel(index) {
-            currentChapter = index;
-            isPlaying = true;
-            updateLevels();
-            updateUI();
-
-            audio.src = songs[index];
-            audio.load();
-            audio.play().catch(error => {
-                console.error("Audio playback failed:", error);
-                isPlaying = false;
-                updateUI();
-            });
-        }
-
-        // Update level highlighting
-        function updateLevels() {
-            const items = levelList.querySelectorAll('.level-item');
-            items.forEach((item, index) => {
-                if (index === currentChapter) {
-                    item.classList.add('active');
-                    const status = item.querySelector('.playing-status');
-                    if (isPlaying) {
-                        status.style.display = 'inline';
-                    }
-                } else {
-                    item.classList.remove('active');
-                    const status = item.querySelector('.playing-status');
-                    status.style.display = 'none';
-                }
-                // Update completion status
-                if (completedChapters.has(index)) {
-                    item.classList.add('completed');
-                }
-            });
-        }
-
-        // Update UI elements
-        function updateUI() {
-            currentCommand.textContent = `select_level(${currentChapter + 1})`;
-            chapterCounter.textContent = `LEVEL ${currentChapter + 1}/4`;
-            currentTitle.textContent = titles[currentChapter];
-            
-            // Update health bar based on overall progress (chapters completed)
-            const totalProgress = ((completedChapters.size + (isPlaying ? 1 : 0)) / songs.length) * 100;
-            healthBar.style.width = totalProgress + '%';
-            
-            if (isPlaying) {
-                playIcon.style.display = 'none';
-                pauseIcon.style.display = 'block';
-            } else {
-                playIcon.style.display = 'block';
-                pauseIcon.style.display = 'none';
-            }
-            updateLevels();
-        }
-
-        // Toggle play/pause
-        playButton.addEventListener('click', () => {
-            if (audio.paused) {
-                audio.play().catch(error => {
-                    console.error("Audio playback failed:", error);
-                });
-            } else {
-                audio.pause();
-            }
-        });
-
-        // Audio event listeners
-        audio.addEventListener('play', () => {
-            isPlaying = true;
-            updateUI();
-        });
-
-        audio.addEventListener('pause', () => {
-            isPlaying = false;
-            updateUI();
-        });
-
-        audio.addEventListener('ended', () => {
-            isPlaying = false;
-            completedChapters.add(currentChapter);
-            updateLevels();
-            updateUI();
-            
-            // Auto-advance to next level if available (with 1-second delay)
-            if (currentChapter < songs.length - 1) {
-                setTimeout(() => selectLevel(currentChapter + 1), 1000);
-            }
-        });
-
-        // Update progress bar in real-time
-        audio.addEventListener('timeupdate', () => {
-            if (audio.duration) {
-                const progress = (audio.currentTime / audio.duration) * 100;
-                progressFill.style.width = progress + '%';
-            }
-        });
-
-        // Add hover sound effect simulation (optional - could add real audio if desired)
-        document.querySelectorAll('.level-item').forEach(item => {
-            item.addEventListener('mouseenter', () => {
-                item.style.transform = 'translateY(-2px) scale(1.02)';
-            });
-            item.addEventListener('mouseleave', () => {
-                if (!item.classList.contains('active')) {
-                    item.style.transform = 'translateY(0) scale(1)';
-                }
-            });
-        });
-
-        // Note: Ensure audio files are in the correct path relative to this HTML file.
-        // The loading screen will auto-hide after ~3 seconds (adjustable in updateLoading()).
-        
-        const loreDatabase = [
-
-{
-title:"Tea Etiquette Lesson",
-character:"hans",
-text:"Hans teaches the ancient etiquette of Chimera tea ceremonies."
-},
-
-{
-title:"Library Rules",
-character:"hans",
-text:"Silence is sacred within the Chimera archives."
-},
-
-{
-title:"Potion Mixing",
-character:"milo",
-text:"Milo experiments with magical café potions."
-},
-
-{
-title:"Starlight Navigation",
-character:"star",
-text:"Star reads cosmic patterns above the café roof."
-},
-
-{
-title:"Garden of Chari",
-character:"chari",
-text:"Chari tends the enchanted herb garden."
-},
-
-{
-title:"Origins of the Chimera Café",
-character:"all",
-text:"The café was founded as a sanctuary for wandering creatures."
-}
-
-];
-
-const searchBox = document.getElementById("searchBox");
-const loreResults = document.getElementById("loreResults");
-const tabs = document.querySelectorAll(".char-tab");
-
-let currentCharacter = "all";
-
-function renderLore(){
-
-const keyword = searchBox.value.toLowerCase();
-
-loreResults.innerHTML="";
-
-loreDatabase.forEach(entry=>{
-
-const matchCharacter =
-currentCharacter==="all" ||
-entry.character===currentCharacter ||
-entry.character==="all";
-
-const matchKeyword =
-entry.title.toLowerCase().includes(keyword) ||
-entry.text.toLowerCase().includes(keyword);
-
-if(matchCharacter && matchKeyword){
-
-const card=document.createElement("div");
-card.className="lore-card";
-
-card.innerHTML=`
-<div class="lore-title">${entry.title}</div>
-<div class="lore-character">${entry.character}</div>
-<p>${entry.text}</p>
-`;
-
-loreResults.appendChild(card);
-
-}
-
-});
-
-}
-
-searchBox.addEventListener("input",renderLore);
-
-tabs.forEach(tab=>{
-tab.addEventListener("click",()=>{
-
-tabs.forEach(t=>t.classList.remove("active"));
-
-tab.classList.add("active");
-
-currentCharacter=tab.dataset.char;
-
-renderLore();
-
-});
-});
-
-renderLore();
-    </script>
-</body>
-</html>
