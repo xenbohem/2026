@@ -1,39 +1,440 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Book Adventure</title>
-    <style>
-        /* Retro Game Theme - Inspired by 8/16-bit gaming */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Courier New', monospace;
-            background-color: #0a0a2a; /* Deep blue night sky */
-            background-image: 
-                linear-gradient(to bottom, #0a0a2a 0%, #1a1a3a 100%),
-                radial-gradient(circle at 20% 80%, #4a00e0 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, #8a2be2 0%, transparent 50%);
-            color: #e0e0ff; /* Light blue text */
-            min-height: 100vh;
-            padding: 1rem;
-            image-rendering: pixelated;
-            overflow: hidden; /* Prevent scrolling during loading */
-        }
-        
-        /* CRT screen effect */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chimera Cafe Base</title>
+
+<style>
+
+/* ===== GLOBAL STYLE ===== */
+
+body{
+font-family:'Courier New',monospace;
+background:#0a0a2a;
+color:#e0e0ff;
+margin:0;
+padding:0;
+overflow:hidden;
+}
+
+/* CRT scanlines */
+
+body::before{
+content:'';
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:linear-gradient(rgba(0,0,0,0)50%,rgba(0,0,0,0.25)50%);
+background-size:100% 4px;
+pointer-events:none;
+}
+
+/* ===== LOADING VIDEO ===== */
+
+.loading-screen{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+background:black;
+z-index:9999;
+}
+
+.intro-video{
+position:absolute;
+width:100%;
+height:100%;
+object-fit:cover;
+opacity:.6;
+}
+
+.loading-overlay{
+z-index:2;
+text-align:center;
+}
+
+.loading-title{
+font-size:2.5rem;
+text-shadow:0 0 10px violet;
+}
+
+.loading-progress{
+width:300px;
+height:15px;
+border:2px solid violet;
+margin-top:15px;
+}
+
+.loading-fill{
+height:100%;
+background:#ff6b6b;
+width:0%;
+}
+
+/* ===== MAIN CONTAINER ===== */
+
+.container{
+max-width:900px;
+margin:auto;
+margin-top:40px;
+background:rgba(30,30,60,.9);
+border:4px solid #8a2be2;
+padding:20px;
+display:none;
+}
+
+/* ===== HEADER ===== */
+
+.header{
+text-align:center;
+margin-bottom:20px;
+}
+
+.header h1{
+font-size:2.5rem;
+color:white;
+text-shadow:2px 2px black;
+}
+
+/* ===== ROLODEX TABS ===== */
+
+.tabs{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-bottom:20px;
+}
+
+.tab{
+padding:8px 16px;
+background:#4a00e0;
+border-radius:6px 6px 0 0;
+cursor:pointer;
+}
+
+.tab.active{
+background:#ff6b6b;
+}
+
+/* ===== SEARCH ===== */
+
+.search-box{
+width:100%;
+padding:10px;
+background:#1a1a2a;
+border:2px solid #4a00e0;
+color:#00ff88;
+margin-bottom:20px;
+}
+
+/* ===== LORE CARDS ===== */
+
+.lore-card{
+background:rgba(60,60,100,.7);
+padding:10px;
+margin-bottom:10px;
+border:2px solid #4a00e0;
+}
+
+/* ===== LIBRARY ===== */
+
+.library{
+margin-top:30px;
+}
+
+.shelf{
+display:flex;
+gap:10px;
+background:#1a1a2a;
+padding:15px;
+border:3px solid #4a00e0;
+}
+
+.book{
+background:#8a2be2;
+padding:10px;
+cursor:pointer;
+transition:.3s;
+}
+
+.book:hover{
+transform:translateY(-5px);
+}
+
+.book.open{
+background:#ff6b6b;
+transform:translateX(40px);
+}
+
+/* ===== AUDIO PLAYER ===== */
+
+.audio-section{
+margin-top:30px;
+padding:20px;
+border:2px solid #8a2be2;
+}
+
+.play-button{
+padding:10px 20px;
+background:#ff6b6b;
+border:none;
+cursor:pointer;
+}
+
+.progress{
+height:10px;
+background:#333;
+margin-top:10px;
+}
+
+.progress-fill{
+height:100%;
+background:#00ff88;
+width:0%;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ===== LOADING SCREEN ===== -->
+
+<div class="loading-screen" id="loading-screen">
+
+<video id="intro-video" autoplay muted playsinline class="intro-video">
+<source src="https://xenbohem.github.io/2026/CHIMERAQUESTTV/PODCAST/Chimeracyberpunkwelcome.mp4" type="video/mp4">
+</video>
+
+<div class="loading-overlay">
+
+<div class="loading-title">CHIMERA CAFE BOOT</div>
+
+<div class="loading-progress">
+<div class="loading-fill" id="loading-fill"></div>
+</div>
+
+</div>
+
+</div>
+
+<!-- ===== MAIN SITE ===== -->
+
+<div class="container" id="main">
+
+<div class="header">
+<h1>CHIMERA CAFE BASE</h1>
+</div>
+
+<!-- TABS -->
+
+<div class="tabs">
+
+<div class="tab active" data-char="all">All</div>
+<div class="tab" data-char="hans">Hans</div>
+<div class="tab" data-char="milo">Milo</div>
+<div class="tab" data-char="star">Star</div>
+<div class="tab" data-char="chari">Chari</div>
+
+</div>
+
+<input class="search-box" id="search" placeholder="Search Chimera Lore...">
+
+<div id="lore-results"></div>
+
+<!-- ===== LIBRARY ===== -->
+
+<div class="library">
+
+<h2>Hans Library</h2>
+
+<div class="shelf">
+
+<div class="book" data-lore="tea">Tea Etiquette</div>
+<div class="book" data-lore="history">Chimera History</div>
+<div class="book" data-lore="archives">Secret Archives</div>
+<div class="book" data-lore="potions">Potion Notes</div>
+
+</div>
+
+<div id="book-lore"></div>
+
+</div>
+
+<!-- ===== AUDIO PLAYER ===== -->
+
+<div class="audio-section">
+
+<h2>Chimera Podcast</h2>
+
+<button class="play-button" id="play">Play</button>
+
+<div class="progress">
+<div class="progress-fill" id="progress"></div>
+</div>
+
+<audio id="audio">
+
+<source src="audio/ch1_intro.mp3">
+</audio>
+
+</div>
+
+</div>
+
+<script>
+
+/* ===== VIDEO LOADING ===== */
+
+const video=document.getElementById("intro-video")
+const fill=document.getElementById("loading-fill")
+const screen=document.getElementById("loading-screen")
+const main=document.getElementById("main")
+
+video.addEventListener("timeupdate",()=>{
+
+if(video.duration){
+
+fill.style.width=(video.currentTime/video.duration*100)+"%"
+
+}
+
+})
+
+video.addEventListener("ended",()=>{
+
+screen.style.display="none"
+
+main.style.display="block"
+
+document.body.style.overflow="auto"
+
+})
+
+/* ===== LORE DATABASE ===== */
+
+const lore=[
+
+{title:"Tea Etiquette",character:"hans",text:"Hans teaches proper tea ceremony."},
+
+{title:"Potion Mixing",character:"milo",text:"Milo experiments with magical potions."},
+
+{title:"Star Navigation",character:"star",text:"Star reads cosmic patterns."},
+
+{title:"Garden Keeper",character:"chari",text:"Chari tends enchanted plants."},
+
+{title:"Cafe Origins",character:"all",text:"The Chimera Cafe was founded as a sanctuary."}
+
+]
+
+const results=document.getElementById("lore-results")
+const search=document.getElementById("search")
+const tabs=document.querySelectorAll(".tab")
+
+let currentChar="all"
+
+function renderLore(){
+
+const key=search.value.toLowerCase()
+
+results.innerHTML=""
+
+lore.forEach(entry=>{
+
+if((currentChar==="all"||entry.character===currentChar||entry.character==="all") &&
+
+(entry.title.toLowerCase().includes(key)||entry.text.toLowerCase().includes(key)))
+
+{
+
+let card=document.createElement("div")
+card.className="lore-card"
+
+card.innerHTML=`<b>${entry.title}</b><br>${entry.text}`
+
+results.appendChild(card)
+
+}
+
+})
+
+}
+
+search.addEventListener("input",renderLore)
+
+tabs.forEach(tab=>{
+
+tab.onclick=()=>{
+
+tabs.forEach(t=>t.classList.remove("active"))
+
+tab.classList.add("active")
+
+currentChar=tab.dataset.char
+
+renderLore()
+
+}
+
+})
+
+renderLore()
+
+/* ===== LIBRARY ===== */
+
+const books=document.querySelectorAll(".book")
+const lorePanel=document.getElementById("book-lore")
+
+books.forEach(book=>{
+
+book.onclick=()=>{
+
+books.forEach(b=>b.classList.remove("open"))
+
+book.classList.add("open")
+
+lorePanel.innerHTML="<p>Opening archive: "+book.dataset.lore+"</p>"
+
+}
+
+})
+
+/* ===== AUDIO PLAYER ===== */
+
+const audio=document.getElementById("audio")
+const play=document.getElementById("play")
+const progress=document.getElementById("progress")
+
+play.onclick=()=>{
+
+audio.play()
+
+}
+
+audio.addEventListener("timeupdate",()=>{
+
+if(audio.duration){
+
+progress.style.width=(audio.currentTime/audio.duration*100)+"%"
+
+}
+
+})
+
+</script>
+
+</body>
+</html>
+```
             background-size: 100% 4px;
             z-index: 1000;
             pointer-events: none;
