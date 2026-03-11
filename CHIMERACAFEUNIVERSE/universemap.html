@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<title>Chimera Universe Map</title>
+
+<style>
+
+body{
+
+margin:0;
+background:#02030a;
+overflow:hidden;
+font-family:Georgia;
+color:white;
+
+}
+
+/* title */
+
+#title{
+
+position:absolute;
+top:30px;
+width:100%;
+text-align:center;
+
+font-size:26px;
+letter-spacing:4px;
+
+color:#8fa9ff;
+
+}
+
+/* realm buttons */
+
+.realm{
+
+position:absolute;
+
+padding:10px 16px;
+
+background:rgba(20,20,50,.85);
+
+border:1px solid #7da2ff;
+
+color:#7da2ff;
+
+cursor:pointer;
+
+font-size:14px;
+
+}
+
+.realm:hover{
+
+background:#7da2ff;
+color:black;
+
+}
+
+/* center */
+
+#hans{
+
+position:absolute;
+
+top:50%;
+left:50%;
+
+transform:translate(-50%,-50%);
+
+padding:20px 30px;
+
+background:rgba(40,40,90,.9);
+
+border:2px solid #aabaff;
+
+font-size:16px;
+
+text-align:center;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="title">
+Chimera Parallel Universe
+</div>
+
+<div id="hans">
+
+Hans' Library<br>
+The Center of the Realms
+
+</div>
+
+<!-- REALM PORTALS -->
+
+<button class="realm" id="cafe"
+onclick="enterRealm('realm-cafe.html')">
+Star's Cosmic Cafe
+</button>
+
+<button class="realm" id="garden"
+onclick="enterRealm('realm-herb-garden.html')">
+Milo's Herb Garden
+</button>
+
+<button class="realm" id="music"
+onclick="enterRealm('realm-music-studio.html')">
+Miki's Music Studio
+</button>
+
+<button class="realm" id="sanctuary"
+onclick="enterRealm('realm-sanctuary.html')">
+Sanctuary Studies
+</button>
+
+<button class="realm" id="chari"
+onclick="enterRealm('realm-chari-corner.html')">
+Chari's Corner
+</button>
+
+<canvas id="stars"></canvas>
+
+<script>
+
+/* canvas */
+
+const canvas = document.getElementById("stars")
+const ctx = canvas.getContext("2d")
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+/* starfield */
+
+let stars=[]
+
+for(let i=0;i<250;i++){
+
+stars.push({
+
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:Math.random()*2,
+tw:Math.random()*5
+
+})
+
+}
+
+/* orbit radius */
+
+let r1=220
+let r2=300
+
+/* place realms */
+
+function positionRealms(){
+
+let cx=window.innerWidth/2
+let cy=window.innerHeight/2
+
+place("cafe",cx+r1,cy)
+
+place("garden",cx-r1,cy)
+
+place("music",cx,cy-r2)
+
+place("sanctuary",cx+r2,cy+60)
+
+place("chari",cx-r2,cy+60)
+
+}
+
+function place(id,x,y){
+
+let e=document.getElementById(id)
+
+e.style.left=(x-60)+"px"
+e.style.top=(y-20)+"px"
+
+}
+
+positionRealms()
+
+/* star animation */
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+stars.forEach(s=>{
+
+let glow=Math.sin(Date.now()*0.002+s.tw)*.5+.5
+
+ctx.fillStyle="rgba(255,255,255,"+glow+")"
+
+ctx.fillRect(s.x,s.y,s.size,s.size)
+
+})
+
+requestAnimationFrame(draw)
+
+}
+
+draw()
+
+/* enter realm */
+
+function enterRealm(link){
+
+window.location.href=link
+
+}
+
+</script>
+
+</body>
+
+</html>
