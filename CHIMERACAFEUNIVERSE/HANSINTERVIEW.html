@@ -290,6 +290,34 @@ nextButton(()=>openRealm(url))
 
 }
 
+<h3>${realmTitle}</h3>
+
+${desc}
+
+`
+
+choices.innerHTML=`
+
+<button onclick="enterRealm()">
+View the realm
+</button>
+
+`
+
+}
+
+
+
+/* ENTER REALM */
+
+function enterRealm(link){
+
+window.location.href=link
+
+}
+
+
+  
 /* PORTAL */
 
 function openRealm(url){
@@ -351,25 +379,6 @@ location.reload()
 function nextButton(func){
 inputArea.innerHTML =
 '<button onclick="'+func.name+'()">Continue</button>'
-}
-choices.innerHTML=`
-
-<button onclick="enterRealm()">
-View the realm
-</button>
-
-`
-
-}
-
-
-
-/* ENTER REALM */
-
-function enterRealm(link){
-
-window.location.href=link
-
 }
 
 </script>
