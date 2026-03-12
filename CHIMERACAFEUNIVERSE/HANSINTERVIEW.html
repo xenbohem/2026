@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 <html>
-<head><script src="/.nekoweb-api/static/site.js" defer></script>
+<head><script src="/.nekoweb-api/static/site.js" defer></script><script src="/.nekoweb-api/static/site.js" defer></script>
 <meta charset="UTF-8">
 <title>Chimera Parallel Universe</title>
 
@@ -141,7 +141,8 @@ Chimera Parallel Universe
 
 <div class="dialogue" id="dialogueBox">
 
-<img class="portrait" id="portrait" src="https://xencafe.nekoweb.org/ARCHIVE-LIBRARY/GALAXYNAVIGATOR/hanz.jpeg">
+<div class="portrait"></div>
+
 <div class="character">
 Hans
 </div>
@@ -290,34 +291,6 @@ nextButton(()=>openRealm(url))
 
 }
 
-<h3>${realmTitle}</h3>
-
-${desc}
-
-`
-
-choices.innerHTML=`
-
-<button onclick="enterRealm()">
-View the realm
-</button>
-
-`
-
-}
-
-
-
-/* ENTER REALM */
-
-function enterRealm(link){
-
-window.location.href=link
-
-}
-
-
-  
 /* PORTAL */
 
 function openRealm(url){
@@ -325,19 +298,8 @@ function openRealm(url){
 playPortalSound()
 
 setTimeout(()=>{
-
-if(url.startsWith("#")){
-
-alert("🚧 This realm is still forming in the universe...")
-
-}else{
-
 window.open(url,"_blank")
-
-}
-
 },400)
-
 
 }
 
