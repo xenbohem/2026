@@ -1,348 +1,190 @@
-
 <!DOCTYPE html>
 <html>
-<head><script src="/.nekoweb-api/static/site.js" defer></script><script src="/.nekoweb-api/static/site.js" defer></script>
+<head>
 <meta charset="UTF-8">
-<title>Chimera Parallel Universe</title>
-
-<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+<title>Hans' Library</title>
 
 <style>
-
-body{
-margin:0;
-background:#04040d;
-color:white;
-font-family:Courier New;
-overflow:hidden;
+body {
+  margin:0;
+  overflow:hidden;
+  background:#02030a;
+  font-family:Georgia;
+  color:white;
 }
 
-/* cosmic stars */
-
-body::before{
-content:"";
-position:fixed;
-width:300%;
-height:300%;
-background:
-radial-gradient(white 1px, transparent 1px),
-radial-gradient(#88aaff 1px, transparent 1px),
-radial-gradient(#ff88ff 1px, transparent 1px);
-background-size:80px 80px,140px 140px,200px 200px;
-animation:stars 180s linear infinite;
-opacity:.4;
-}
-
-@keyframes stars{
-from{transform:translate(0,0);}
-to{transform:translate(-1200px,-900px);}
+/* star canvas */
+canvas {
+  position:absolute;
+  top:0;
+  left:0;
 }
 
 /* title */
-
-.title{
-position:absolute;
-top:15%;
-width:100%;
-text-align:center;
-font-family:'UnifrakturCook';
-font-size:42px;
-color:#7da2ff;
-letter-spacing:3px;
+#title {
+  position:absolute;
+  top:40px;
+  width:100%;
+  text-align:center;
+  font-size:26px;
+  letter-spacing:5px;
+  color:#8fa9ff;
 }
 
-/* entry portal */
-
-.avatar{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:120px;
-height:120px;
-border-radius:50%;
-background:radial-gradient(circle,#fff,#7da2ff,#1a1a50);
-box-shadow:0 0 30px #7da2ff;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:30px;
-cursor:pointer;
-transition:.4s;
+/* dialogue panel */
+#panel {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:600px;
+  padding:40px;
+  background:rgba(10,10,40,.9);
+  border:2px solid #7da2ff;
+  box-shadow:0 0 30px rgba(120,150,255,.25);
+  text-align:left;
 }
 
-.avatar:hover{
-transform:translate(-50%,-50%) scale(1.2);
+/* avatar */
+#avatar {
+  width:120px;
+  float:left;
+  margin-right:20px;
 }
 
-/* dialogue */
-
-.dialogue{
-position:absolute;
-bottom:50px;
-left:50%;
-transform:translateX(-50%);
-width:600px;
-background:rgba(20,20,50,.9);
-border:2px solid #7da2ff;
-padding:20px;
-display:none;
-}
-
-.character{
-font-weight:bold;
-color:#7da2ff;
-margin-bottom:10px;
-}
-
-/* portrait */
-
-.portrait{
-float:left;
-width:80px;
-height:80px;
-background:#333;
-margin-right:15px;
-border:2px solid #7da2ff;
+/* dialogue text */
+#dialogue {
+  font-size:16px;
+  line-height:1.6;
 }
 
 /* buttons */
-
-button{
-margin-top:10px;
-padding:8px 16px;
-background:#7da2ff;
-border:none;
-cursor:pointer;
+button {
+  margin-top:18px;
+  padding:10px 16px;
+  background:#0b0b30;
+  border:1px solid #7da2ff;
+  color:#7da2ff;
+  cursor:pointer;
 }
-
-input{
-padding:6px;
+button:hover {
+  background:#7da2ff;
+  color:black;
 }
-
-.reset{
-position:absolute;
-bottom:10px;
-right:10px;
+.choice {
+  display:block;
+  margin-top:12px;
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="title">
-Chimera Parallel Universe
+<div id="title">Hans' Library</div>
+<canvas id="stars"></canvas>
+
+<div id="panel">
+  <img id="avatar" src="https://xencafe.nekoweb.org/ARCHIVE-LIBRARY/GALAXYNAVIGATOR/hanz.jpeg">
+  <div id="dialogue"></div>
+  <div id="choices"></div>
 </div>
-
-<div class="avatar" onclick="startStory()">
-✨
-</div>
-
-<div class="dialogue" id="dialogueBox">
-
-<div class="portrait"></div>
-
-<div class="character">
-Hans
-</div>
-
-<div id="text"></div>
-
-<div id="inputArea"></div>
-
-<div style="clear:both;"></div>
-
-</div>
-
-<button class="reset" onclick="resetGame()">Reset Adventure</button>
 
 <script>
-
-/* PLAYER SAVE SYSTEM */
-
-let player = JSON.parse(localStorage.getItem("chimeraPlayerData")) || {
-name:null,
-apprenticeship:null,
-progress:[]
+/* starfield */
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let stars = [];
+for (let i=0;i<250;i++){
+  stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*2, tw:Math.random()*5});
 }
-
-function savePlayer(){
-localStorage.setItem("chimeraPlayerData", JSON.stringify(player))
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    let glow = Math.sin(Date.now()*0.002+s.tw)*0.5+0.5;
+    ctx.fillStyle="rgba(255,255,255,"+glow+")";
+    ctx.fillRect(s.x,s.y,s.size,s.size);
+  });
+  requestAnimationFrame(drawStars);
 }
+drawStars();
 
-/* STORY START */
+/* PLAYER MEMORY */
+let playerName="Traveler";
 
-function startStory(){
+startIntro();
 
-document.querySelector(".avatar").style.display="none"
-document.getElementById("dialogueBox").style.display="block"
+/* INTRO */
+function startIntro(){
+  dialogue.innerHTML = `<b>Hans</b><br><br>
+  Welcome, traveler.<br><br>
+  You have crossed a rather curious threshold.<br>
+  Before we proceed, what shall we call you?`;
 
-if(player.name){
-
-text.innerHTML =
-"Welcome back <b>"+player.name+"</b>. The Chimera Universe remembers you."
-
-nextButton(intro2)
-
-}else{
-
-text.innerHTML =
-"Greetings traveler. My name is Hans.<br><br>What shall we call you?"
-
-inputArea.innerHTML =
-'<input id="nameInput" placeholder="Your name"><br><button onclick="saveName()">Continue</button>'
-
-}
-
+  choices.innerHTML = `
+    <input id="nameInput" placeholder="Your name">
+    <br>
+    <button onclick="saveName()">Continue</button>
+  `;
 }
 
 /* SAVE NAME */
-
 function saveName(){
-
-player.name = document.getElementById("nameInput").value
-savePlayer()
-
-inputArea.innerHTML=""
-
-text.innerHTML =
-"A wonderful name.<br><br>Welcome "+player.name+"."
-
-nextButton(intro2)
-
+  let n = document.getElementById("nameInput").value;
+  if(n.length>0) playerName=n;
+  intro2();
 }
 
-/* INTRO STORY */
-
+/* INTRO PART 2 */
 function intro2(){
+  dialogue.innerHTML = `<b>Hans</b><br><br>
+  Excellent, ${playerName}.<br><br>
+  The Chimera Parallel Universe contains many realms.<br>
+  Each one teaches something different.<br><br>
+  To guide you properly, I must ask you a question.`;
 
-text.innerHTML =
-"You have entered a universe unlike anything you have encountered before."
-
-nextButton(intro3)
-
+  choices.innerHTML = `<button onclick="question1()">Begin Interview</button>`;
 }
 
-function intro3(){
+/* QUESTION 1 */
+function question1(){
+  dialogue.innerHTML = `<b>Hans</b><br><br>
+  Tell me, ${playerName}…<br><br>
+  What kind of discovery appeals to you most?`;
 
-text.innerHTML =
-"Within this world are cafés, libraries, gardens, music halls, and mysteries."
-
-nextButton(startQuiz)
-
+  choices.innerHTML = `
+    <button class="choice" onclick="choose('cafe')">Creative arts and making things</button>
+    <button class="choice" onclick="choose('garden')">Plants, herbs, and gardens</button>
+    <button class="choice" onclick="choose('music')">Music and sound</button>
+    <button class="choice" onclick="choose('study')">Reading and study</button>
+    <button class="choice" onclick="choose('talk')">Conversation and thoughtful people</button>
+  `;
 }
 
-/* QUIZ */
+/* RESULT CHOICES WITH TEMP LINKS */
+function choose(type){
+  let realmTitle="", desc="", tempLink="";
+  if(type=="cafe"){ realmTitle="Star's Cosmic Cafe"; desc="A place where drinks are crafted and travelers gather."; tempLink="cafe.html"; }
+  if(type=="garden"){ realmTitle="Milo's Herb Garden"; desc="A peaceful garden of herbs and natural wisdom."; tempLink="garden.html"; }
+  if(type=="music"){ realmTitle="Miki's Music Studio"; desc="A world of melody and rhythm."; tempLink="music.html"; }
+  if(type=="study"){ realmTitle="Sanctuary Studies"; desc="A quiet library of reflection and books."; tempLink="study.html"; }
+  if(type=="talk"){ realmTitle="Chari's Corner"; desc="A gentle place for thoughtful conversation."; tempLink="talk.html"; }
 
-function startQuiz(){
+  dialogue.innerHTML = `<b>Hans</b><br><br>
+    Excellent, ${playerName}.<br><br>
+    You are perfectly suited for:<br>
+    <h3>${realmTitle}</h3>
+    ${desc}
+  `;
 
-text.innerHTML =
-"Tell me, "+player.name+"... which calls to you most?"
-
-inputArea.innerHTML = `
-
-<button onclick="resultCafe()">☕ Tea and conversation</button><br><br>
-
-<button onclick="resultGarden()">🌿 Herbs and gardens</button><br><br>
-
-<button onclick="resultMusic()">🎵 Music and creativity</button><br><br>
-
-<button onclick="resultTalk()">💬 Quiet thoughtful conversation</button>
-
-`
-
+  choices.innerHTML = `<button onclick="enterRealm('${tempLink}')">Enter Realm</button>`;
 }
 
-function resultCafe(){
-player.apprenticeship="Cafe Apprentice"
-savePlayer()
-showResult("Cafe Apprentice","cafe.html")
+/* ENTER REALM */
+function enterRealm(link){
+  window.location.href = link; // temporary link
 }
-
-function resultGarden(){
-player.apprenticeship="Herbalist Apprentice"
-savePlayer()
-showResult("Herb Garden","garden.html")
-}
-
-function resultMusic(){
-player.apprenticeship="Music Apprentice"
-savePlayer()
-showResult("Music Hall","music.html")
-}
-
-function resultTalk(){
-player.apprenticeship="Conversation Apprentice"
-savePlayer()
-showResult("Chari's Conversation Room","chari.html")
-}
-
-/* RESULT */
-
-function showResult(place,url){
-
-inputArea.innerHTML=""
-
-text.innerHTML =
-"Excellent, "+player.name+".<br><br>You are perfectly suited for <b>"+place+"</b>."
-
-nextButton(()=>openRealm(url))
-
-}
-
-/* PORTAL */
-
-function openRealm(url){
-
-playPortalSound()
-
-setTimeout(()=>{
-window.open(url,"_blank")
-},400)
-
-}
-
-/* SYNTH PORTAL SOUND */
-
-function playPortalSound(){
-
-const ctx = new (window.AudioContext||window.webkitAudioContext)()
-
-const osc = ctx.createOscillator()
-const gain = ctx.createGain()
-
-osc.type="sine"
-osc.frequency.value=440
-
-osc.connect(gain)
-gain.connect(ctx.destination)
-
-gain.gain.value=.15
-
-osc.start()
-
-osc.frequency.exponentialRampToValueAtTime(660,ctx.currentTime+.4)
-gain.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.4)
-
-osc.stop(ctx.currentTime+.4)
-
-}
-
-/* RESET */
-
-function resetGame(){
-localStorage.removeItem("chimeraPlayerData")
-location.reload()
-}
-
-/* NEXT BUTTON */
-
-function nextButton(func){
-inputArea.innerHTML =
-'<button onclick="'+func.name+'()">Continue</button>'
-}
-
 </script>
 
 </body>
