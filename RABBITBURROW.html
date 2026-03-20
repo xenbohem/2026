@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Riddle Me Zen</title>
+<!-- Load Spicey Rice font from Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Spicey+Rice&display=swap" rel="stylesheet" />
+<style>
+body {
+  margin:0;
+  font-family: monospace;
+  background:black;
+  color:#eee;
+  overflow-x:hidden;
+}
+
+/* Title style */
+#gameTitle {
+  font-family: 'Spicey Rice', cursive;
+  font-size: 3em;
+  color: #ffcc00;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px #000;
+}
+
+/* Realm menu style */
+#realmsMenu {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+#realmsMenu button {
+  font-family: 'Spicey Rice', cursive;
+  font-size: 1.2em;
+  padding: 8px 12px;
+  background-color: #444;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#realmsMenu button:hover {
+  background-color: #666;
+}
+
+/* Screen styles */
+.screen {
+  display:none;
+  padding:20px;
+  min-height:80vh;
+}
+.active { display:block; }
+
+/* Basic style for realm sections */
+#herbal, #riddles, #feline, #music, #tearoom {
+  display:none;
+}
+#herbal.active, #riddles.active, #feline.active, #music.active, #tearoom.active {
+  display:block;
+}
+
+/* Doors and UI */
+.door {
+  border:1px solid white;
+  padding:10px;
+  margin:10px;
+  display:inline-block;
+  cursor:pointer;
+  transition: all 0.5s;
+}
+.npc { color:pink; cursor:pointer; }
+.item { color:cyan; cursor:pointer; }
+#inventory {
+  position:fixed;
+  top:10px;
+  left:10px;
+}
+#help {
+  position:fixed;
+  bottom:10px;
+  right:10px;
+  cursor:pointer;
+}
+#helpBox {
+  position:fixed; bottom:10px; right:10px;
+  background:#222; padding:10px; border:1px solid white; max-width:300px; color:#fff;
+}
+#confetti-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events:none;
+  z-index: 9999;
+}
+</style>
+</head>
+<body>
+
+<h1 id="gameTitle">Riddle Me Zen</h1>
+
+<!-- Realm Navigation Menu -->
+<div id="realmsMenu">
+  <button onclick="goToRealm('herbal')">Herbal Garden</button>
+  <button onclick="goToRealm('riddles')">Riddles</button>
+  <button onclick="goToRealm('feline')">Feline</button>
+  <button onclick="goToRealm('music')">Music</button>
+  <button onclick="goToRealm('tearoom')">Tea Room</button>
+</div>
+
+<!-- Help / Translation box -->
+<div id="helpBox">
+  <h4>Help / Traduction</h4>
+  <div id="helpContent">Bienvenue! Cliquez sur les objets ou portes pour explorer.</div>
+</div>
+
+<!-- Main screens -->
+<div id="main" class="screen active">
+  <h2>🐇 Choose a Realm</h2>
+  <div id="doors"></div>
+</div>
+
+<!-- Herbal Garden Realm -->
+<div id="herbal" class="screen">
+  <h2>🌿 Herbal Garden</h2>
+  <p>You feel the scent of herbs and flowers.</p>
+  <div class="door" onclick="go('main')">Back to Main</div>
+</div>
+
+<!-- Riddles Realm -->
+<div id="riddles" class="screen">
+  <h2>🧩 Riddles</h2>
+  <p>Explore riddles and puzzles.</p>
+  <div class="door" onclick="go('main')">Back to Main</div>
+</div>
+
+<!-- Feline Realm -->
+<div id="feline" class="screen">
+  <h2>🐈 Feline</h2>
+  <p>Meet mysterious cats.</p>
+  <div class="door" onclick="go('main')">Back to Main</div>
+</div>
+
+<!-- Music Realm -->
+<div id="music" class="screen">
+  <h2>🎶 Music</h2>
+  <p>Feel the melodies and rhythms.</p>
+  <div class="door" onclick="go('main')">Back to Main</div>
+</div>
+
+<!-- Tea Room Realm -->
+<div id="tearoom" class="screen">
+  <h2>🍵 Tea Room</h2>
+  <p>Enjoy a calming tea experience.</p>
+  <div class="door" onclick="go('main')">Back to Main</div>
+</div>
+
+<!-- TRIVIA -->
+<div id="trivia" class="screen">
+  <h2>🧠 Trivia Challenge</h2>
+  <p>Answer the questions to earn your reward!</p>
+  <button onclick="cancelTrivia()">Cancel</button>
+</div>
+
+<!-- Canvas for confetti -->
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+// --- Etat ---
+let state = JSON.parse(localStorage.getItem("rabbitState")) || {
+  tea:0, treat:0, knowledge:0, collectedItems: {}
+};
+let lastSpeech = "Bienvenue!";
+
+// --- Données objets avec énigmes françaises ---
+const itemsData = {
+  key: {
+    name: "Clé Ancienne",
+    riddle: "Je ouvre les portes du passé, cachée dans l'ombre projetée.",
+    story: "Vous avez trouvé une vieille clé rouillée sous les racines d'un arbre ancien."
+  },
+  coin: {
+    name: "Pièce Mystique",
+    riddle: "Je suis un symbole de chance, dans des histoires anciennes.",
+    story: "Une pièce brillante avec des symboles mystérieux, scintillant sous la lune."
+  },
+  letter: {
+    name: "Lettre Oubliée",
+    riddle: "Écrite en hâte, perdue dans le temps, secrets cachés en rime.",
+    story: "Une lettre chiffonnée avec de l'encre fanée, révélant un message secret."
+  },
+  feather: {
+    name: "Plume Enchantée",
+    riddle: "Léger comme l'air, guidant avec soin.",
+    story: "Une plume scintillante d'une lueur surnaturelle, flottant doucement."
+  },
+  crystal: {
+    name: "Fragment de Cristal",
+    riddle: "Fragile mais brillant, je tiens la lumière.",
+    story: "Un éclat lumineux, vibrant d'énergie."
+  },
+  shadow: {
+    name: "Amulette d'Ombre",
+    riddle: "Là où l'obscurité réside, mon pouvoir grandit.",
+    story: "Une amulette absorbant les ombres environnantes."
+  },
+  compass: {
+    name: "Boussole Dorée",
+    riddle: "Suivez-moi, et vous trouverez ce qui est dû.",
+    story: "Une boussole ornée pointant vers des directions mystérieuses."
+  },
+  scroll: {
+    name: "Parchemin Ancien",
+    riddle: "Sagesse déroulée, histoires racontées.",
+    story: "Un parchemin ancien avec des écrits mystérieux."
+  },
+  map: {
+    name: "Carte Mystérieuse",
+    riddle: "Suivez les lignes pour trouver les signes.",
+    story: "Une vieille carte avec des symboles cryptiques."
+  },
+  ring: {
+    name: "Anneau Spectral",
+    riddle: "Invisible à beaucoup, mais certains voient.",
+    story: "Un anneau faiblement lumineux, scintillant avec une énergie spectrale."
+  },
+  mask: {
+    name: "Masque Ancien",
+    riddle: "Visage de sagesse, masque du temps.",
+    story: "Un masque sculpté avec des symboles anciens."
+  },
+  bell: {
+    name: "Cloche Silencieuse",
+    riddle: "Son sans bruit, écho partout.",
+    story: "Une cloche qui ne produit aucun son mais résonne visuellement."
+  },
+  pendant: {
+    name: "Pendentif Perdu",
+    riddle: "Une pierre du cœur, séparée du reste.",
+    story: "Un pendentif contenant une gemme tourbillonnante."
+  },
+  star: {
+    name: "Fragment d'Étoile",
+    riddle: "Un morceau du ciel nocturne, pris dans un mensonge.",
+    story: "Un fragment d'étoile, brillant doucement."
+  },
+  void: {
+    name: "Cristal du Vide",
+    riddle: "Absorbe toute lumière, devient la nuit.",
+    story: "Un cristal sombre, semblant aspirer la lumière environnante."
+  }
+};
+
+// --- Pool de questions de trivia ---
+let triviaQuestionsPool = [];
+const allTriviaQuestions = [
+  {
+    question: "What has keys but can't open locks?",
+    answer: "keyboard"
+  },
+  {
+    question: "What can travel around the world while staying in the corner?",
+    answer: "stamp"
+  },
+  {
+    question: "I speak without a mouth and hear without ears. What am I?",
+    answer: "echo"
+  },
+  {
+    question: "The more you take, the more you leave behind. What are they?",
+    answer: "footsteps"
+  },
+  {
+    question: "What has hands but can’t clap?",
+    answer: "clock"
+  },
+  {
+    question: "What is full of holes but still holds water?",
+    answer: "sponge"
+  },
+  {
+    question: "What gets wetter the more it dries?",
+    answer: "towel"
+  },
+  {
+    question: "What can run but never walks, has a mouth but never talks?",
+    answer: "river"
+  }
+];
+
+function initTriviaPool() {
+  triviaQuestionsPool = [...allTriviaQuestions];
+}
+
+// --- Fonctions ---
+function save() {
+  localStorage.setItem("rabbitState", JSON.stringify(state));
+  updateInventory();
+  updateCollectionDisplay();
+}
+
+function updateHelp(text) {
+  document.getElementById('helpContent').innerText = text;
+  lastSpeech = text;
+}
+
+function updateInventory() {
+  document.getElementById("inventory").innerText =
+    "🍃 Feuilles de thé: " + state.tea + " | 🍖 Friandises: " + state.treat;
+}
+updateInventory();
+updateCollectionDisplay();
+
+// Afficher les portes
+function renderDoors() {
+  let doors = [
+    { name: "🍵 Thé", id: "tea" },
+    { name: "🐈 Chats", id: "cats" },
+    { name: "⚡ Pouvoir", id: "power" },
+    { name: "🧠 Défi Trivia", id: "trivia" }
+  ];
+  let html = "";
+  doors.forEach(d => {
+    html += `<div class="door" onclick="go('${d.id}')">${d.name}</div>`;
+  });
+  document.getElementById("doors").innerHTML = html;
+}
+renderDoors();
+
+function go(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  renderDoors();
+
+  if (id === 'trivia') {
+    startTrivia();
+  }
+  // Afficher les autres zones
+  if(id === 'herbal') { document.getElementById('herbal').classList.add('active'); }
+  if(id === 'riddles') { document.getElementById('riddles').classList.add('active'); }
+  if(id === 'feline') { document.getElementById('feline').classList.add('active'); }
+  if(id === 'music') { document.getElementById('music').classList.add('active'); }
+  if(id === 'tearoom') { document.getElementById('tearoom').classList.add('active'); }
+
+  sound();
+}
+
+// Fonctions d'interactions
+function teaNPC() {
+  if (state.tea < 2) {
+    alert("Tu es maladroit.");
+    updateHelp("Ils jugent ta posture...");
+  } else {
+    alert("Acceptable.");
+    updateHelp("Tu es toléré.");
+    state.knowledge=1;
+    save();
+  }
+}
+
+function feedCat() {
+  if (state.treat > 0) {
+    state.treat--;
+    alert("Le chat est satisfait.");
+    updateHelp("Le chat regarde...");
+    save();
+  } else {
+    alert("Le chat regarde...");
+  }
+}
+
+function addItem(type) {
+  if (type === 'tea') {
+    state.tea++;
+  } else if (type === 'treat') {
+    state.treat++;
+  }
+  save();
+}
+
+function showItemStory(itemKey) {
+  const item = itemsData[itemKey];
+  alert(`Vous avez trouvé ${item.name}!\n\n${item.story}\n\nÉnigme: ${item.riddle}`);
+  updateHelp(`Énigme: ${item.riddle}`);
+}
+
+function checkCollectionProgress() {
+  const totalCollected = Object.keys(state.collectedItems).length;
+  if (totalCollected >= 15) {
+    inviteToDiscord();
+  }
+}
+
+function inviteToDiscord() {
+  alert("Félicitations! Vous avez collecté assez d'objets. Rejoignez notre Discord: https://discord.gg/temporary");
+}
+
+// Partie Trivia
+let questionsAsked = 0;
+let currentQuestion = null;
+
+function startTrivia() {
+  initTriviaPool();
+  questionsAsked = 0;
+  askNextQuestion();
+}
+
+function askNextQuestion() {
+  if (triviaQuestionsPool.length === 0) {
+    initTriviaPool();
+  }
+  const qIndex = Math.floor(Math.random() * triviaQuestionsPool.length);
+  currentQuestion = triviaQuestionsPool.splice(qIndex, 1)[0];
+  questionsAsked++;
+  updateHelp(`Énigme: ${currentQuestion.question}`); // Affiche en français
+  let response = prompt(currentQuestion.question);
+
+  if (response !== null && response.trim().toLowerCase() === currentQuestion.answer) {
+    alert("Correct!");
+    if (currentQuestion.answer === "sponge") {
+      celebrateWinning();
+      return;
+    }
+  } else {
+    alert("Incorrect. La réponse était: " + currentQuestion.answer);
+  }
+
+  if (questionsAsked < 12) {
+    askNextQuestion();
+  } else {
+    finalQuestion();
+  }
+}
+
+function finalQuestion() {
+  const answer = prompt("Question finale: Combien dure l'infini?");
+  if (
+    answer !== null &&
+    (
+      answer.trim().toLowerCase().includes("endless") ||
+      answer.trim().toLowerCase().includes("infinite") ||
+      answer.trim().toLowerCase().includes("eternal") ||
+      answer.trim().toLowerCase().includes("forever")
+    )
+  ) {
+    alert("Correct! Rejoins notre Discord: https://discord.gg/temporary");
+  } else {
+    alert("Ce n'est pas correct. Essaie plus tard!");
+  }
+}
+
+function celebrateWinning() {
+  showConfetti();
+  alert("🎉 Félicitations! Vous avez répondu correctement à l'énigme de l'éponge! 🎉");
+}
+
+// Animation confettis
+function showConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const confettiCount = 150;
+  const confetti = [];
+
+  for (let i=0; i<confettiCount; i++) {
+    confetti.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 3 + 2,
+      color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+      tilt: Math.random() * 10 - 5,
+      tiltAngle: Math.random() * Math.PI * 2,
+      tiltSpeed: Math.random() * 0.02 + 0.01
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+      ctx.fillStyle = c.color;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      c.tiltAngle += c.tiltSpeed;
+      c.x += Math.sin(c.tiltAngle) * 2;
+      c.y += 3;
+
+      if (c.y > canvas.height) {
+        c.y = -10;
+        c.x = Math.random() * canvas.width;
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  setTimeout(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }, 3000);
+}
+
+// Fonction pour changer de royaume
+function goToRealm(realm) {
+  // Désactive toutes les zones
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  // Active la zone sélectionnée
+  if (realm === 'herbal') {
+    document.getElementById('herbal').classList.add('active');
+  } else if (realm === 'riddles') {
+    document.getElementById('riddles').classList.add('active');
+  } else if (realm === 'feline') {
+    document.getElementById('feline').classList.add('active');
+  } else if (realm === 'music') {
+    document.getElementById('music').classList.add('active');
+  } else if (realm === 'tearoom') {
+    document.getElementById('tearoom').classList.add('active');
+  }
+  // Mettez à jour l'écran principal si nécessaire
+  // (Pour l'instant, il n'y a pas de contenu spécifique dans ces zones)
+}
+
+// Fonction pour jouer un son
+function sound() {
+  let ctx = new (window.AudioContext || window.webkitAudioContext)();
+  let oscillator = ctx.createOscillator();
+  oscillator.type = 'square';
+  oscillator.frequency.value = 200 + Math.random() * 400;
+  oscillator.connect(ctx.destination);
+  oscillator.start();
+  oscillator.stop(ctx.currentTime + 0.2);
+}
+</script>
+</body>
+</html>
