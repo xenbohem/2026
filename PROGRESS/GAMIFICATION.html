@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🧙‍♂️ Vision Cafe - Week 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Vampiro+One&family=Klee+One&display=swap" rel="stylesheet">
+<link rel="manifest" href="data:application/manifest+json,{
+  'name': 'Vision Cafe',
+  'short_name': 'VisionCafe',
+  'start_url': '.',
+  'display': 'standalone',
+  'background_color': '#000',
+  'theme_color': '#ff4da6',
+  'icons': [{'src': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjRkY0RGE2Ii8+Cjx0ZXh0IHg9Ijk2IiB5PSIxMjAiIGZvbnQtZmFtaWx5PSJWYW1waXJvIE9uZSIgZm9udC1zaXplPSIzMCIgZmlsbD0iIzAwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+VjwvdGV4dD4KPC9zdmc+', 'sizes': '192x192', 'type': 'image/svg+xml'}]
+}">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: radial-gradient(circle at center, #1a0033 0%, #000 70%);
+  color: #fff;
+  font-family: 'Klee One', sans-serif;
+  padding: 15px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.container {
+  max-width: 380px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #111, #1a1a2e);
+  border-radius: 25px;
+  padding: 25px 20px;
+  box-shadow: 0 0 40px #8a2be2;
+  border: 2px solid #8a2be2;
+  position: relative;
+}
+.header {
+  font-family: 'Vampiro One', cursive;
+  font-size: 2rem;
+  text-align: center;
+  background: linear-gradient(45deg, #ff4da6, #ff1493);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px #ff4da6;
+  animation: headerGlow 3s ease-in-out infinite alternate;
+}
+@keyframes headerGlow {
+  from { filter: drop-shadow(0 0 10px #ff4da6); }
+  to { filter: drop-shadow(0 0 25px #ff1493); }
+}
+.week-title {
+  text-align: center;
+  background: linear-gradient(45deg, #88aaee, cornflowerblue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+.day {
+  margin-bottom: 22px;
+  padding: 18px 15px;
+  background: rgba(26,26,46,0.8);
+  border-radius: 18px;
+  border-left: 5px solid #ff4da6;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.day:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(138,43,226,0.3);
+  border-left-color: #ff1493;
+}
+.day-header {
+  font-family: 'Vampiro One', cursive;
+  font-size: 1.3rem;
+  color: #ff4da6;
+  margin-bottom: 12px;
+  text-shadow: 0 0 8px #ff4da6;
+}
+.task {
+  padding: 12px 10px;
+  margin: 6px 0;
+  background: rgba(135,206,250,0.15);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  border-left: 3px solid cornflowerblue;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.task:hover {
+  background: rgba(135,206,250,0.25);
+  transform: translateX(3px);
+}
+.priority { 
+  background: linear-gradient(135deg, #ff4da6, #ff1493) !important;
+  color: white !important;
+  border-left-color: gold !important;
+  box-shadow: 0 0 15px #ff4da6;
+  animation: priorityGlow 2s infinite;
+}
+.urgent { 
+  background: linear-gradient(135deg, #ff4444, #ff6666) !important;
+  color: white !important;
+  border-left-color: #ff0000 !important;
+  box-shadow: 0 0 20px #ff4444;
+  animation: urgentFlash 1.5s infinite;
+}
+.rest {
+  background: linear-gradient(135deg, #44ff88, #66ffaa) !important;
+  color: #000 !important;
+  border-left-color: #44ff88 !important;
+  font-weight: bold;
+}
+@keyframes priorityGlow { 0%,100%{box-shadow:0 0 15px #ff4da6;}50%{box-shadow:0 0 30px #ff1493;} }
+@keyframes urgentFlash { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.85;transform:scale(1.03);} }
+.deadline-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff4444;
+  color: white;
+  padding: 3px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.1);} }
+.progress {
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(26,26,46,0.8);
+  border-radius: 18px;
+  text-align: center;
+  border: 2px solid #333;
+}
+.progress-bar {
+  height: 12px;
+  background: #222;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 15px 0;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4da6, cornflowerblue, #8a2be2);
+  width: 14.28%;
+  border-radius: 8px;
+  transition: width 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+  position: relative;
+  box-shadow: 0 0 20px rgba(255,77,166,0.6);
+}
+.progress-text {
+  font-family: 'Vampiro One', cursive;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  background: linear-gradient(45deg, #ff4da6, cornflowerblue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@media (max-width: 400px) {
+  body { padding: 10px; }
+  .container { padding: 20px 15px; margin: 10px; }
+  .header { font-size: 1.6rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">🧙‍♂️ Vision Cafe</div>
+  <div class="week-title">Week 1 • Day 1/90</div>
+  
+  <!-- MONDAY -->
+  <div class="day">
+    <div class="day-header">📅 Monday</div>
+    <div class="task priority" onclick="completeTask(this)">
+      🚨 9AM: Define purpose<span class="deadline-badge">Day 3</span>
+    </div>
+    <div class="task">1-2PM: Deep work slot</div>
+    <div class="task">7-8PM: Creative flow</div>
+  </div>
+  
+  <!-- TUESDAY -->
+  <div class="day">
+    <div class="day-header">📱 Tuesday</div>
+    <div class="task priority" onclick="completeTask(this)">
+      9AM: Choose platform<span class="deadline-badge">Day 5</span>
+    </div>
+    <div class="task priority">1PM: Genre + tone</div>
+  </div>
+  
+  <!-- WEDNESDAY -->
+  <div class="day">
+    <div class="day-header">⚠️ Wednesday</div>
+    <div class="task urgent" onclick="completeTask(this)">
+      ⏰ 7PM: Create channels<span class="deadline-badge">⚠️ TODAY</span>
+    </div>
+  </div>
+  
+  <!-- PROGRESS -->
+  <div class="progress">
+    <div>Week 1 Progress</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">1/7 days • 14%</div>
+  </div>
+</div>
+
+<script>
+let completedTasks = 0;
+const totalTasks = 7;
+
+function completeTask(task) {
+  task.style.opacity = '0.6';
+  task.style.textDecoration = 'line-through';
+  task.onclick = null;
+  completedTasks++;
+  updateProgress();
+  
+  // Celebration!
+  task.style.background = '#44ff88';
+  task.style.color = '#000';
+  setTimeout(() => {
+    task.innerHTML += '<br><span style="font-size:0.7rem;color:#44ff88;">✓ DONE</span>';
+  }, 500);
+}
+
+function updateProgress() {
+  const progress = (completedTasks / totalTasks) * 100;
+  document.getElementById('progressBar').style.width = progress + '%';
+  document.getElementById('progressText').textContent = 
+    `${completedTasks}/${totalTasks} tasks • ${Math.round(progress)}%`;
+  
+  // Win condition
+  if (completedTasks === totalTasks) {
+    setTimeout(() => {
+      alert('🎉 WEEK 1 MASTERED!\nWeek 2 auto-loads tomorrow!');
+    }, 1000);
+  }
+}
+
+// PWA Ready
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('data:text/javascript;base64,' + 
+  btoa(`self.addEventListener('install',e=>e.waitUntil(self.skipWaiting()));`));
+}
+
+// Auto-save progress
+window.onbeforeunload = () => {
+  localStorage.setItem('visionCafeProgress', JSON.stringify({completedTasks}));
+};
+window.onload = () => {
+  const saved = localStorage.getItem('visionCafeProgress');
+  if (saved) {
+    const data = JSON.parse(saved);
+    completedTasks = data.completedTasks || 0;
+    updateProgress();
+  }
+};
+</script>
+</body>
+</html>
