@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>90-Day Vision Cafe Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Vampiro+One&family=Klee+One&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #000, #1a0033, #000);
+  color: cornflowerblue;
+  font-family: 'Klee One', sans-serif;
+  min-height: 100vh;
+  overflow-x: auto;
+}
+
+.calendar-frame {
+  max-width: 1400px;
+  margin: 20px auto;
+  border: 3px solid #8a2be2;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.95);
+  box-shadow: 0 0 50px #8a2be2;
+  backdrop-filter: blur(20px);
+}
+
+.header {
+  font-family: 'Vampiro One', cursive;
+  font-size: 3rem;
+  text-align: center;
+  padding: 30px;
+  color: #ff4da6;
+  text-shadow: 0 0 25px #ff4da6;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(135deg, #000, #1a0033);
+  z-index: 100;
+}
+
+.calendar-title {
+  font-family: 'Vampiro One', cursive;
+  color: #ff4da6;
+  text-align: center;
+  font-size: 2rem;
+  margin: 20px 0 15px 0;
+  text-shadow: 0 0 20px #ff4da6;
+}
+
+.week-counter {
+  font-size: 1.2rem;
+  color: #88aaee;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.calendar-container {
+  padding: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.calendar-day {
+  background: linear-gradient(135deg, #111, #1a1a2e);
+  border: 2px solid #333;
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+  transition: all 0.3s ease;
+  min-height: 450px;
+}
+
+.calendar-day:hover {
+  border-color: #8a2be2;
+  box-shadow: 0 0 30px #8a2be2;
+  transform: translateY(-5px);
+}
+
+.calendar-day-header {
+  font-family: 'Vampiro One', cursive;
+  font-size: 1.5rem;
+  color: #ff4da6;
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px #ff4da6;
+}
+
+.time-slot {
+  margin-bottom: 15px;
+  padding: 12px;
+  border: 2px dashed #444;
+  border-radius: 10px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #666;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.time-slot:hover {
+  border-color: cornflowerblue;
+  background: rgba(135, 206, 250, 0.1);
+}
+
+.time-slot.filled {
+  border-style: solid;
+  cursor: grab;
+}
+
+.time-slot.priority {
+  background: linear-gradient(45deg, #ff4da6, #ff1493);
+  color: white;
+  border-color: gold;
+  border-left-width: 6px;
+  animation: priorityGlow 2s infinite;
+}
+
+.time-slot.urgent {
+  background: linear-gradient(45deg, #ff4444, #ff6666);
+  color: white;
+  border-color: #ff0000;
+  border-left-width: 6px;
+  animation: urgentFlash 1s infinite;
+  box-shadow: 0 0 25px #ff4444;
+}
+
+.time-slot.rest {
+  background: linear-gradient(45deg, #44ff88, #66ffaa);
+  color: #000;
+  border-color: #44ff88;
+  font-weight: bold;
+}
+
+@keyframes priorityGlow {
+  0%, 100% { box-shadow: 0 0 15px #ff4da6; }
+  50% { box-shadow: 0 0 35px #ff1493; }
+}
+
+@keyframes urgentFlash {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+.deadline-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff4444;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+.progress-bar {
+  position: sticky;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 8px;
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(135, 206, 250, 0.5);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, cornflowerblue, #ff4da6);
+  width: 0%;
+  transition: width 1s ease-out;
+  border-radius: 10px;
+  position: relative;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Vampiro One', cursive;
+  font-size: 1.1rem;
+  color: white;
+  text-shadow: 0 0 10px #000;
+}
+
+@media (max-width: 768px) {
+  .calendar-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 20px;
+  }
+  .calendar-day {
+    min-height: 400px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="calendar-frame">
+  <div class="header">🧙‍♂️ Vision Cafe Roadmap</div>
+  
+  <div style="text-align: center; color: #88aaee; padding: 0 30px 20px;">
+    <div class="calendar-title">Week 1 • 90-Day Mastery Plan</div>
+    <div class="week-counter" id="week-counter">Day 1 of 90</div>
+  </div>
+
+  <div class="calendar-container">
+    <!-- MONDAY -->
+    <div class="calendar-day" data-day="1">
+      <div class="calendar-day-header">📅 Monday</div>
+      <div class="time-slot priority filled" data-task="Define purpose" data-deadline="Day 3">
+        🚨 DAY 1<br>Define purpose (Guild)<br><span style="font-size:0.8rem;">9-10AM</span>
+        <div class="deadline-badge">Day 3</div>
+      </div>
+      <div class="time-slot" data-slot="Mon-1pm">1-2PM<br>Deep Work</div>
+      <div class="time-slot" data-slot="Mon-7pm">7-8PM<br>Creative Flow</div>
+    </div>
+
+    <!-- TUESDAY -->
+    <div class="calendar-day" data-day="2">
+      <div class="calendar-day-header">📱 Tuesday</div>
+      <div class="time-slot priority filled" data-task="Choose platform" data-deadline="Day 5">
+        📱 DAY 2<br>Choose platform (Guild)<br><span style="font-size:0.8rem;">9-10AM</span>
+        <div class="deadline-badge">Day 5</div>
+      </div>
+      <div class="time-slot priority filled" data-task="Decide genre + tone" data-deadline="Day 17">
+        🎭 Decide genre + tone (Roleplay)<br><span style="font-size:0.8rem;">1-2PM</span>
+      </div>
+      <div class="time-slot" data-slot="Tue-7pm">7-8PM<br>Review</div>
+    </div>
+
+    <!-- WEDNESDAY - URGENT DEADLINE -->
+    <div class="calendar-day" data-day="3">
+      <div class="calendar-day-header">⚠️ Wednesday</div>
+      <div class="time-slot" data-slot="Wed-9am">9-10AM<br>Flex</div>
+      <div class="time-slot" data-slot="Wed-1pm">1-2PM<br>Flex</div>
+      <div class="time-slot urgent filled" data-task="Create channels" data-deadline="Day 7">
+        ⏰ DEADLINE TODAY<br>Create channels (Guild)<br><span style="font-size:0.8rem;">7-8PM</span>
+        <div class="deadline-badge">⚠️ TODAY</div>
+      </div>
+    </div>
+
+    <!-- THURSDAY -->
+    <div class="calendar-day" data-day="4">
+      <div class="calendar-day-header">📜 Thursday</div>
+      <div class="time-slot priority filled" data-task="Set rules" data-deadline="Day 19">
+        📜 Set rules (Roleplay)<br><span style="font-size:0.8rem;">9-10AM</span>
+      </div>
+      <div class="time-slot priority filled" data-task="Create templates" data-deadline="Day 31">
+        👤 Create templates (Characters)<br><span style="font-size:0.8rem;">1-2PM</span>
+      </div>
+      <div class="time-slot" data-slot="Thu-7pm">7-8PM<br>Polish</div>
+    </div>
+
+    <!-- FRIDAY -->
+    <div class="calendar-day" data-day="5">
+      <div class="calendar-day-header">🏗️ Friday</div>
+      <div class="time-slot priority filled" data-task="Design onboarding" data-deadline="Day 14">
+        🏗️ Design onboarding (Guild)<br><span style="font-size:0.8rem;">9-10AM</span>
+      </div>
+      <div class="time-slot" data-slot="Fri-1pm">1-2PM<br>Flex</div>
+      <div class="time-slot" data-slot="Fri-7pm">7-8PM<br>Wrap week</div>
+    </div>
+
+    <!-- SATURDAY REST -->
+    <div class="calendar-day" data-day="6">
+      <div class="calendar-day-header">😌 Saturday</div>
+      <div class="time-slot rest filled">REST DAY<br>Review progress<br>🥳</div>
+      <div class="time-slot" data-slot="Sat-1pm">Light planning<br>Optional</div>
+      <div class="time-slot rest filled">Recharge<br>🎮</div>
+    </div>
+
+    <!-- SUNDAY PLAN -->
+    <div class="calendar-day" data-day="7">
+      <div class="calendar-day-header">📋 Sunday</div>
+      <div class="time-slot rest filled">WEEK REVIEW<br>Celebrate wins!<br>🏆</div>
+      <div class="time-slot priority filled">Week 2 Preview<br>Auto-loads next tasks</div>
+      <div class="time-slot rest filled">Vision Cafe<br>Manifest Day 90</div>
+    </div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width: 14%;">
+      <div class="progress-text">Week 1 • 1/7 days</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* SIMPLE PROGRESS TRACKER */
+let currentDay = 1;
+const totalDays = 90;
+
+function updateProgress() {
+  const progress = (currentDay / totalDays) * 100;
+  document.getElementById('progress-fill').style.width = progress + '%';
+  document.getElementById('week-counter').textContent = `Day ${currentDay} of ${totalDays}`;
+  
+  // Glow current day
+  document.querySelectorAll('.calendar-day').forEach((day, index) => {
+    day.style.boxShadow = index + 1 === currentDay ? '0 0 40px #ff4da6' : 'none';
+  });
+}
+
+// Click to advance day (demo)
+document.querySelectorAll('.calendar-day').forEach((day, index) => {
+  day.addEventListener('click', () => {
+    currentDay = index + 1;
+    updateProgress();
+  });
+});
+
+updateProgress();
+</script>
+</body>
+</html>
