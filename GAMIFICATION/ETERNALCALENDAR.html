@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chez Moi Cafe • Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Vampiro+One&family=Klee+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a0033 50%, #000 100%);
+  color: #e6e6fa;
+  font-family: 'Klee One', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.calendar-frame {
+  width: 100%;
+  max-width: 420px;
+  height: 95vh;
+  max-height: 900px;
+  background: rgba(26,26,46,0.98);
+  border: 2px solid rgba(138,43,226,0.6);
+  border-radius: 25px;
+  box-shadow: 
+    0 0 50px rgba(138,43,226,0.5),
+    inset 0 0 30px rgba(0,0,0,0.3);
+  backdrop-filter: blur(25px);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.frame-glow {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff4da6, #8a2be2, #ff4da6, #8a2be2);
+  z-index: -1;
+  border-radius: 27px;
+  padding: 2px;
+  animation: frameShimmer 4s linear infinite;
+}
+@keyframes frameShimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 25px;
+  scrollbar-width: thin;
+  scrollbar-color: #8a2be2 rgba(26,26,46,0.5);
+}
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-container::-webkit-scrollbar-track {
+  background: rgba(26,26,46,0.8);
+  border-radius: 10px;
+}
+.scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(#ff4da6, #8a2be2);
+  border-radius: 10px;
+}
+.vampire-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(255,77,166,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(138,43,226,0.08) 0%, transparent 50%),
+    linear-gradient(135deg, #10002b 0%, #1a0033 100%);
+  z-index: -2;
+}
+.header {
+  text-align: center;
+  padding: 30px 25px 20px;
+  background: linear-gradient(135deg, rgba(26,26,46,0.95), transparent);
+  border-bottom: 1px solid rgba(138,43,226,0.3);
+}
+.title {
+  font-family: 'Vampiro One', cursive;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  background: linear-gradient(45deg, #ff4da6, #ff1493, #8a2be2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 25px rgba(255,77,166,0.6);
+  margin-bottom: 5px;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+@keyframes titleGlow {
+  from { filter: drop-shadow(0 0 12px #ff4da6); }
+  to { filter: drop-shadow(0 0 28px #8a2be2); }
+}
+.hansel-chat {
+  background: rgba(15,15,35,0.95);
+  border: 1px solid rgba(138,43,226,0.4);
+  border-radius: 18px;
+  padding: 20px;
+  margin: 20px 0;
+  backdrop-filter: blur(20px);
+  max-width: 100%;
+  text-align: center;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+}
+.hansel-avatar {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(45deg, #ff4da6, #8a2be2);
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 0 20px rgba(255,77,166,0.5);
+  animation: hanselFloat 3s ease-in-out infinite;
+}
+@keyframes hanselFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+.hansel-text {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #ff4da6;
+  font-family: 'Klee One', sans-serif;
+  text-shadow: 0 0 8px rgba(255,77,166,0.4);
+}
+.username-input {
+  display: none;
+  margin-top: 15px;
+}
+.username-input input {
+  padding: 10px 18px;
+  background: rgba(0,0,0,0.8);
+  border: 2px solid #8a2be2;
+  border-radius: 20px;
+  color: #e6e6fa;
+  font-family: 'Klee One', sans-serif;
+  font-size: 1rem;
+  text-align: center;
+  width: 100%;
+  max-width: 280px;
+}
+.username-input input::placeholder { color: #888; }
+.month-header {
+  text-align: center;
+  margin: 25px 0 25px;
+}
+.month-title {
+  font-family: 'Vampiro One', cursive;
+  font-size: 1.8rem;
+  background: linear-gradient(45deg, cornflowerblue, #8a2be2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  text-shadow: 0 0 15px rgba(135,206,250,0.5);
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  max-width: 100%;
+}
+.day-header {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Vampiro One', cursive;
+  font-size: 0.9rem;
+  color: #ff4da6;
+  background: rgba(255,77,166,0.12);
+  border-radius: 10px;
+  font-weight: bold;
+  text-shadow: 0 0 6px rgba(255,77,166,0.3);
+}
+.calendar-day {
+  aspect-ratio: 1;
+  background: rgba(10,10,25,0.9);
+  border: 1px solid rgba(138,43,226,0.15);
+  border-radius: 10px;
+  padding: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 70px;
+}
+.calendar-day:hover {
+  background: rgba(138,43,226,0.12);
+  border-color: #ff4da6;
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(138,43,226,0.25);
+}
+.calendar-day.today {
+  background: linear-gradient(135deg, #ff4da6, #ff1493);
+  color: white;
+  border-color: gold;
+  box-shadow: 0 0 18px #ff4da6;
+  animation: todayPulse 2s infinite;
+}
+@keyframes todayPulse {
+  0%, 100% { box-shadow: 0 0 18px #ff4da6; }
+  50% { box-shadow: 0 0 28px #ff1493; }
+}
+.day-number {
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #ff4da6;
+  text-align: center;
+}
+.day-notes {
+  font-size: 0.7rem;
+  opacity: 0.85;
+  word-break: break-word;
+  flex-grow: 1;
+  min-height: 28px;
+  padding: 2px;
+  outline: none;
+}
+.day-notes:focus {
+  background: rgba(138,43,226,0.15);
+  border-radius: 6px;
+}
+.mantras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin: 35px 0 25px;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 1.5s forwards;
+}
+.mantra {
+  background: rgba(15,15,35,0.9);
+  border: 1px solid rgba(255,77,166,0.25);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(15px);
+}
+.mantra:hover {
+  border-color: #ff4da6;
+  box-shadow: 0 12px 35px rgba(255,77,166,0.25);
+  transform: translateY(-4px);
+}
+.mantra-icon {
+  font-size: 2.2rem;
+  color: #ff4da6;
+  margin-bottom: 12px;
+}
+.mantra-text {
+  font-family: 'Vampiro One', cursive;
+  font-size: 1.2rem;
+  color: #ff4da6;
+  margin-bottom: 8px;
+  text-shadow: 0 0 8px rgba(255,77,166,0.3);
+}
+.footer {
+  text-align: center;
+  padding: 25px 20px;
+  color: #b19cd9;
+  font-size: 0.95rem;
+  opacity: 0.85;
+  border-top: 1px solid rgba(138,43,226,0.2);
+  margin-top: auto;
+}
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 480px) {
+  .calendar-frame { margin: 10px; height: 98vh; }
+  .scroll-container { padding: 20px 15px; }
+  .calendar-day { min-height: 65px; font-size: 0.75rem; }
+}
+</style>
+</head>
+<body>
+  <div class="vampire-bg"></div>
+  
+  <div class="calendar-frame">
+    <div class="frame-glow"></div>
+    
+    <div class="scroll-container">
+      <!-- Header -->
+      <div class="header">
+        <div class="title">Calendar</div>
+      </div>
+
+      <!-- Hansel Greeting -->
+      <div class="hansel-chat" id="hanselChat">
+        <div class="hansel-avatar">🧙‍♂️</div>
+        <div class="hansel-text" id="greetingText">
+          The mists part...
+        </div>
+        <div class="username-input" id="usernameInput">
+          <input type="text" id="usernameField" placeholder="Your name, wanderer?" maxlength="20" autofocus>
+        </div>
+      </div>
+
+      <!-- Monthly Calendar -->
+      <div class="calendar-container">
+        <div class="month-header">
+          <div class="month-title" id="monthTitle">January 2024</div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid">
+          <!-- Generated by JS -->
+        </div>
+      </div>
+
+      <!-- Daily Mantras -->
+      <div class="mantras">
+        <div class="mantra">
+          <div class="mantra-icon">🌙</div>
+          <div class="mantra-text">"Shadows hide the path to dawn"</div>
+        </div>
+        <div class="mantra">
+          <div class="mantra-icon">✨</div>
+          <div class="mantra-text">"Stars remember every wish"</div>
+        </div>
+        <div class="mantra">
+          <div class="mantra-icon">💜</div>
+          <div class="mantra-text">"Violets bloom in midnight silence"</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div style="font-family:'Vampiro One',cursive;font-size:1.2rem;color:#ff4da6;margin-bottom:5px;">
+          Made with 💜
+        </div>
+        <div>ChezXen</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Month data
+const currentDate = new Date();
+let currentMonth = currentDate.getMonth();
+let currentYear = currentDate.getFullYear();
+const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// Username
+let username = localStorage.getItem('chezCalendarUsername') || '';
+
+function greetUser() {
+  const greeting = document.getElementById('greetingText');
+  const inputDiv = document.getElementById('usernameInput');
+  
+  if (username) {
+    greeting.innerHTML = `
+      Welcome back, <span style="color:#ff4da6;font-family:'Vampiro One',cursive;">${username}</span>...<br>
+      ${monthNames[currentMonth]} awaits your whispers.<br>
+      What shall we create today? ✨
+    `;
+    inputDiv.style.display = 'none';
+  } else {
+    setTimeout(() => {
+      greeting.innerHTML = 'A name for the shadows...?';
+      inputDiv.style.display = 'block';
+      document.getElementById('usernameField').focus();
+    }, 1500);
+  }
+}
+
+document.getElementById('usernameField').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    const name = e.target.value.trim();
+    if (name) {
+      username = name;
+      localStorage.setItem('chezCalendarUsername', username);
+      greetUser();
+    }
+  }
+});
+
+// Calendar generation
+function generateCalendar() {
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const today = currentDate.getDate();
+  const todayMonth = currentDate.getMonth();
+  const todayYear = currentDate.getFullYear();
+  
+  document.getElementById('monthTitle').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+  
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '';
+  
+  // Headers
+  const headers = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  headers.forEach(day => {
+    const header = document.createElement('div');
+    header.className = 'day-header';
+    header.textContent = day;
+    grid.appendChild(header);
+  });
+  
+  // Empty cells
+  for (let i = 0; i < firstDay; i++) {
+    grid.appendChild(document.createElement('div'));
+  }
+  
+  // Days
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'calendar-day';
+    
+    const isToday = day === today && currentMonth === todayMonth && currentYear === todayYear;
+    if (isToday) dayDiv.classList.add('today');
+    
+    dayDiv.innerHTML = `
+      <div class="day-number">${day}</div>
+      <div class="day-notes" contenteditable="true" data-day="${day}" data-month="${currentMonth}" data-year="${currentYear}" placeholder="..."></div>
+    `;
+    
+    dayDiv.addEventListener('click', (e) => {
+      if (e.target.classList.contains('calendar-day')) {
+        e.target.querySelector('.day-notes').focus();
+      }
+    });
+    
+    grid.appendChild(dayDiv);
+  }
+  
+  loadNotes();
+}
+
+// Notes persistence
+function saveNotes() {
+  const notes = {};
+  document.querySelectorAll('.day-notes').forEach(note => {
+    const key = `${note.dataset.year}-${note.dataset.month}-${note.dataset.day}`;
+    if (note.textContent.trim()) {
+      notes[key] = note.textContent.trim();
+    }
+  });
+  localStorage.setItem('chezCalendarNotes', JSON.stringify(notes));
+}
+
+function loadNotes() {
+  const saved = localStorage.getItem('chezCalendarNotes');
+  if (saved) {
+    const notes = JSON.parse(saved);
+    document.querySelectorAll('.day-notes').forEach(note => {
+      const key = `${note.dataset.year}-${note.dataset.month}-${note.dataset.day}`;
+      if (notes[key]) {
+        note.textContent = notes[key];
+      }
+    });
+  }
+}
+
+// Event listeners
+document.addEventListener('input', (e) => {
+  if (e.target.classList.contains('day-notes')) {
+    saveNotes();
+  }
+});
+
+// Month navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') {
+    currentMonth = (currentMonth - 1 + 12) % 12;
+    if (currentMonth === 11) currentYear--;
+    generateCalendar();
+  } else if (e.key === 'ArrowRight') {
+    currentMonth = (currentMonth + 1) % 12;
+    if (currentMonth === 0) currentYear++;
+    generateCalendar();
+  }
+});
+
+// Touch/swipe for mobile
+let startX = 0;
+document.addEventListener('touchstart', (e) => {
+  startX = e.touches[0].clientX;
+});
+document.addEventListener('touchend', (e) => {
+  if (!startX) return;
+  const endX = e.changedTouches[0].clientX;
+  const diff = startX - endX;
+  
+  if (Math.abs(diff) > 50) {
+    if (diff > 0) { // Swipe left -> next month
+      currentMonth = (currentMonth + 1) % 12;
+      if (currentMonth === 0) currentYear++;
+    } else { // Swipe right -> prev month
+      currentMonth = (currentMonth - 1 + 12) % 12;
+      if (currentMonth === 11) currentYear--;
+    }
+    generateCalendar();
+  }
+  startX = 0;
+});
+
+// Initialize
+window.addEventListener('load', () => {
+  greetUser();
+  generateCalendar();
+  
+  // Smooth scroll to today
+  setTimeout(() => {
+    const todayCell = document.querySelector('.calendar-day.today');
+    if (todayCell) {
+      todayCell.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center',
+        inline: 'center' 
+      });
+    }
+  }, 800);
+  
+  // Console hints
+  console.log('👻 Chez Moi Calendar');
+  console.log('← → arrows or swipe: change months');
+  console.log('Click day → add notes (auto-save)');
+});
+</script>
+</body>
+</html>
