@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lavender Latte Apprenticeship</title>
+<link href="https://fonts.googleapis.com/css2?family=Vampiro+One&family=Klee+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: linear-gradient(135deg, #2c1810 0%, #3a1f2b 50%, #1a0f1e 100%);
+  color: #f5f5dc;
+  font-family: 'Klee One', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.lavender-frame {
+  width: 100%;
+  max-width: 450px;
+  height: 95vh;
+  max-height: 950px;
+  background: linear-gradient(135deg, rgba(147,112,219,0.95), rgba(221,160,221,0.9));
+  border: 3px solid rgba(138,43,226,0.8);
+  border-radius: 30px;
+  box-shadow: 
+    0 0 60px rgba(147,112,219,0.6),
+    inset 0 0 40px rgba(255,255,255,0.1);
+  backdrop-filter: blur(25px);
+  overflow: hidden;
+  position: relative;
+}
+.frame-glow {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #e6e6fa, #dda0dd, #9370db, #e6e6fa);
+  z-index: -1;
+  border-radius: 33px;
+  padding: 3px;
+  animation: lavenderShimmer 5s linear infinite;
+}
+@keyframes lavenderShimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
+}
+.scroll-container {
+  height: 100%;
+  overflow-y: auto;
+  padding: 30px 25px;
+  scrollbar-width: thin;
+  scrollbar-color: #9370db rgba(147,112,219,0.3);
+}
+.scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-container::-webkit-scrollbar-track {
+  background: rgba(221,160,221,0.2);
+  border-radius: 12px;
+}
+.scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(#9370db, #dda0dd);
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(147,112,219,0.5);
+}
+.header {
+  text-align: center;
+  padding: 35px 0 25px;
+  background: linear-gradient(135deg, rgba(221,160,221,0.3), transparent);
+  border-bottom: 2px solid rgba(147,112,219,0.4);
+  margin: -30px -25px 25px -25px;
+}
+.title {
+  font-family: 'Vampiro One', cursive;
+  font-size: clamp(2.2rem, 6vw, 3rem);
+  background: linear-gradient(45deg, #9370db, #dda0dd, #e6e6fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 25px rgba(147,112,219,0.8);
+  margin-bottom: 8px;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+@keyframes titleGlow {
+  from { filter: drop-shadow(0 0 15px #9370db); }
+  to { filter: drop-shadow(0 0 35px #dda0dd); }
+}
+.subtitle {
+  color: #f5f5dc;
+  font-size: 1.15rem;
+  font-weight: 500;
+  text-shadow: 0 0 10px rgba(245,245,220,0.5);
+}
+.game-section {
+  background: rgba(255,255,255,0.92);
+  border-radius: 22px;
+  padding: 30px 25px;
+  margin: 25px 0;
+  text-align: center;
+  box-shadow: 
+    0 12px 40px rgba(147,112,219,0.3),
+    inset 0 2px 10px rgba(255,255,255,0.4);
+  border: 2px solid rgba(221,160,221,0.6);
+  transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.game-section:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 20px 60px rgba(147,112,219,0.5),
+    inset 0 2px 15px rgba(255,255,255,0.5);
+  border-color: #9370db;
+}
+.game-icon {
+  font-size: 4rem;
+  background: linear-gradient(45deg, #9370db, #dda0dd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 20px rgba(147,112,219,0.6));
+  animation: iconFloat 3s ease-in-out infinite;
+}
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+.game-title {
+  font-family: 'Vampiro One', cursive;
+  font-size: 1.8rem;
+  color: #2c1810;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.game-description {
+  color: #4a2c5a;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  font-weight: 500;
+}
+.play-button {
+  display: inline-block;
+  padding: 16px 35px;
+  background: linear-gradient(135deg, #9370db, #dda0dd);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 25px;
+  font-family: 'Vampiro One', cursive;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 
+    0 8px 25px rgba(147,112,219,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  position: relative;
+  overflow: hidden;
+}
+.play-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 15px 40px rgba(147,112,219,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.4);
+}
+.play-button:active {
+  transform: translateY(-1px);
+}
+.button-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.5s;
+}
+.play-button:hover .button-glow {
+  left: 100%;
+}
+.apprenticeship-info {
+  background: rgba(245,245,220,0.15);
+  border-radius: 18px;
+  padding: 25px;
+  margin: 30px 0;
+  border-left: 5px solid #9370db;
+  text-align: center;
+}
+.info-title {
+  font-family: 'Vampiro One', cursive;
+  font-size: 1.5rem;
+  color: #9370db;
+  margin-bottom: 15px;
+  text-shadow: 0 0 10px rgba(147,112,219,0.5);
+}
+.info-text {
+  color: #f5f5dc;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+.external-link {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #dda0dd, #e6e6fa);
+  color: #2c1810;
+  text-decoration: none;
+  border-radius: 20px;
+  font-family: 'Klee One', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(221,160,221,0.4);
+  transition: all 0.3s ease;
+}
+.external-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(221,160,221,0.6);
+  background: linear-gradient(135deg, #e6e6fa, #dda0dd);
+}
+.footer {
+  text-align: center;
+  padding: 30px 0 20px;
+  color: #d8bfd8;
+  font-size: 0.95rem;
+  opacity: 0.9;
+  margin-top: 40px;
+  border-top: 1px solid rgba(147,112,219,0.3);
+}
+@media (max-width: 480px) {
+  .lavender-frame { margin: 10px; height: 98vh; }
+  .scroll-container { padding: 25px 20px; }
+}
+</style>
+</head>
+<body>
+  <div class="lavender-frame">
+    <div class="frame-glow"></div>
+    
+    <div class="scroll-container">
+      <!-- Header -->
+      <div class="header">
+        <div class="title">Lavender Latte</div>
+        <div class="subtitle">Apprenticeship Game</div>
+      </div>
+
+      <!-- Main Game Section -->
+      <div class="game-section">
+        <div class="game-icon">☕✨</div>
+        <div class="game-title">Brew Your Destiny</div>
+        <div class="game-description">
+          Master the ancient art of Lavender Latte crafting.<br>
+          Collect rare ingredients, perfect your brew,<br>
+          and ascend as Cafe Alchemist! 🧙‍♀️
+        </div>
+        <a href="https://arcade.padlet.com/game/7qje5vByjl" target="_blank" class="play-button">
+          <span class="button-glow"></span>
+          🎮 Play Now
+        </a>
+      </div>
+
+      <!-- Apprenticeship Info -->
+      <div class="apprenticeship-info">
+        <div class="info-title">The Path of the Latte Sage</div>
+        <div class="info-text">
+          Complete the game to unlock secret apprenticeship<br>
+          opportunities at Chez Moi Cafe. Only the worthy<br>
+          shall master the Violet Elixir! 🌸💜
+        </div>
+        <a href="YOUR_SECRET_PAGE_URL" target="_blank" class="external-link">
+          🌟 Apprenticeship Portal
+        </a>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div style="font-family:'Vampiro One',cursive;font-size:1.4rem;color:#9370db;margin-bottom:8px;">
+          Made with 💜 & Lavender
+        </div>
+        <div>ChezXen • 2024</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Smooth scroll reveal
+window.addEventListener('load', () => {
+  document.querySelector('.game-section').style.opacity = '0';
+  document.querySelector('.game-section').style.transform = 'translateY(30px)';
+  
+  setTimeout(() => {
+    document.querySelector('.game-section').style.transition = 'all 1s cubic-bezier(0.25,0.46,0.45,0.94)';
+    document.querySelector('.game-section').style.opacity = '1';
+    document.querySelector('.game-section').style.transform = 'translateY(0)';
+  }, 500);
+});
+
+// PWA Ready
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('data:text/javascript;base64,' + 
+  btoa(`self.addEventListener('install',e=>e.waitUntil(self.skipWaiting()));`));
+}
+</script>
+</body>
+</html>
