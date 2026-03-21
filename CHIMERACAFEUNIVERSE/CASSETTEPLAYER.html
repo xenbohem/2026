@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/.nekoweb-api/static/site.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chimera Lore Radio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vampiro+One&family=Klee+One&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Klee One', cursive;
+            background: radial-gradient(ellipse at center, #0a0a1f 0%, #000 70%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* COSMIC GLITCH BACKGROUND */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120,219,255,0.3) 0%, transparent 50%);
+            animation: cosmicPulse 8s ease-in-out infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes cosmicPulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .glitch-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #ff00ff;
+            border-radius: 50%;
+            animation: glitchFloat 12s linear infinite;
+            box-shadow: 0 0 8px #ff00ff;
+        }
+
+        @keyframes glitchFloat {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-50px) rotate(720deg); opacity: 0; }
+        }
+
+        .title {
+            font-family: 'Vampiro One', cursive;
+            font-size: 4rem;
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(255,0,255,0.7));
+            position: relative;
+            z-index: 10;
+            animation: titleGlitch 4s ease-in-out infinite;
+        }
+
+        @keyframes titleGlitch {
+            0%, 100% { transform: scale(1); }
+            20% { transform: scale(1.02) skew(2deg); }
+            50% { transform: scale(0.98) skew(-1deg); }
+            80% { transform: scale(1.01) skew(1deg); }
+        }
+
+        .subtitle {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            text-align: center;
+            color: #00ff88;
+            margin-bottom: 40px;
+            text-shadow: 0 0 20px #00ff88;
+        }
+
+        /* CASSETTE PLAYER */
+        .cassette-player {
+            max-width: 500px;
+            margin: 0 auto 60px;
+            padding: 40px;
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 4px solid #00ff88;
+            border-radius: 25px;
+            box-shadow: 
+                0 30px 80px rgba(0,255,136,0.4),
+                inset 0 0 40px rgba(0,255,136,0.1),
+                0 0 60px rgba(0,255,136,0.2);
+            position: relative;
+            z-index: 20;
+        }
+
+        .cassette-display {
+            background: #000;
+            border: 3px solid #333;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cassette-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #ff0080, #00ff88, #0080ff);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .now-playing {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            color: #00ffff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px #00ffff;
+        }
+
+        .track-title {
+            font-family: 'Vampiro One', cursive;
+            font-size: 1.8rem;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #ff6b6b;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: drop-shadow(0 0 10px #ff6b6b); }
+            100% { filter: drop-shadow(0 0 25px #ff6b6b); }
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #ff6b6b);
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0,255,136,0.6);
+        }
+
+        /* CASSETTE CONTROLS */
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            width: 70px;
+            height: 70px;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .play-btn {
+            background: linear-gradient(145deg, #00ff88, #00cc66);
+            color: #000;
+            font-size: 2.2rem;
+        }
+
+        .pause-btn {
+            background: linear-gradient(145deg, #ff6b6b, #ff5252);
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .eject-btn {
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+            color: #333;
+            font-size: 1.4rem;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 20px 50px rgba(0,255,136,0.6);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* POPTART EJECT DECK */
+        .eject-deck {
+            position: fixed;
+            top: -300px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 350px;
+            background: linear-gradient(145deg, #ff6b6b, #ff5252);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 
+                0 30px 80px rgba(255,107,107,0.7),
+                inset 0 2px 10px rgba(255,255,255,0.3);
+            z-index: 1000;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-align: center;
+        }
+
+        .eject-deck.popped {
+            top: 100px;
+        }
+
+        .eject-deck::before {
+            content: '🍞';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            animation: steam 2s ease-out;
+        }
+
+        @keyframes steam {
+            0% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(-30px) scale(1.5); opacity: 0; }
+        }
+
+        .deck-title {
+            font-family: 'Vampiro One', cursive;
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.8);
+        }
+
+        .track-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .track-card:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(10px);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+        }
+
+        .track-card.playing {
+            background: linear-gradient(145deg, #00ff88, #00cc66);
+            color: #000;
+            box-shadow: 0 0 25px rgba(0,255,136,0.8);
+        }
+
+        .track-icon {
+            font-size: 1.5rem;
+        }
+
+        /* TRACK LIST */
+        .track-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        /* VOLUME */
+        .volume-section {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.8;
+        }
+
+        .volume-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Orbitron', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .volume-btn.active {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+
+        @media (max-width: 768px) {
+            .cassette-player { margin: 0 20px 40px; padding: 25px; }
+            .title { font-size: 2.5rem; }
+            .controls { gap: 15px; }
+            .control-btn { width: 60px; height: 60px; font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="glitch-particles" id="particles"></div>
+
+    <h1 class="title">Chimera Lore Radio</h1>
+    <p class="subtitle">Cassette deck broadcasting forbidden feline transmissions...</p>
+
+    <!-- CASSETTE PLAYER -->
+    <div class="cassette-player">
+        <div class="cassette-display">
+            <div class="now-playing" id="nowPlaying">Ready to receive transmission...</div>
+            <div class="track-title" id="trackTitle">-- Insert Cassette --</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn eject-btn" id="ejectBtn" title="Eject Deck">⏏</button>
+            <button class="control-btn pause-btn" id="pauseBtn" title="Pause">⏸</button>
+            <button class="control-btn play-btn" id="playBtn" title="Play">▶</button>
+        </div>
+<div class="volume-section">
+    <button class="volume-btn" id="volumeBtn">🔇 Mute</button>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <button class="control-btn" id="prevBtn" title="Previous">⏮</button>
+        <span id="trackCounter" style="font-family: Orbitron; opacity: 0.8;">1/6</span>
+        <button class="control-btn" id="nextBtn" title="Next">⏭</button>
+    </div>
+    <span>| <span id="nextTrack">--</span></span>
+</div>
+        
+    </div>
+
+    <!-- EJECT POPTART DECK -->
+    <div class="eject-deck" id="ejectDeck">
+        <div class="deck-title">🍞 Ejected Cassettes</div>
+        <div class="track-list" id="trackList"></div>
+        <button class="control-btn play-btn" onclick="loadNextTrack()" style="margin-top: 15px;">
+            ▶ Play Next
+        </button>
+    </div>
+
+    <script>
+        // CHIMERA LORE PLAYLIST - REPLACE WITH YOUR MP3 URLs!
+        const playlist = [
+            { title: "NOTW2", file: "https://xenbohem.github.io/2026/RETROTV/PUNKCAFE/notw2.mp3", icon: "🐱" },
+            { title: "Coffee Void Whispers", file: "RETROTV/PUNKCAFE/trans5ashort.mp3", icon: "☕" },
+            { title: "Zen Tea Prophecy", file: "https://your-site.com/chimera3.mp3", icon: "🍵" },
+            { title: "Chimera Awakening", file: "https://your-site.com/chimera4.mp3", icon: "🔮" },
+            { title: "Neon Cafe Eclipse", file: "https://your-site.com/chimera5.mp3", icon: "🌙" },
+            { title: "Hans' Forbidden Brew", file: "https://your-site.com/chimera6.mp3", icon: "🖤" }
+        ];
+
+        let audio = new Audio();
+        let currentTrack = 0;
+        let isPlaying = false;
+        let isMuted = true;
+        let ejectedTracks = [];
+
+        // DOM Elements
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const ejectBtn = document.getElementById('ejectBtn');
+        const volumeBtn = document.getElementById('volumeBtn');
+        const nowPlaying = document.getElementById('nowPlaying');
+        const trackTitle = document.getElementById('trackTitle');
+        const progressFill = document.getElementById('progressFill');
+        const nextTrack = document.getElementById('nextTrack');
+        const ejectDeck = document.getElementById('ejectDeck');
+        const trackList = document.getElementById('trackList');
+
+        // GLITCH PARTICLES
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 12 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 6) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // LOAD TRACK
+        function loadTrack(index) {
+            if (index >= playlist.length) index = 0;
+            currentTrack = index;
+            const track = playlist[index];
+            
+            audio.src = track.file;
+            trackTitle.textContent = track.title;
+            nowPlaying.textContent = `Chimera Transmission ${index + 1}/${playlist.length}`;
+            nextTrack.textContent = playlist[(index + 1) % playlist.length].title;
+            
+            // Update progress
+            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('ended', nextTrackAuto);
+        }
+
+        // UPDATE PROGRESS BAR
+        function updateProgress() {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = progress + '%';
+        }
+
+        // PLAY/PAUSE
+        playBtn.addEventListener('click', () => {
+            if (!isPlaying) {
+                audio.play();
+                isPlaying = true;
+                playBtn.style.opacity = '0.6';
+                pauseBtn.style.opacity = '1';
+            }
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            audio.pause();
+            isPlaying = false;
+            playBtn.style.opacity = '1';
+            pauseBtn.style.opacity = '0.6';
+        });
+
+        // VOLUME TOGGLE
+        volumeBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            audio.muted = isMuted;
+            volumeBtn.textContent = isMuted ? '🔇 Mute' : '🔊 Sound';
+            volumeBtn.classList.toggle('active', !isMuted);
+        });
+
+        // EJECT LIKE POPTART!
+        ejectBtn.addEventListener('click', () => {
+            const track = playlist[currentTrack];
+            ejectedTracks.push(track);
+            
+                        // Animate POPTART!
+            ejectDeck.classList.add('popped');
+            
+            // Add to deck
+            const trackCard = document.createElement('div');
+            trackCard.className = 'track-card';
+            trackCard.innerHTML = `
+                <span class="track-icon">${track.icon}</span>
+                <div>
+                    <strong>${track.title}</strong><br>
+                    <small>Duration: ${Math.floor(Math.random()*4+2)}:30</small>
+                </div>
+            `;
+            trackCard.onclick = () => loadNextTrack();
+            trackList.appendChild(trackCard);
+            
+            // Eject animation complete
+            setTimeout(() => {
+                audio.pause();
+                isPlaying = false;
+                playBtn.style.opacity = '1';
+                pauseBtn.style.opacity = '0.6';
+                loadTrack((currentTrack + 1) % playlist.length);
+            }, 800);
+        });
+
+        // NEXT TRACK
+        function nextTrackAuto() {
+            loadNextTrack();
+            if (isPlaying) {
+                setTimeout(() => audio.play(), 500); // 0.5s pause between tracks
+            }
+        }
+
+        function loadNextTrack() {
+            const nextIndex = (currentTrack + 1) % playlist.length;
+            loadTrack(nextIndex);
+            if (isPlaying) audio.play();
+        }
+
+        // KEYBOARD SHORTCUTS
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case ' ': // Spacebar
+                    e.preventDefault();
+                    if (isPlaying) pauseBtn.click();
+                    else playBtn.click();
+                    break;
+                case 'Enter':
+                    ejectBtn.click();
+                    break;
+                case 'm':
+                case 'M':
+                    volumeBtn.click();
+                    break;
+                case 'ArrowRight':
+                    loadNextTrack();
+                    break;
+            }
+        });
+
+        // PROGRESS BAR CLICK
+        progressFill.parentElement.addEventListener('click', (e) => {
+            const rect = progressFill.parentElement.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = pos * audio.duration;
+        });
+
+        // INIT
+        createParticles();
+        loadTrack(0); // Load first track
+        
+        // Welcome message
+        setTimeout(() => {
+            nowPlaying.textContent = 'Insert cassette & press ▶';
+        }, 2000);
+
+        console.log(`
+🎵 CHIMERA LORE RADIO LIVE! 🎵
+Controls:
+SPACEBAR = Play/Pause
+ENTER = Eject Poptart! 🍞
+M = Mute Toggle
+→ Arrow = Next Track
+Click progress bar to seek!
+
+Your forbidden transmissions await... 🐱🔊
+        `);
+    </script>
+</body>
+</html>
