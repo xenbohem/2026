@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Tools Rolodex</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(ellipse at bottom, #0a0a0a 0%, #000000 70%);
+            background-attachment: fixed;
+            color: #e6d5ff;
+            font-family: 'Orbitron', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Stars */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            background: linear-gradient(45deg, #a855f7, #c084fc, #e879f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            color: #b794ff;
+            opacity: 0.8;
+        }
+
+        /* Drawers Container */
+        .drawers-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Drawer */
+        .drawer {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        .drawer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #a855f7, #c084fc, #e879f9);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .drawer:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: #a855f7;
+            box-shadow: 
+                0 20px 40px rgba(168, 85, 247, 0.3),
+                0 0 0 1px rgba(168, 85, 247, 0.5),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        .drawer.active {
+            transform: scale(1.05);
+            border-color: #e879f9;
+            box-shadow: 
+                0 25px 50px rgba(232, 121, 249, 0.4),
+                0 0 0 1px #e879f9;
+        }
+
+        /* Drawer Content */
+        .drawer-label {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+            font-weight: 700;
+            text-align: center;
+            color: #e6d5ff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+
+        .drawer:hover .drawer-label {
+            color: #e879f9;
+            text-shadow: 0 0 20px #e879f9;
+        }
+
+        /* Keyhole */
+        .keyhole {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle, #333 40%, #111 70%, transparent 80%);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .keyhole::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #555;
+            border-radius: 50%;
+        }
+
+        /* Tabs Panel */
+        .tabs-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            display: none;
+            z-index: 100;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .tabs-panel.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-panel {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, #a855f7, #c084fc);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 101;
+        }
+
+        .close-panel:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+        }
+
+        .tabs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            width: 100%;
+            padding: 2rem 0;
+        }
+
+        /* Tab Cards */
+        .tab-card {
+            background: linear-gradient(145deg, #1e1b4b, #2a1d5c);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .tab-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #a855f7, #c084fc);
+        }
+
+        .tab-card:hover {
+            transform: translateY(-10px);
+            border-color: #e879f9;
+            box-shadow: 
+                0 20px 40px rgba(168, 85, 247, 0.4),
+                0 0 0 1px rgba(168, 85, 247, 0.5);
+        }
+
+        .tab-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e6d5ff;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .tab-description {
+            color: #b794ff;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .tab-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(45deg, #a855f7, #c084fc);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .tab-link:hover {
+            transform: translateX(8px);
+            box-shadow: 0 10px 25px rgba(168, 85, 247, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .drawers-container {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .tabs-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(#a855f7, #c084fc);
+            border-radius: 4px;
+        }
+        /* Search Bar */
+.search-container {
+    position: sticky;
+    top: 0;
+    background: rgba(10, 10, 42, 0.95);
+    backdrop-filter: blur(20px);
+    z-index: 20;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.search-bar {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    border: 2px solid transparent;
+    border-radius: 25px;
+    color: #e6d5ff;
+    font-size: 1rem;
+    font-family: 'Orbitron', monospace;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.search-input::placeholder {
+    color: #b794ff;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #a855f7;
+    box-shadow: 
+        0 0 0 3px rgba(168, 85, 247, 0.3),
+        0 8px 30px rgba(168, 85, 247, 0.4);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b794ff;
+    font-size: 1.1rem;
+}
+
+/* Search highlight */
+.drawer.search-highlight {
+    border-color: #e879f9 !important;
+    box-shadow: 
+        0 0 0 2px rgba(232, 121, 249, 0.6),
+        0 15px 35px rgba(232, 121, 249, 0.4) !important;
+    animation: searchPulse 1s ease-in-out;
+}
+
+@keyframes searchPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+    </style>
+</head>
+<body>
+    <!-- Stars Background -->
+    <div class="stars" id="stars"></div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Dev Tools Rolodex</h1>
+        <div class="subtitle">Your cosmic catalog of development treasures</div>
+    </div>
+<!-- PERFECTLY SIZED & POSITIONED Search Bar -->
+<div class="search-container">
+    <div class="search-bar">
+        <svg class="search-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8.5" cy="8.5" r="6"/>
+            <path d="m16.5 16.5-3-3"/>
+        </svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Type 'host', 'ai', 'music'...">
+    </div>
+</div>
+<!-- Search Bar -->
+
+    <!-- Drawers Grid -->
+    <div class="drawers-container" id="drawersContainer">
+        <!-- Drawers will be populated by JavaScript -->
+    </div>
+
+    <!-- Tabs Panel -->
+    <div class="tabs-panel" id="tabsPanel">
+        <button class="close-panel" id="closePanel">×</button>
+        <div class="tabs-grid" id="tabsGrid">
+            <!-- Tabs will be populated dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // Create stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = star.style.height = (Math.random() * 3 + 1) + 'px';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Drawer data structure
+        const drawersData = [
+            {
+                id: 'music',
+                label: '🎵 Music Tools',
+                tabs: [
+                    { title: 'AudioMass', desc: 'Free web-based audio editor', url: 'https://audiomass.co/' },
+                    { title: 'Freesound', desc: 'Collaborative sound database', url: 'https://freesound.org/' },
+                    { title: 'Howler.js', desc: 'Modern audio library for web', url: 'https://howlerjs.com/' },
+                    { title: 'Tone.js', desc: 'Web audio framework', url: 'https://tonejs.github.io/' },
+                    { title: 'BeepBox', desc: 'Online music maker', url: 'https://www.beepbox.co/' }
+                ]
+            },
+            {
+                id: 'embeds',
+                label: '📺 Simple Embeds',
+                tabs: [
+                    { title: 'Embed responsibly', desc: 'Universal embed generator', url: 'https://embedresponsibly.com/' },
+                    { title: 'Embed.ly', desc: 'Universal embed code creator', url: 'https://embed.ly/' },
+                    { title: 'Iframe Generator', desc: 'Simple iframe maker', url: 'https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_iframe' },
+                    { title: 'oEmbed Tester', desc: 'Test oEmbed endpoints', url: 'https://oembed.com/' }
+                ]
+            },
+            {
+                id: 'hosting',
+                label: '🏠 Free Hosting',
+                tabs: [
+                    { title: 'Netlify', desc: 'Free static hosting + forms', url: 'https://www.netlify.com/' },
+                    { title: 'Vercel', desc: 'Next.js optimized hosting', url: 'https://vercel.com/' },
+                    { title: 'Render', desc: 'Free web services + databases', url: 'https://render.com/' },
+                    { title: 'Railway', desc: 'Free tier for full-stack apps', url: 'https://railway.app/' },
+                    { title: 'Fly.io', desc: 'Global edge deployment', url: 'https://fly.io/' },
+                    { title: 'Tiiny Host', desc: 'Simple static hosting', url: 'https://tiiny.host/' }
+                ]
+            },
+            {
+                id: 'indie',
+                label: '🌱 Indie Sites',
+                tabs: [
+                    { title: 'Eleventy', desc: 'Eleventy static site generator', url: 'https://www.11ty.dev/' },
+                    { title: 'Astro', desc: 'Islands architecture framework', url: 'https://astro.build/' },
+                    { title: 'Kit', desc: 'Minimal React framework', url: 'https://github.com/john-smith/kit' },
+                    { title: 'SvelteKit', desc: 'Svelte app framework', url: 'https://kit.svelte.dev/' },
+                    { title: 'Qwik', desc: 'Instant-loading framework', url: 'https://qwik.builder.io/' }
+                ]
+            },
+            {
+                id: 'backends',
+                label: '🔧 Alt Backends',
+                tabs: [
+                    { title: 'Supabase', desc: 'Open source Firebase alt', url: 'https://supabase.com/' },
+                    { title: 'PocketBase', desc: 'Self-hosted backend', url: 'https://pocketbase.io/' },
+                    { title: 'Appwrite', desc: 'Open source BaaS', url: 'https://appwrite.io/' },
+                    { title: 'Convex', desc: 'Reactive database', url: 'https://www.convex.dev/' }
+                ]
+            },
+            {
+                id: 'hex',
+                label: '🎨 Hex Codes',
+                tabs: [
+                    { title: 'Coolors', desc: 'Color palette generator', url: 'https://coolors.co/' },
+                    { title: 'Huemint', desc: 'AI color palette generator', url: 'https://huemint.com/' },
+                    { title: 'Color Hunt', desc: 'Curated color palettes', url: 'https://colorhunt.co/' },
+                    { title: 'Adobe Color', desc: 'Professional color tools', url: 'https://color.adobe.com/' },
+                    { title: 'CSS Gradient', desc: 'Beautiful gradient generator', url: 'https://cssgradient.io/' }
+                ]
+            },
+            {
+                id: 'school',
+                label: '🎓 Free School',
+                tabs: [
+                    { title: 'freeCodeCamp', desc: 'Complete web dev curriculum', url: 'https://www.freecodecamp.org/' },
+                    { title: 'The Odin Project', desc: 'Full-stack curriculum', url: 'https://www.theodinproject.com/' },
+                    { title: 'Scrimba', desc: 'Interactive screencasts', url: 'https://scrimba.com/' },
+                    { title: 'JavaScript30', desc: '30 vanilla JS projects', url: 'https://javascript30.com/' }
+                ]
+            },
+            {
+                id: 'python',
+                label: '🐍 Python',
+                tabs: [
+                    { title: 'Replit', desc: 'Online Python IDE', url: 'https://replit.com/' },
+                    { title: 'Pyodide', desc: 'Python in browser', url: 'https://pyodide.org/' },
+                    { title: 'FastAPI', desc: 'Modern Python API framework', url: 'https://fastapi.tiangolo.com/' },
+                    { title: 'Streamlit', desc: 'Python web apps', url: 'https://streamlit.io/' }
+                ]
+            },
+            {
+                id: 'bookmarks',
+                label: '📚 Bookmarking',
+                tabs: [
+                    { title: 'Raindrop.io', desc: 'Beautiful bookmark manager', url: 'https://raindrop.io/' },
+                    { title: 'Pinboard', desc: 'Fast minimalist bookmarks', url: 'https://pinboard.in/' },
+                    { title: 'Wallabag', desc: 'Self-hosted read-it-later', url: 'https://wallabag.org/' },
+                    { title: 'Linkding', desc: 'Minimalist bookmark service', url: 'https://linkding.org/' }
+                ]
+            },
+            {
+                id: 'ai-video',
+                  label: 'ai-video',
+                  tabs: [
+                    { title: 'RunwayML', desc: 'AI video generation & editing', url: 'https://runwayml.com/' },
+                    { title: 'Pika Labs', desc: 'Text-to-video AI generator', url: 'https://pika.art/' },
+                    { title: 'Kaiber', desc: 'AI music videos from audio', url: 'https://kaiber.ai/' },
+                    { title: 'Luma AI', desc: 'Dream Machine video generator', url: 'https://lumalabs.ai/dream-machine' },
+                    { title: 'Kling AI', desc: 'High-quality video generation', url: 'https://klingai.com/' }
+                ]
+            },
+            {
+                id: 'ai-avatars',
+                label: '🤖 AI Avatars',
+                tabs: [
+                    { title: 'HeyGen', desc: 'Talking avatar video generator', url: 'https://www.heygen.com/' },
+                    { title: 'Synthesia', desc: 'AI video with avatars', url: 'https://www.synthesia.io/' },
+                    { title: 'D-ID', desc: 'Animated talking avatars', url: 'https://www.d-id.com/' },
+                    { title: 'Elai.io', desc: 'AI video from text', url: 'https://elai.io/' },
+                    { title: 'Colossyan', desc: 'AI video actors', url: 'https://www.colossyan.com/' }
+                ]
+            },
+            {
+                id: 'lingo',
+                label: '🆕 New Lingo',
+                tabs: [
+                    { title: 'State of CSS/JS', desc: 'Latest trends survey', url: 'https://2023.stateofcss.com/' },
+                    { title: 'Hacker News', desc: 'Developer discussions', url: 'https://news.ycombinator.com/' },
+                    { title: 'This Week in Dev', desc: 'Weekly dev newsletter', url: 'https://thisweekinreact.com/' },
+                    { title: 'Kent C. Dodds Blog', desc: 'Modern web dev insights', url: 'https://kentcdodds.com/blog' },
+                    { title: 'Addy Osmani Blog', desc: 'Performance & web standards', url: 'https://addyosmani.com/blog/' }
+                ]
+            },
+            {
+                id: 'ai-content',
+                label: '✨ AI Content',
+                tabs: [
+                    { title: 'Claude.ai', desc: 'Best AI for writing code/docs', url: 'https://claude.ai/' },
+                    { title: 'Cursor', desc: 'AI-powered code editor', url: 'https://cursor.sh/' },
+                    { title: 'Replit Ghostwriter', desc: 'AI coding assistant', url: 'https://replit.com/ai' },
+                    { title: 'Blackbox Code Chat', desc: 'AI code generation', url: 'https://www.blackbox.ai/' },
+                    { title: 'v0 by Vercel', desc: 'AI UI generation', url: 'https://v0.dev/' },
+                    { title: 'Bolt.new', desc: 'AI-powered prototyping', url: 'https://bolt.new/' }
+                ]
+            }
+        ];
+
+        // Initialize app
+        function init() {
+            createStars();
+            createDrawers();
+            setupEventListeners();
+        }
+
+        // Create drawer elements
+        function createDrawers() {
+            const container = document.getElementById('drawersContainer');
+            drawersData.forEach(drawerData => {
+                const drawer = document.createElement('div');
+                drawer.className = 'drawer';
+                drawer.dataset.drawerId = drawerData.id;
+                drawer.innerHTML = `
+                    <div class="keyhole"></div>
+                    <div class="drawer-label">${drawerData.label}</div>
+                `;
+                container.appendChild(drawer);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const drawers = document.querySelectorAll('.drawer');
+            const closePanelBtn = document.getElementById('closePanel');
+            const tabsPanel = document.getElementById('tabsPanel');
+
+            // Drawer click handlers
+            drawers.forEach(drawer => {
+                drawer.addEventListener('click', function() {
+                    const drawerId = this.dataset.drawerId;
+                    showTabs(drawerId);
+                    
+                    // Visual feedback
+                    document.querySelectorAll('.drawer').forEach(d => d.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Close panel
+            closePanelBtn.addEventListener('click', closeTabs);
+            tabsPanel.addEventListener('click', function(e) {
+                if (e.target === this) closeTabs();
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeTabs();
+            });
+        }
+
+        // Show tabs for specific drawer
+        function showTabs(drawerId) {
+            const drawerData = drawersData.find(d => d.id === drawerId);
+            const tabsGrid = document.getElementById('tabsGrid');
+            const tabsPanel = document.getElementById('tabsPanel');
+
+            // Clear previous tabs
+            tabsGrid.innerHTML = '';
+
+            // Create tab cards
+            drawerData.tabs.forEach(tab => {
+                const tabCard = document.createElement('div');
+                tabCard.className = 'tab-card';
+                tabCard.innerHTML = `
+                    <div class="tab-title">${tab.title}</div>
+                    <div class="tab-description">${tab.desc}</div>
+                    <a href="${tab.url}" target="_blank" rel="noopener noreferrer" class="tab-link">
+                        🚀 Visit Site
+                    </a>
+                `;
+                tabsGrid.appendChild(tabCard);
+            });
+
+            // Show panel
+            tabsPanel.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close tabs panel
+        function closeTabs() {
+            const tabsPanel = document.getElementById('tabsPanel');
+            const drawers = document.querySelectorAll('.drawer');
+            
+            tabsPanel.classList.remove('active');
+            drawers.forEach(d => d.classList.remove('active'));
+            document.body.style.overflow = '';
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+
+        // PWA-like install prompt (optional)
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            deferredPrompt = e;
+        });
+        // Search functionality
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const drawers = document.querySelectorAll('.drawer');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        drawers.forEach(drawer => {
+            const label = drawer.querySelector('.drawer-label').textContent.toLowerCase();
+            const drawerId = drawer.dataset.drawerId;
+            
+            drawer.classList.remove('search-highlight');
+            
+            if (query === '') {
+                drawer.style.display = '';
+                drawer.style.opacity = '1';
+                return;
+            }
+            
+            if (label.includes(query) || drawerId.includes(query)) {
+                drawer.style.display = '';
+                drawer.style.opacity = '1';
+                drawer.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'center'
+                });
+                drawer.classList.add('search-highlight');
+            } else {
+                drawer.style.opacity = '0.3';
+                drawer.style.display = '';
+            }
+        });
+    });
+
+    // Clear search on Escape
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            this.value = '';
+            this.blur();
+            document.querySelectorAll('.drawer').forEach(d => {
+                d.classList.remove('search-highlight');
+                d.style.opacity = '1';
+            });
+        }
+    });
+}
+
+// Update init function to include search
+function init() {
+    createStars();
+    createDrawers();
+    setupEventListeners();
+    setupSearch(); // Add this line
+}
+    </script>
+</body>
+</html>
