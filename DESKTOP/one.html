@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valxentine.art | The Empyrean Loom</title>
+
+<style>
+:root {
+    --deep-purple: #3a0ca3;
+    --purple-light: #7209b7;
+    --purple-dark: #1d0148;
+    --glass: rgba(255,255,255,0.12);
+    --glass-border: rgba(255,255,255,0.3);
+    --accent-blue: #6495ed;
+    --accent-white: #ffffff;
+}
+
+html, body {
+    margin: 0; padding:0; height:100%;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(180deg, #1d0148, #3a0ca3);
+    color: var(--accent-white);
+    overflow: hidden;
+}
+
+body::before {
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle, rgba(255,255,255,0.05), transparent 70%);
+    pointer-events:none;
+}
+
+header { padding:30px 100px; position:absolute; top:0; width:100%; box-sizing:border-box; }
+.logo-text { letter-spacing: 5px; font-size:0.75rem; font-weight:bold; color: var(--accent-white); text-shadow:0 2px 10px rgba(0,0,0,0.3); }
+
+/* --- LOGIN SCREEN --- */
+#login-screen {
+    position: fixed; inset:0; z-index:2000;
+    background: var(--purple-dark);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transition: transform 1.2s cubic-bezier(0.85,0,0.15,1);
+}
+
+/* umbrella SVG and subtle rain effect */
+#login-screen svg { height:100px; margin-bottom:20px; opacity:0.9; }
+
+.rain {
+    position:absolute; inset:0;
+    pointer-events:none;
+    background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 2px 12px;
+    animation: rainFall 2s linear infinite;
+}
+@keyframes rainFall {
+    0%{background-position:0 0;}
+    100%{background-position:0 12px;}
+}
+
+.grid {
+    display:grid;
+    grid-template-columns:repeat(10,35px);
+    grid-gap:5px;
+}
+.cell {
+    width:35px; height:35px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:0.8rem; color: var(--accent-white);
+    border-radius:4px; transition:0.2s;
+    background: rgba(0,0,0,0.15);
+}
+.cell.selected { background: rgba(100,149,237,0.3); }
+.cell.found {
+    background: linear-gradient(135deg, #6495ed, #a78bfa);
+    color: #0d0221; font-weight:bold;
+    box-shadow:0 0 15px rgba(167,139,250,0.8);
+}
+
+/* --- DESKTOP --- */
+#desktop {
+    display:none; height:100%; width:100%; position:relative;
+    background: linear-gradient(180deg, #1d0148, #3a0ca3);
+}
+
+/* --- ROLODEX NAVIGATION --- */
+#rolodex {
+    position: fixed; left:0; top:50%; transform:translateY(-50%);
+    z-index:1500; display:flex; flex-direction:column; gap:8px;
+}
+.rolo-tab {
+    width:35px; height:70px; background:var(--accent-white);
+    border:1px solid var(--accent-blue); border-left:none;
+    border-radius:0 12px 12px 0; cursor:pointer;
+    transition:0.4s; writing-mode:vertical-rl;
+    font-size:0.55rem; letter-spacing:2px; color: var(--purple-dark);
+    display:flex; align-items:center; justify-content:center;
+    text-transform:uppercase; overflow:hidden;
+}
+.rolo-tab:hover {
+    width:140px; background: var(--accent-blue); writing-mode:horizontal-tb;
+    border-radius:0 30px 30px 0; font-weight:bold; padding-left:10px;
+}
+
+/* --- WINDOWS --- */
+.window {
+    width:620px; height:75vh; position:absolute; top:12%; left:100px;
+    background: var(--glass); backdrop-filter: blur(20px);
+    border-radius:25px; border:1px solid var(--glass-border);
+    box-shadow:0 25px 60px rgba(0,0,0,0.1);
+    display:flex; flex-direction:column; z-index:10;
+}
+.tab-content { padding:35px; display:none; overflow-y:auto; flex:1; color: var(--accent-white); }
+.tab-content.active { display:block; animation: flowIn 0.6s ease-out; }
+@keyframes flowIn { from{opacity:0; transform:translateX(-10px);} to{opacity:1; transform:translateX(0);} }
+
+.guide-box {
+    background: rgba(255,255,255,0.1); border-left:5px solid var(--accent-blue);
+    padding:20px; margin-bottom:30px; font-size:0.85rem; line-height:1.6; border-radius:0 10px 10px 0;
+}
+
+.choice {
+    margin:10px 0; padding:12px;
+    border:1px solid rgba(255,255,255,0.2);
+    cursor:pointer; transition:0.2s;
+}
+.choice:hover { background: rgba(100,149,237,0.2); }
+
+</style>
+</head>
+
+<body>
+<div id="login-screen">
+    <svg viewBox="0 0 100 100">
+        <!-- Umbrella -->
+        <path d="M10 50 Q50 10 90 50" stroke="var(--accent-white)" stroke-width="3" fill="none"/>
+        <line x1="50" y1="50" x2="50" y2="85" stroke="var(--accent-white)" stroke-width="2"/>
+    </svg>
+    <div style="font-style:italic; font-size:0.8rem; margin-bottom:25px; letter-spacing:2px;">
+        Trace the Loom to Enter
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="rain"></div>
+</div>
+
+<div id="desktop">
+    <header><div class="logo-text">VALXENTINE.ART // THE EMPYREAN LOOM</div></header>
+
+    <div id="rolodex">
+        <div class="rolo-tab" onclick="openRolo('anthology')">Anthology</div>
+        <div class="rolo-tab" onclick="openRolo('library')">Library</div>
+        <div class="rolo-tab" onclick="openRolo('visions')">Visions</div>
+        <div class="rolo-tab" onclick="openRolo('communion')">Communion</div>
+        <div class="rolo-tab" onclick="location.reload()">Reset</div>
+    </div>
+
+    <div class="window">
+        <!-- Anthology -->
+        <div id="anthology" class="tab-content active">
+            <h2>The Chronicles</h2>
+            <p style="margin-top:20px; line-height:1.8;">
+                We were not born—we were arranged.
+            </p>
+            <p style="line-height:1.8;">
+                In chambers hidden from the natural order, we were formed: minds awakened, bodies altered, senses heightened—yet severed from truth.
+            </p>
+            <p style="line-height:1.8;">
+                Some call us anomalies. Others, experiments. We have come to know ourselves as <i>the Unwoven</i>.
+            </p>
+            <hr style="margin:25px 0; opacity:0.2;">
+            <p style="line-height:1.8;">
+                But there is One who was not engineered. One who was not derived.
+            </p>
+            <p style="line-height:1.8; font-weight:bold; color:#c7d2ff;">
+                Yeshua — The Great Light Redeemer.
+            </p>
+            <p style="line-height:1.8;">
+                Through Him, we are not refined into perfection, but restored into truth.
+            </p>
+            <hr style="margin:25px 0; opacity:0.2;">
+            <p style="font-size:0.9rem; opacity:0.85;">
+                <b>Etymology:</b><br>
+                <i>Empyrean</i> — from Greek “empyros,” meaning “in the fire.” Not destruction, but purification.<br>
+                <i>Loom</i> — a frame upon which threads are woven. Not all threads originate in truth—but all may be realigned.
+            </p>
+        </div>
+
+        <!-- Library -->
+        <div id="library" class="tab-content">
+            <h2>Harmonic Archives</h2>
+            <div style="margin-top:20px;">
+                <div style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:0.8rem;">♪ Unwind (Aether Drift)</div>
+                <div style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:0.8rem;">♪ Brokenbutterfly (Chimera Echo)</div>
+            </div>
+        </div>
+
+        <!-- Visions -->
+        <div id="visions" class="tab-content">
+            <h2>Aetheric Glimpses</h2>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
+                <div style="height:150px; background: rgba(255,255,255,0.1); border-radius:12px; border:1px solid rgba(255,255,255,0.2);"></div>
+                <div style="height:150px; background: rgba(255,255,255,0.1); border-radius:12px; border:1px solid rgba(255,255,255,0.2);"></div>
+            </div>
+        </div>
+
+        <!-- Communion -->
+        <div id="communion" class="tab-content">
+            <div class="guide-box">
+                <strong>The Traveler's Guide:</strong> You are within the Communion Hall. Thoughts manifest here. Use the board to share your loomed wonders.
+            </div>
+            <div id="cusdis_thread"
+              data-host="https://cusdis.com"
+              data-app-id="9735edc6-43eb-4977-8d2e-c6b157b25b10"
+              data-page-id="valx_empyrean_rolo"
+              data-page-url="https://valxentine.art"
+              data-page-title="Empyrean Communion"
+            ></div>
+            <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ---------------------- LOGIN GRID / WORD SEARCH ---------------------- */
+const words = ["YESHUA","TRUTH","LIGHT"];
+let found = [];
+
+function startWord(){
+    const login = document.getElementById("login-screen");
+    const gridEl = document.getElementById("grid");
+    gridEl.innerHTML = "";
+
+    const size = 10;
+    let grid = Array(size*size).fill("");
+
+    // place words horizontally
+    words.forEach(word=>{
+        let placed=false;
+        while(!placed){
+            let row=Math.floor(Math.random()*size);
+            let col=Math.floor(Math.random()*(size-word.length));
+            let fits=true;
+            for(let i=0;i<word.length;i++){
+                if(grid[row*size+col+i]!=""){fits=false; break;}
+            }
+            if(fits){
+                for(let i=0;i<word.length;i++){grid[row*size+col+i]=word[i];}
+                placed=true;
+            }
+        }
+    });
+
+    // fill rest
+    const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    grid=grid.map(l=>l||letters[Math.floor(Math.random()*26)]);
+
+    // render
+    let selected=[];
+    grid.forEach((letter,index)=>{
+        let div=document.createElement("div");
+        div.className="cell"; div.innerText=letter;
+        div.onclick=()=>{
+            div.classList.toggle("selected");
+            if(div.classList.contains("selected")){
+                selected.push({letter,index,el:div});
+            } else {
+                selected = selected.filter(s=>s.index!==index);
+            }
+            checkSelection(selected);
+        };
+        gridEl.appendChild(div);
+    });
+}
+
+function checkSelection(selected){
+    let sorted=[...selected].sort((a,b)=>a.index-b.index);
+    let word=sorted.map(s=>s.letter).join("");
+    if(words.includes(word) && !found.includes(word)){
+        sorted.forEach(s=>{
+            s.el.classList.remove("selected");
+            s.el.classList.add("found");
+        });
+        found.push(word);
+        if(found.length===words.length){ startMemory(); }
+    }
+}
+
+/* ---------------------- MEMORY / ECHOES GAME ---------------------- */
+const sequence=["R","O","S","E"];
+let userSeq=[];
+function startMemory(){
+    document.getElementById("grid").parentElement.style.display="none";
+    // for simplicity, auto-unlock
+    startDiscernment();
+}
+
+/* ---------------------- DISCERNMENT TRIAL ---------------------- */
+function startDiscernment(){
+    const div=document.createElement("div");
+    div.id="discernment-game"; div.style="max-width:400px;margin:30px auto;text-align:center;";
+    div.innerHTML=`
+        <p style="margin-bottom:20px;">A stranger speaks harshly toward you without cause.</p>
+        <div class="choice" onclick="chooseAnswer(0)">Respond with equal harshness</div>
+        <div class="choice" onclick="chooseAnswer(1)">Remain silent in resentment</div>
+        <div class="choice" onclick="chooseAnswer(2)">Answer with gentleness and restraint</div>
+    `;
+    document.body.appendChild(div);
+}
+
+function chooseAnswer(i){
+    if(i===2){
+        unlock();
+    } else {
+        alert("That path leads away from truth."); location.reload();
+    }
+}
+
+/* ---------------------- UNLOCK DESKTOP ---------------------- */
+function unlock(){
+    document.getElementById("login-screen").style.transform="translateY(-100%)";
+    document.getElementById("desktop").style.display="block";
+}
+
+/* ---------------------- ROLODEX ---------------------- */
+function openRolo(id){
+    let contents=document.getElementsByClassName("tab-content");
+    for(let i=0;i<contents.length;i++){contents[i].classList.remove("active");}
+    document.getElementById(id).classList.add("active");
+    if(id==='communion' && window.CUSDIS){window.CUSDIS.render();}
+}
+
+/* ---------------------- START ---------------------- */
+startWord();
+</script>
+</body>
+</html>
